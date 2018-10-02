@@ -1,0 +1,168 @@
+VGMPlayGUI - Technical Changelog:
+
+v2.2:
+    
+    +       Added a keyboard control:
+        Alt+P sends a BN_CLICKED command to the 'Play' button (IDC_BTN_PLAY).
+        
+v2.3:
+    
+    +       Added a function that sets default config values (SetDefConfig).
+    +       Added a function that manages statusbar messages (SetSbrText).
+    +       Added a function to create tooltips (CreateToolTip).
+    +       SettingsProc now sets the default keyboard focus.
+    
+v2.3.1:
+    
+    +       Added titlebar text for the Open Common Dialog used to browse for
+        VGMPlay (ofn.lpstrTitle = @VGMPlayBrowse).
+    +       Filled the ".lpstrDefExt" field of the VGMPlay browsing dialog
+        (ofn.lpstrDefExt = @VGMPDefFileExt).
+    +       Added many new documentation files.
+    
+v2.3.2:
+    
+    *       Split some functions off into another module.
+    
+v2.3.2.3:
+    
+    *       Adjusted default window size, as the previous default size was
+        too small.
+    
+v2.3.3:
+    
+    +       Added a button to go up one directory (IDC_BTN_BACK).
+    +       Added 'Go to Drive Root' menu option under IDM_FILE (IDM_ROOT).
+    
+v2.3.4:
+    
+    +       Added a button to reset the settings to their default values
+        in IDD_SETTINGS.
+    
+v2.4:
+    
+    *       Changed IDD_SETTINGS into a property sheet.
+    +       Added 'Open VGM File' option to menu (IDM_OPEN).
+    *       Changed the method by which the text for the titlebar for the
+        'Open' Common Dialog used to browse for VGMPlay is loaded. It now
+        loads the string from the program's resources.
+    -       Removed the 'OK' and 'Cancel' buttons from the paths property
+        sheet page.
+    
+v2.5:
+    *       Changed IDC_STC_PATH into an edit control (IDC_EDT_PATH).
+    +       Added a button to change to the path entered in IDC_EDT_PATH.
+    *       Fixed tabstop.
+    *       Cleaned up and commented code.
+    *       Changed 'szBuff' in 'Open VGM File' to static storage.
+    *       Fixed typos and missing information in version info
+        (IDR_VERSIONINFO).
+    +       Added error checking for the ChDir statement in the PopulateLists
+        function.
+    
+v2.5.0.29:
+    
+    +       Added a tooltip for the 'Go' button (IDC_BTN_GO).
+    -       Removed keyboard controls in favor of menu access-keys.
+    
+v2.6:
+    
+    +       The main dialog can no longer be resized to be too small. The
+        default size on startup is the minimum (503x443).
+    
+v2.6.3.5:
+    
+    +       Added an icon (IDI_PLAY) to IDC_BTN_PLAY.
+    *       Resized IDC_BTN_PLAY to fit the new icon.
+    
+v2.6.3.6:
+    
+    +       Added a tooltip to IDC_BTN_PLAY.
+    
+v2.7.0.1:
+    
+    +       Added an exit button (IDM_EXIT) to IDM_FILE, which sends a
+        WM_CLOSE message to IDD_MAIN.
+    *       Split the menu resources off into their own file (Res\menus.rc).
+    +       Added a context menu (IDR_MENUCONTEXT), but it has no
+        functionality as of now.
+    +       Made some preparations for implementing a file history system.
+    
+v2.7.0.7:
+    
+    +       Added additional preprocessor commands.
+
+v2.7.0.8:
+    
+    *       Optimization fixes.
+    
+v2.8.0.0:
+    
+    +       Added a button that refreshes the directory listing
+        (IDC_BTN_REFRESH). This is done by passing the path: "." to
+        PopulateLists.
+    
+v2.8.0.1:
+    
+    +       Corrected the drawing procedure for IDC_BTN_REFRESH.
+    
+v2.8.2.3:
+    
+    +       Added a confirm prompt for the cancel button in the options
+        property sheet.
+    
+v2.8.2.4:
+    
+    *       Cleaned up and commented code.
+    
+v2.9:
+    
+    +       Fixed a bug with the SysErrMsgBox function in the ErrMsgBox
+        module that was causing the message boxes to not be displayed.
+    +       Changed the property sheet size to 212x188 dialog units.
+    +       Added a property sheet page allowing for the user to change the
+        file filter used by PopulateLists.
+    +   Added help to the File Filter property sheet page.
+    
+v2.9.1:
+    
+    +       Fixed a bug.
+    
+v2.9.2:
+    
+    *       Cleaned up code.
+    
+v2.9.3:
+    
+    *       Cleaned up code.
+    +       Added a StartVGMPlay function.
+    *       Revised IDD_FILEFILT.
+    *       Replaced a few functions with ones from the Windows Shell API.
+    
+v2.9.4:
+    
+    *       Cleaned up code.
+    -       Removed SettingsProc and IDD_SETTINGS as they were unused.
+    *       Changed the functionality of the OpenVGMFile function. It now
+        immediately calls StartVGMPlay.
+    
+v2.10:
+    
+    *       Revised the DisplayContextMenu function.
+    *       Split the context menu resources into IDR_MENUCONTEXT.
+    *       Fixed the minimum window size being smaller than the initial size.
+    -       Removed the edit menu.
+    
+v2.10.1:
+    
+    *       Major revisions to documentation file formatting.
+    *       Greatly cleaned up code.
+    +/*     Added and improved all comments.
+    -       Removed the HEAP_LOCK, HEAP_UNLOCK, HEAP_LOCK_FUNCTION, and
+        HEAP_UNLOCK_FUNCTION macros.
+    *       Greatly improved optimization.
+    *       Fixed some error-checking.
+    *       Improved the options property sheet's cancel prompt's method of
+        saving data.
+    
+EOF

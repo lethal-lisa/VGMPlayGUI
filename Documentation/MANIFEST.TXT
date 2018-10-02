@@ -1,0 +1,22 @@
+VGMPlayGUI - File List:
+    
+    \
+        default-settings.reg    -   Default registry settings.
+        FILE_ID.DIZ             -   Zip file desctiption.
+        test.vgm                -   Test VGM file.
+        VGMPlayGUI.exe          -   Main executable.
+    
+    \Doc\
+        AUTHORS.TXT             -   Credits.
+        BUGS.TXT                -   Bug tracker.
+        CHANGES.TXT             -   Detailed, technical changelog intended
+                                    for developers.
+        DEVNOTES.TXT            -   Developer notes.
+        INSTALL.TXT             -   Installation instructions.
+        MANIFEST.TXT            -   List of included files.
+        NEWS.TXT                -   Simple changelog indend for users.
+        README.TXT              -   General documentation
+        THANKS.TXT              -   Special thanks.
+        TODO.TXT                -   List of planned features.
+    
+EOF

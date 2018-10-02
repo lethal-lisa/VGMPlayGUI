@@ -1,0 +1,42 @@
+VGMPlayGUI - Developer Notes:
+
+Registry Structure:
+
+    HKEY_CURRENT_USER\Software\VGMPlayGUI\
+        
+        KEY:            TYPE:       DEFAULT VALUE:
+        
+        (Default)       REG_SZ      (value not set)
+        VGMPlay Path    REG_SZ      ""
+        Default Path    REG_SZ      ""
+        Recent Files    REG_SZ      ""
+    
+Keyboard controls used by VGMPlay:
+    
+    KEY:            FUNCTION:
+    Space           Pause
+    Left            Seek backwards five seconds.
+    Right           Seek forwards five seconds.
+    Ctrl+Left       Seek one minute backwards.
+    Ctrl+Right      Seek one minute forwards.
+    Escape          Quit
+    Q               Quit
+    F               Fade out.
+    R               Restart current track.
+    PageUp          Previous track.
+    B               Previous track.
+    PageDown        Next track.
+    N               Next track.
+    
+File types supported by VGMPlay:
+    
+    Video Game Music Files (*.vgm, *.vgz)
+    Creative Music Files (*.cmf)
+    DOSBox RAW OPL Logs (*.dro)
+    M3U Playlist Files (*.m3u)
+    
+Default Window Size in Pixels is (503, 443).
+
+Release build currently requires 1,040KB free to run (v2.8).
+
+EOF
