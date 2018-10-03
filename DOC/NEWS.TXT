@@ -95,4 +95,8 @@ v2.10:
     -       Removed some bugs.
     *       Optimization fixes.
     
+v2.10.1:
+    
+    *       Optimization fixes.
+    
 EOF
