@@ -1,0 +1,62 @@
+//strings.rc
+
+#define IDS_APPNAME             0x0001
+
+#define IDS_MSGTXT_ABOUT        0x0011
+#define IDS_MSGCAP_ABOUT        0x0012
+#define IDS_MSGTXT_NYI          0x0013
+#define IDS_MSGCAP_NYI          0x0014
+#define IDS_MSGTXT_VGMPMISS     0x0015
+#define IDS_MSGCAP_VGMPMISS     0x0016
+#define IDS_MSGTXT_CHANGES      0x0017
+#define IDS_MSGCAP_CHANGES      0x0018
+#define IDS_MSGTXT_FILTHELP     0x0019
+#define IDS_MSGCAP_FILTHELP     0x001A
+#define IDS_MSGTXT_DELFILE      0x001B
+#define IDS_MSGCAP_DELFILE      0x001C
+
+#define IDS_REG_VGMPLAYPATH     0x0021
+#define IDS_REG_DEFAULTPATH     0x0022
+#define IDS_REG_FILEFILTER      0x0023
+
+#define IDS_FILT_VGMPLAY        0x0031
+#define IDS_FILT_VGMFILE        0x0032
+
+#define IDS_TIP_DRIVELIST       0x0041
+#define IDS_TIP_BACKBTN         0x0042
+#define IDS_TIP_GOBTN           0x0043
+#define IDS_TIP_REFRESHBTN      0x0044
+#define IDS_TIP_PLAYBTN         0x0045
+
+#define IDS_OPTIONS             0x0051
+
+STRINGTABLE
+LANGUAGE 9, 1
+BEGIN
+    IDS_APPNAME "VGMPlayGUI"
+    IDS_MSGTXT_ABOUT "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nCopyright (c) 2018 Kazusoft Co."
+    IDS_MSGCAP_ABOUT "About VGMPlayGUI"
+    IDS_MSGTXT_NYI "This feature is not implemented yet.\nSorry."
+    IDS_MSGCAP_NYI "NYI"
+    IDS_MSGTXT_VGMPMISS "Could not find ""VGMPlay.exe"".\nPlease specify its location."
+    IDS_MSGCAP_VGMPMISS "VGMPlay Not Found"
+    IDS_MSGTXT_CHANGES "If you cancel now, you will lose an unsaved changes.\nWould you like to save them now?"
+    IDS_MSGCAP_CHANGES "Cancel?"
+    IDS_MSGTXT_FILTHELP "You can change the filter used by the file browser by selecting different options from here."
+    IDS_MSGCAP_FILTHELP "File Filter Help"
+    IDS_MSGTXT_DELFILE "Are you sure you want to delete %1?\nThis action cannot be undone."
+    IDS_MSGCAP_DELFILE "Delete File?"
+    IDS_REG_VGMPLAYPATH "VGMPlay Path"
+    IDS_REG_DEFAULTPATH "Default Path"
+    IDS_REG_FILEFILTER "File Filter"
+    IDS_FILT_VGMPLAY "VGMPlay (VGMPlay.exe)\0VGMPLAY.EXE\0All Files (*.*)\0*.*\0"
+    IDS_FILT_VGMFILE "Accepted File Types\0*.VGM;*.VGZ;*.CMF;*.DRO;*.M3U\0VGM Files (*.vgm, *.vgz)\0*.VGM;*.VGZ\0Creative Music Files (*.cmf)\0*.CMF\0DOSBox OPL Logs (*.dro)\0*.DRO\0Playlist Files (*.m3u)\0*.M3U\0All Files (*.*)\0*.*\0"
+    IDS_TIP_DRIVELIST "Available Drives"
+    IDS_TIP_BACKBTN "Go up one directory"
+    IDS_TIP_GOBTN "Go to entered directory"
+    IDS_TIP_REFRESHBTN "Refresh directory listing"
+    IDS_TIP_PLAYBTN "Play"
+    IDS_OPTIONS "Options"
+END
+
+//EOF

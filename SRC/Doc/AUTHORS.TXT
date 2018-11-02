@@ -1,0 +1,5 @@
+VGMPlayGUI - Authors:
+
+Lisa Murray - Programmer and Developer.
+
+EOF

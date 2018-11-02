@@ -1,0 +1,106 @@
+VGMPlayGUI - What's New? (User Changelog):
+
+v2.2:
+    
+    +       Added a keyboard control: 
+        Pressing "Alt+P" will now act as pushing the 'Play' button.
+    
+v2.3:
+    
+    +       Will now set the default configuration upon first startup.
+    +       Added status messages on the statusbar.
+    +       Added a tooltip for the drive selection pane.
+    *       Fixes to the options menu.
+    
+v2.3.1:
+    
+    *       Fixed some things relating to the browse function (but it still
+        isn't working).
+    +       Added more documentation files.
+    
+v2.3.2:
+    
+    *       Optimization fixes.
+    
+v2.3.3:
+    
+    +       Added a button that moves the directory up one.
+    +       Added a 'Go to Drive Root' menu option in the 'File' menu.
+    
+v2.4:
+    
+    *       Changed the options dialog's appearance.
+    +       Added an 'Open VGM File' option in the 'File' menu.
+    
+v2.5:
+    
+    +       Added a 'Go' button. This allows you to type in a path and change
+        to it.
+    *       Fixed the order in which things are changed to by pressing 'Tab'.
+    +       'Open VGM File' now remembers the last item chosen.
+    +       Added additional error checking.
+    -       Removed keyboard the Alt+P keyboard combo in favor of keyboard
+        based menu control (access keys).
+    
+v2.6:
+    
+    +       The window can no longer be sized down to an absurdly small size.
+    -       Removed most status bar functionality for development.
+
+v2.7:
+    
+    *       Changed the play button to an icon, made it a different size,
+        and added a tool tip to it.
+    +       Added a right-click menu, but it has no functionality as of now
+    +       Added an 'Exit' option in the 'File' menu.
+    
+v2.8:
+    
+    +       Added a button that refreshes the current directory listing.
+    
+v2.8.2:
+    
+    +       Added a confirm prompt to the cancel button in the options
+        dialog.
+    
+v2.9:
+    
+    *       Fixed some bugs.
+    *       Made the options menu larger.
+    +       Added an options menu page allowing the user to change file
+        filtering settings.
+    
+v2.9.1:
+    
+    +       Fixed a bug.
+    
+v2.9.2:
+    
+    +       Optimization fixes.
+    
+v2.9.3:
+    
+    *       Optimization fixes.
+    *       Revised the File Filter menu.
+    
+v2.9.4:
+    
+    *       The 'Open File' option, now immediately plays the selected file.
+    -       Removed the empty 'Settings' page from the options menu.
+    *       Optimization fixes.
+    
+v2.10:
+    
+    +       Improvements to the context menus.
+    -       Removed some bugs.
+    *       Optimization fixes.
+    
+v2.10.1:
+    
+    *       Optimization fixes.
+    
+v2.10.2:
+    
+    -       Removed the 'Open File' option, as it wasn't frequently used.
+    
+EOF

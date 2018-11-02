@@ -1,0 +1,6 @@
+VGMPlayGUI - Bug Tracker:
+    
+    -       The 'Browse' feature in the options menu does not work
+        correctly. (Fixed).
+    
+EOF

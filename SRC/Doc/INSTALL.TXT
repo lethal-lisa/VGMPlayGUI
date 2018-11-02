@@ -1,0 +1,14 @@
+VGMPlayGUI - Installation Instructions:
+    
+    1.      Install Valley Bell's VGMPlay for Windows. This is
+        available at: (http://www.smspower.org/Music/InVgm).
+        
+    2.      Launch VGMPlayGUI, and head to the 'Options' menu.
+    
+    3.      Input or browse for your VGMPlay.exe file's path.
+    
+    4.      Click 'OK'.
+    
+    5.      Enjoy the magic of VGM.
+    
+EOF
