@@ -1,8 +1,0 @@
-VGMPlayGUI - Special Thanks:
-    
-    Valley Bell         - for creating VGMPlay.
-    Persephone Vine     - for beta-testing and morale support.
-    Kiernan             - for morale support.
-    Daniel              - for morale support.
-    
-EOF
