@@ -802,7 +802,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                     
                     ''get page handle
                     hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (CheckHandle(Cast(HANDLE, hwndPrsht)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                 Case PSN_KILLACTIVE                     ''page becoming inactive
                     
@@ -858,7 +858,7 @@ Function CoreSelectProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam 
                     
                     ''get page handle
                     hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (CheckHandle(Cast(HANDLE, hwndPrsht)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                 Case PSN_KILLACTIVE                     ''page becoming inactive
                     
@@ -923,7 +923,7 @@ Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     Dim hPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
     
     ''stop VGMPlay if it's already running
-    If (CheckHandle(ppiProcInfo->hProcess) = TRUE) Then
+    If (ppiProcInfo->hProcess <> INVALID_HANDLE_VALUE) Then
         TerminateProcess(ppiProcInfo->hProcess, ERROR_SINGLE_INSTANCE_APP)
     End If
     
@@ -1038,7 +1038,7 @@ End Function
 ''loads the needed string resources
 Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     
-    If (CheckHandle(Cast(HANDLE, hInst)) = FALSE) Then Return(FALSE)
+    If (hInst = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     

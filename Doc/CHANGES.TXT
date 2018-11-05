@@ -179,4 +179,8 @@ v2.10.2:
     *       Changed this file's version counting to file version instead of
         product version.
     
+1.13.13.9:
+    
+    *       Optimized the WinAPICheck module.
+    
 EOF

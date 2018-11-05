@@ -37,24 +37,4 @@ Public Function CheckLongErrCode (ByVal lCode As LONG32) As BOOL
     End If
 End Function
 
-Public Function CheckHandle (ByVal hRef As HANDLE) As BOOL
-    If (hRef = INVALID_HANDLE_VALUE) Then
-        SetLastError(ERROR_INVALID_HANDLE)
-        Return(FALSE)
-    Else
-        SetLastError(ERROR_SUCCESS)
-        Return(TRUE)
-    End If
-End Function
-
-Public Function CheckAlloc (ByVal lpItem As LPCVOID) As BOOL
-    If (lpItem = NULL) Then
-        SetLastError(ERROR_OUTOFMEMORY)
-        Return(FALSE)
-    Else
-        SetLastError(ERROR_SUCCESS)
-        Return(TRUE)
-    End If
-End Function
-
 ''EOF
