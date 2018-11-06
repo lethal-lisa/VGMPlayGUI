@@ -12,9 +12,9 @@
 #Define IDC_STC_DEFAULTPATH     &h0450 /'1104'/
 #Define IDC_EDT_DEFAULTPATH     &h0451 /'1105'/
 #Define IDC_BTN_DEFAULTPATH     &h0452 /'1106'/
-#Define IDC_STC_WAVOUTPATH      &h0423 /'1107'/
-#Define IDC_EDT_WAVOUTPATH      &h0424 /'1108'/
-#Define IDC_BTN_WAVOUTPATH      &h0425 /'1109'/
+#Define IDC_STC_WAVOUTPATH      &h0453 /'1107'/
+#Define IDC_EDT_WAVOUTPATH      &h0454 /'1108'/
+#Define IDC_BTN_WAVOUTPATH      &h0455 /'1109'/
 
 ''file filter property sheet:
 #Define IDD_FILEFILT            &h04B0 /'1200'/
