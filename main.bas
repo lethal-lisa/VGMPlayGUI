@@ -1027,7 +1027,7 @@ Function InitMem () As BOOL
     
     ''check allocation
     If ((plpszPath = NULL) Or (plpszKeyName = NULL) Or (plpszStrRes = NULL) Or (phkProgKey = NULL) Or (ppiProcInfo = FALSE) Or (psiStartInfo = FALSE)) Then
-        If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+        HeapUnlock(hHeap)
         Return(FALSE)
     End If
     
@@ -1035,7 +1035,7 @@ Function InitMem () As BOOL
     For iPath As UINT32 = 0 To (NUM_PATH - 1)
         plpszPath[iPath] = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, CB_PATH)))
         If (plpszPath[iPath] = NULL) Then
-            If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+            HeapUnlock(hHeap)
             Return(FALSE)
         End If
     Next iPath
@@ -1044,7 +1044,7 @@ Function InitMem () As BOOL
     For iKey As UINT32 = 0 To (NUM_KEY - 1)
         plpszKeyName[iKey] = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, CB_KEY)))
         If (plpszKeyName[iKey] = NULL) Then
-            If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+            HeapUnlock(hHeap)
             Return(FALSE)
         End If
     Next iKey
@@ -1053,7 +1053,7 @@ Function InitMem () As BOOL
     For iRes As UINT32 = 0 To (NUM_STRRES - 1)
         plpszStrRes[iRes] = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, CB_STRRES)))
         If (plpszStrRes[iRes] = NULL) Then
-            If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+            HeapUnlock(hHeap)
             Return(FALSE)
         End If
     Next iRes
