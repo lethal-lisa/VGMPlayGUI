@@ -49,6 +49,7 @@ LANGUAGE 9, 1
 BEGIN
     IDS_APPNAME "VGMPlayGUI"
     IDS_OPTIONS "Options"
+    //message text and captions
     IDS_MSGTXT_ABOUT "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nCopyright (c) 2018 Kazusoft Co."
     IDS_MSGCAP_ABOUT "About VGMPlayGUI"
     IDS_MSGTXT_NYI "This feature is not implemented yet.\nSorry."
@@ -61,25 +62,28 @@ BEGIN
     IDS_MSGCAP_FILTHELP "File Filter Help"
     IDS_MSGTXT_DELFILE "Are you sure you want to delete %1?\nThis action cannot be undone."
     IDS_MSGCAP_DELFILE "Delete File?"
+    //registry keys
     IDS_REG_VGMPLAYPATH "VGMPlay Path"
     IDS_REG_DEFAULTPATH "Default Path"
-    IDS_REG_WAVOUTPATH "Wav Output Path"
+    IDS_REG_WAVOUTPATH "Wave File Output Path"
     IDS_REG_FILEFILTER "File Filter"
+    //filters
     IDS_FILT_VGMPLAY "VGMPlay (VGMPlay.exe)\0VGMPLAY.EXE\0All Files (*.*)\0*.*\0"
     IDS_FILT_VGMFILE "Accepted File Types\0*.VGM;*.VGZ;*.CMF;*.DRO;*.M3U\0VGM Files (*.vgm, *.vgz)\0*.VGM;*.VGZ\0Creative Music Files (*.cmf)\0*.CMF\0DOSBox OPL Logs (*.dro)\0*.DRO\0Playlist Files (*.m3u)\0*.M3U\0All Files (*.*)\0*.*\0"
-    IDS_TIP_DRIVELIST "Available Drives"
+    //tooltips
+    IDS_TIP_DRIVELIST "List of available drives"
     IDS_TIP_BACKBTN "Go up one directory"
     IDS_TIP_GOBTN "Go to entered directory"
     IDS_TIP_REFRESHBTN "Refresh directory listing"
     IDS_TIP_PLAYBTN "Play"
     IDS_TIP_VGMPLAYPATH "Path to VGMPlay's executable"
     IDS_TIP_DEFAULTPATH "Initial path"
-    IDS_TIP_WAVOUTPATH "Path for rendered WAV files"
+    IDS_TIP_WAVOUTPATH "Path for rendered wave files"
     IDS_TIP_ARCHIVE "Include files with the archive attribute set"
     IDS_TIP_HIDDEN "Include hidden files"
     IDS_TIP_SYSTEM "Include files with the system attribute set"
     IDS_TIP_READONLY "Include read-only files"
-    IDS_TIP_EXCLUSIVE "Show only the files selected above"
+    IDS_TIP_EXCLUSIVE "Show only files with the attributes selected above"
     IDS_TIP_CHIP "Chip"
     IDS_TIP_CORE "Emulator core to use"
 END
