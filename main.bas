@@ -919,6 +919,16 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                 End If
             Next i
             
+            ''load settings from VGMPlay.ini
+            Select Case GetPrivateProfileInt("General", "LogSound", 0, "VGMPlay.ini")
+                Case 0
+                    CheckDlgButton(hWnd, IDC_CHK_WAVOUT, BST_UNCHECKED)
+                Case 1
+                    CheckDlgButton(hWnd, IDC_CHK_WAVOUT, BST_CHECKED)
+                Case 2
+                    CheckDlgButton(hWnd, IDC_CHK_WAVOUT, BST_INDETERMINATE)
+            End Select
+            
         Case WM_NOTIFY      ''notifications
             
             Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
@@ -934,6 +944,24 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     Return(FALSE)
                     
                 Case PSN_APPLY                          ''user has pressed the apply button
+                    
+                    'Dim lpszVGMPlayIni As LPTSTR
+                    
+                    Select Case IsDlgButtonChecked(hWnd, IDC_CHK_WAVOUT)
+                        Case BST_CHECKED
+                            WritePrivateProfileString("General", "LogSound", "1", "VGMPlay.ini")
+                        Case BST_UNCHECKED
+                            WritePrivateProfileString("General", "LogSound", "0", "VGMPlay.ini")
+                        Case BST_INDETERMINATE
+                            WritePrivateProfileString("General", "LogSound", "2", "VGMPlay.ini")
+                    End Select
+                    
+                    Select Case IsDlgButtonChecked(hWnd, IDC_CHK_PREFJAPTAGS)
+                        Case BST_CHECKED
+                            WritePrivateProfileString("General", "PreferJapTag", "True", "VGMPlay.ini")
+                        Case BST_UNCHECKED
+                            WritePrivateProfileString("General", "PreferJapTag", "False", "VGMPlay.ini")
+                    End Select
                     
                 Case PSN_HELP                           ''user has pressed the help button
                     

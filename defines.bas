@@ -30,9 +30,8 @@
 #Define IDC_GRP_CORESEL         &h0515 /'1301'/
 #Define IDC_CBX_CHIP            &h0516 /'1302'/
 #Define IDC_CBX_CORE            &h0517 /'1303'/
-#Define IDC_GRP_WAVOUTPUT       &h0518 /'1304'/
-#Define IDC_CHK_SPEAKERS        &h0519 /'1305'/
-#Define IDC_CHK_WAVFILE         &h051A /'1306'/
+#Define IDC_CHK_WAVOUT          &h0518 /'1304'/
+#Define IDC_CHK_PREFJAPTAGS     &h0519 /'1305'/
 
 
 ''defines from icons.rc:

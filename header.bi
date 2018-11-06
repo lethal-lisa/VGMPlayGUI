@@ -37,7 +37,6 @@
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
 #Include Once "win/prsht.bi"
-#Include Once "inc/inifile.bi"
 #Include "inc/errmsgbox.bi"
 #Include "inc/regint.bi"
 #Include "inc/winapicheck.bi"
