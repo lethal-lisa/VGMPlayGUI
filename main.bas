@@ -143,13 +143,18 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
-            
             ''set the default keyboard focus to IDC_LST_MAIN
             If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
-            
             ''set the arrow cursor
             SetCursor(LoadCursor(NULL, IDC_ARROW))
+            
+            ''make sure VGMPlay's path is valid
+            If (PathFileExists(plpszPath[PATH_VGMPLAY]) = FALSE) Then
+                If (ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_VGMPMISS, IDS_MSGCAP_VGMPMISS, MB_YESNO Or MB_ICONWARNING) = IDYES) Then
+                    If (DoOptionsPropSheet(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                End If
+            End If
             
         Case WM_CLOSE               ''window is being closed
             
@@ -547,7 +552,7 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPTSTR) As BOOL
     
     
     ''refresh directory listings
-    If ((DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, puOption[OPT_FILEFILT]) = 0) Or (DlgDirList(hDlg, NULL, IDC_LST_DRIVES, NULL, (DDL_DRIVES Or DDL_EXCLUSIVE)) = 0)) Then
+    If ((DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, dwFileFilt) = 0) Or (DlgDirList(hDlg, NULL, IDC_LST_DRIVES, NULL, (DDL_DRIVES Or DDL_EXCLUSIVE)) = 0)) Then
         HeapUnlock(hHeap)
         Return(FALSE)
     End If
@@ -608,10 +613,10 @@ Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .dwSize         = SizeOf(PROPSHEETPAGE)
         .dwFlags        = (PSP_USEICONID Or PSP_HASHELP)
         .hInstance      = hInstance
-        .pszTemplate    = MAKEINTRESOURCE(IDD_CORESELECT)
+        .pszTemplate    = MAKEINTRESOURCE(IDD_VGMPLAYSETTINGS)
         .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
         .pszTitle       = NULL
-        .pfnDlgProc     = @CoreSelectProc
+        .pfnDlgProc     = @VGMPlaySettingsProc
         .lParam         = NULL
         .pfnCallback    = NULL
     End With
@@ -655,11 +660,13 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
     Select Case uMsg        ''messages
         Case WM_INITDIALOG  ''dialog init
             
+            ''create tooltips
+            CreateToolTip(hWnd, IDC_EDT_VGMPLAYPATH, IDS_TIP_VGMPLAYPATH, TTS_ALWAYSTIP, NULL)
+            CreateToolTip(hWnd, IDC_EDT_DEFAULTPATH, IDS_TIP_DEFAULTPATH, TTS_ALWAYSTIP, NULL)
+            CreateToolTip(hWnd, IDC_EDT_WAVOUTPATH, IDS_TIP_WAVOUTPATH, TTS_ALWAYSTIP, NULL)
+            
             ''set text in path options
-            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-            SetDlgItemText(hWnd, IDC_EDT_VGMPLAYPATH, plpszPath[PATH_VGMPLAY])
-            SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, plpszPath[PATH_DEFAULT])
-            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (SetPathsProc(hWnd, plpszPath) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case WM_COMMAND     ''commands
             
@@ -713,6 +720,10 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                             
                             If (SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, CurDir()) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             
+                        Case IDC_BTN_WAVOUTPATH         ''browse for a wav output path
+                            
+                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_OK Or MB_ICONWARNING)
+                            
                     End Select
                     
                 Case EN_CHANGE          ''edit control changing
@@ -733,7 +744,6 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                     ''get page handle
                     hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
                     If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                    'If (CheckHandle(Cast(HANDLE, hwndPrsht)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                 Case PSN_KILLACTIVE                     ''page becoming inactive
                     
@@ -744,10 +754,7 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
                     ''get settings from dialog
-                    If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                    GetDlgItemText(hWnd, IDC_EDT_VGMPLAYPATH, plpszPath[PATH_VGMPLAY], MAX_PATH)
-                    GetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, plpszPath[PATH_DEFAULT], MAX_PATH)
-                    If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (GetPathsProc(hWnd, plpszPath) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                     ''save settings to the registry
                     If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
@@ -768,6 +775,36 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
     
 End Function
 
+Function SetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
+    
+    ''set values
+    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    SetDlgItemText(hWnd, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY])
+    SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT])
+    SetDlgItemText(hWnd, IDC_EDT_WAVOUTPATH, plpszValue[PATH_WAVOUT])
+    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    
+    ''return
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Function GetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
+    
+    ''get values
+    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    GetDlgItemText(hWnd, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY], MAX_PATH)
+    GetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT], MAX_PATH)
+    GetDlgItemText(hWnd, IDC_EDT_WAVOUTPATH, plpszValue[PATH_WAVOUT], MAX_PATH)
+    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    
+    ''return
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
 Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
     ''declare local variables
@@ -777,14 +814,17 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
     Select Case uMsg        ''messages
         Case WM_INITDIALOG  ''dialog init
             
+            ''create tooltips
+            For i As UINT32 = 0 To 4
+                If (CreateToolTip(hWnd, (IDC_CHK_ARCHIVE + i), (IDS_TIP_ARCHIVE + i), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
+                    SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    Exit For
+                End If
+            Next i
+            
             ''display current
-            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-            If (puOption[OPT_FILEFILT] And DDL_ARCHIVE) Then CheckDlgButton(hWnd, IDC_CHK_ARCHIVE, BST_CHECKED)
-            If (puOption[OPT_FILEFILT] And DDL_HIDDEN) Then CheckDlgButton(hWnd, IDC_CHK_HIDDEN, BST_CHECKED)
-            If (puOption[OPT_FILEFILT] And DDL_SYSTEM) Then CheckDlgButton(hWnd, IDC_CHK_SYSTEM, BST_CHECKED)
-            If (puOption[OPT_FILEFILT] And DDL_READONLY) Then CheckDlgButton(hWnd, IDC_CHK_READONLY, BST_CHECKED)
-            If (puOption[OPT_FILEFILT] And DDL_EXCLUSIVE) Then CheckDlgButton(hWnd, IDC_CHK_EXCLUSIVE, BST_CHECKED)
-            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            SetFileFiltProc(hWnd, dwFileFilt)
+            
             
         Case WM_COMMAND     ''commands
             
@@ -812,14 +852,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
                     ''get values from sheet
-                    If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                    puOption[OPT_FILEFILT] = DDL_DIRECTORY
-                    If (IsDlgButtonChecked(hWnd, IDC_CHK_ARCHIVE) = BST_CHECKED) Then puOption[OPT_FILEFILT] = (puOption[OPT_FILEFILT] Or DDL_ARCHIVE)
-                    If (IsDlgButtonChecked(hWnd, IDC_CHK_HIDDEN) = BST_CHECKED) Then puOption[OPT_FILEFILT] = (puOption[OPT_FILEFILT] Or DDL_HIDDEN)
-                    If (IsDlgButtonChecked(hWnd, IDC_CHK_SYSTEM) = BST_CHECKED) Then puOption[OPT_FILEFILT] = (puOption[OPT_FILEFILT] Or DDL_SYSTEM)
-                    If (IsDlgButtonChecked(hWnd, IDC_CHK_READONLY) = BST_CHECKED) Then puOption[OPT_FILEFILT] = (puOption[OPT_FILEFILT] Or DDL_READONLY)
-                    If (IsDlgButtonChecked(hWnd, IDC_CHK_EXCLUSIVE) = BST_CHECKED) Then puOption[OPT_FILEFILT] = (puOption[OPT_FILEFILT] Or DDL_EXCLUSIVE)
-                    If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    dwFileFilt = GetFileFiltProc(hWnd)
                     
                     ''save to registry
                     If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
@@ -830,7 +863,8 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                     
                 Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
                     
-                    PrpshCancelPrompt(hWnd)
+                    Dim dwCurrent As DWORD32 = GetFileFiltProc(hWnd)
+                    If (dwCurrent <> dwFileFilt) Then PrpshCancelPrompt(hWnd)
                     
             End Select
             
@@ -844,13 +878,47 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
     
 End Function
 
-Function CoreSelectProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+Sub SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32)
+    
+    If (dwValue And DDL_ARCHIVE) Then CheckDlgButton(hWnd, IDC_CHK_ARCHIVE, BST_CHECKED)
+    If (dwValue And DDL_HIDDEN) Then CheckDlgButton(hWnd, IDC_CHK_HIDDEN, BST_CHECKED)
+    If (dwValue And DDL_SYSTEM) Then CheckDlgButton(hWnd, IDC_CHK_SYSTEM, BST_CHECKED)
+    If (dwValue And DDL_READONLY) Then CheckDlgButton(hWnd, IDC_CHK_READONLY, BST_CHECKED)
+    If (dwValue And DDL_EXCLUSIVE) Then CheckDlgButton(hWnd, IDC_CHK_EXCLUSIVE, BST_CHECKED)
+    
+End Sub
+
+Function GetFileFiltProc (ByVal hWnd As HWND) As DWORD32
+    
+    Dim dwReturnValue As DWORD32 = DDL_DIRECTORY
+    
+    If (IsDlgButtonChecked(hWnd, IDC_CHK_ARCHIVE) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_ARCHIVE)
+    If (IsDlgButtonChecked(hWnd, IDC_CHK_HIDDEN) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_HIDDEN)
+    If (IsDlgButtonChecked(hWnd, IDC_CHK_SYSTEM) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_SYSTEM)
+    If (IsDlgButtonChecked(hWnd, IDC_CHK_READONLY) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_READONLY)
+    If (IsDlgButtonChecked(hWnd, IDC_CHK_EXCLUSIVE) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_EXCLUSIVE)
+    
+    Return(dwReturnValue)
+    
+End Function
+
+Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
     ''declare local variables
     Static hwndPrsht As HWND    ''handle to property sheet.
     
     ''process messages
     Select Case uMsg        ''messages
+        Case WM_INITDIALOG  ''initialize dialog
+            
+            ''create tooltips
+            For i As UINT32 = 0 To 1
+                If (CreateToolTip(hWnd, (IDC_CBX_CHIP + i), (IDS_TIP_CHIP + i), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
+                    SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    Exit For
+                End If
+            Next i
+            
         Case WM_NOTIFY      ''notifications
             
             Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
@@ -956,10 +1024,9 @@ Function InitMem () As BOOL
     phkProgKey      = Cast(PHKEY, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(HKEY))))
     ppiProcInfo     = Cast(PROCESS_INFORMATION Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(PROCESS_INFORMATION))))
     psiStartInfo    = Cast(STARTUPINFO Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(STARTUPINFO))))
-    puOption        = Cast(PUINT32, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, SIZE_OPT))
     
     ''check allocation
-    If ((plpszPath = NULL) Or (plpszKeyName = NULL) Or (plpszStrRes = NULL) Or (phkProgKey = NULL) Or (ppiProcInfo = FALSE) Or (psiStartInfo = FALSE) Or (puOption = FALSE)) Then
+    If ((plpszPath = NULL) Or (plpszKeyName = NULL) Or (plpszStrRes = NULL) Or (phkProgKey = NULL) Or (ppiProcInfo = FALSE) Or (psiStartInfo = FALSE)) Then
         If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
         Return(FALSE)
     End If
@@ -1025,7 +1092,6 @@ Function FreeMem () As BOOL
     If (HeapFree(hHeap, 0, Cast(LPVOID, phkProgKey)) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, 0, Cast(LPVOID, ppiProcInfo)) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, 0, Cast(LPVOID, psiStartInfo)) = FALSE) Then Return(FALSE)
-    If (HeapFree(hHeap, 0, Cast(LPVOID, puOption)) = FALSE) Then Return(FALSE)
     
     ''return
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
@@ -1045,6 +1111,7 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     ''load the strings
     If (LoadString(hInst, IDS_REG_VGMPLAYPATH, plpszKeyName[KEY_VGMPLAYPATH], CCH_KEY) = 0) Then Return(FALSE)
     If (LoadString(hInst, IDS_REG_DEFAULTPATH, plpszKeyName[KEY_DEFAULTPATH], CCH_KEY) = 0) Then Return(FALSE)
+    If (LoadString(hInst, IDS_REG_WAVOUTPATH, plpszKeyName[KEY_WAVOUTPATH], CCH_KEY) = 0) Then Return(FALSE)
     If (LoadString(hInst, IDS_REG_FILEFILTER, plpszKeyName[KEY_FILEFILTER], CCH_KEY) = 0) Then Return(FALSE)
     
     If (LoadString(hInst, IDS_APPNAME, plpszStrRes[STR_APPNAME], CCH_STRRES) = 0) Then Return(FALSE)
@@ -1075,8 +1142,10 @@ Function LoadConfig () As BOOL
     If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_VGMPLAYPATH], 0, NULL, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), @cbValue)) = FALSE) Then Return(FALSE)
     cbValue = CB_PATH
     If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_DEFAULTPATH], 0, NULL, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), @cbValue)) = FALSE) Then Return(FALSE)
-    cbValue = CB_OPT
-    If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_FILEFILTER], 0, NULL, Cast(LPBYTE, @puOption[OPT_FILEFILT]), @cbValue)) = FALSE) Then Return(FALSE)
+    cbValue = CB_PATH
+    If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_WAVOUTPATH], 0, NULL, Cast(LPBYTE, plpszPath[PATH_WAVOUT]), @cbValue)) = FALSE) Then Return(FALSE)
+    cbValue = SizeOf(DWORD32)
+    If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_FILEFILTER], 0, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue)) = FALSE) Then Return(FALSE)
     
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
@@ -1094,7 +1163,8 @@ Function SaveConfig () As BOOL
     ''save configuration
     If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_VGMPLAYPATH], 0, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH)) = FALSE) Then Return(FALSE)
     If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_DEFAULTPATH], 0, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), CB_PATH)) = FALSE) Then Return(FALSE)
-    If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_FILEFILTER], 0, REG_DWORD, Cast(LPBYTE, @puOption[OPT_FILEFILT]), CB_OPT)) = FALSE) Then Return(FALSE)
+    If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_WAVOUTPATH], 0, REG_SZ, Cast(LPBYTE, plpszPath[PATH_WAVOUT]), CB_PATH)) = FALSE) Then Return(FALSE)
+    If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_FILEFILTER], 0, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32))) = FALSE) Then Return(FALSE)
     
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
@@ -1107,11 +1177,14 @@ End Function
 ''sets the default configuration
 Function SetDefConfig () As BOOL
     
-    ''set defaults
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    
+    ''set defaults
     *plpszPath[PATH_VGMPLAY]    = ""
     *plpszPath[PATH_DEFAULT]    = ""
-    puOption[OPT_FILEFILT]      = DDL_DIRECTORY
+    *plpszPath[PATH_WAVOUT]     = ""
+    dwFileFilt                  = DDL_DIRECTORY
+    
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
     ''call SaveConfig

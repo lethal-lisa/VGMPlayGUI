@@ -170,17 +170,19 @@ v2.10.2:
     -       Removed the open file functionality.
     +       Added some string resources for later use.
     
-1.13.12.3:
+v2.11:
     
-    *       Changed the order of certain commands.
+    *       Optimized the order of certain commands.
     -       Removed old, unnecessary source files.
     +       Added some comments.
     *       Changed all ID's to hexadecimal.
-    *       Changed this file's version counting to file version instead of
-        product version.
-    
-1.13.13.9:
-    
     *       Optimized the WinAPICheck module.
+    +       Added inifile.bi.
+    *       Split defines.bas off of header.bi.
+    +       Added an "Emulator Core Settings" Property Sheet page.
+    *       VGMPlayGUI now checks if its path to VGMPlay.exe is correct and
+        prompts the user to correct it if it isn't.
+    +       Added tooltips to most controls in the options menu.
+    *       Revised some strings.
     
 EOF
