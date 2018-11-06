@@ -55,7 +55,7 @@ BEGIN
     IDS_MSGCAP_NYI "NYI"
     IDS_MSGTXT_VGMPMISS "Could not find ""VGMPlay.exe"".\nYou must specify its location before playing any VGM files.\nWould you like to specify its location now?."
     IDS_MSGCAP_VGMPMISS "VGMPlay Not Found"
-    IDS_MSGTXT_CHANGES "If you cancel now, you will lose an unsaved changes.\nWould you like to save them now?"
+    IDS_MSGTXT_CHANGES "If you cancel now, you will lose any unsaved changes.\nWould you like to save them now?"
     IDS_MSGCAP_CHANGES "Cancel?"
     IDS_MSGTXT_FILTHELP "You can change the filter used by the file browser by selecting different options from here."
     IDS_MSGCAP_FILTHELP "File Filter Help"
