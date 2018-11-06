@@ -24,7 +24,6 @@ Delete=
 3=header.bi
 4=Doc\AUTHORS.TXT
 5=Doc\MANIFEST.TXT
-1001=
 1002=Mod\ErrMsgBox.bas
 6=Inc\ErrMsgBox.bi
 1003=Mod\RegInt.bas
@@ -44,8 +43,6 @@ Delete=
 1004=Mod\WinAPICheck.bas
 20=Res\icons.rc
 21=Res\versioninfo.rc
-[BreakPoint]
-
 [FileInfo]
 5=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 4=0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
