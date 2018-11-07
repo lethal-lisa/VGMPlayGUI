@@ -177,12 +177,11 @@ v2.11:
     +       Added some comments.
     *       Changed all ID's to hexadecimal.
     *       Optimized the WinAPICheck module.
-    +       Added inifile.bi.
     *       Split defines.bas off of header.bi.
-    +       Added an "Emulator Core Settings" Property Sheet page.
+    +       Added an "VGMPlay Settings" Property Sheet page.
     *       VGMPlayGUI now checks if its path to VGMPlay.exe is correct and
         prompts the user to correct it if it isn't.
     +       Added tooltips to most controls in the options menu.
-    *       Revised some strings.
+    *       Fixed some typos.
     
 EOF
