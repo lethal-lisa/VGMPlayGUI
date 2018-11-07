@@ -878,7 +878,7 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                 End If
             Next iTip
             
-            If (SetVGMPlaySettingsProc(hWnd, "VGMPlay.ini") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (SetVGMPlaySettingsProc(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case WM_COMMAND     ''commands
             Select Case HiWord(wParam) ''event code
@@ -904,7 +904,7 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
-                    If (GetVGMPlaySettings(hWnd, "VGMPlay.ini") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (GetVGMPlaySettings(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                 Case PSN_HELP                           ''user has pressed the help button
                     
@@ -925,20 +925,27 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
     
 End Function
 
-Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
+Function SetVGMPlaySettingsProc (ByVal hWnd As HWND) As BOOL
     
-    Dim lpszIniSec As LPTSTR = "General"
-    Dim szGetValue As ZString*6
+    ''read VGMPlay.exe's path and replace the extension
+    Dim pszFile As PTSTR
+    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    *pszFile = *plpszPath[PATH_VGMPLAY]
+    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    PathCchRenameExtension(pszFile, Cast(SIZE_T, SizeOf(pszFile) / SizeOf(TCHAR)), "ini")
+    
+    ''declare local variables
+    Dim lpszGetValue As LPTSTR
     Dim dwSetValue As DWORD32
     
-    Select Case GetPrivateProfileInt(lpszIniSec, @VGMPLAY_SETTINGS.LogSound, 0, lpszFile)
+    Select Case GetPrivateProfileInt(@VGMPLAY_SETTINGS_SECTIONS.General, @VGMPLAY_SETTINGS.LogSound, 0, pszFile)
         Case 0 : dwSetValue = BST_UNCHECKED
         Case 1 : dwSetValue = BST_CHECKED
         Case 2 : dwSetValue = BST_INDETERMINATE
     End Select
     If (CheckDlgButton(hWnd, IDC_CHK_WAVOUT, dwSetValue) = FALSE) Then Return(FALSE)
     
-    GetPrivateProfileString(lpszIniSec, @VGMPLAY_SETTINGS.PreferJapTag, "False", @szGetValue, SizeOf(szGetValue), lpszFile)
+    GetPrivateProfileString(@VGMPLAY_SETTINGS_SECTIONS.General, @VGMPLAY_SETTINGS.PreferJapTag, "False", lpszGetValue, SizeOf(lpszGetValue), pszFile)
     Select Case szGetValue
         Case "False" : dwSetValue = BST_UNCHECKED
         Case "True" : dwSetValue = BST_CHECKED
@@ -950,9 +957,15 @@ Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) 
     
 End Function
 
-Function GetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
+Function GetVGMPlaySettingsProc (ByVal hWnd As HWND) As BOOL
     
-    Dim lpszIniSec As LPTSTR = "General"
+    ''read VGMPlay.exe's path and replace the extension
+    Dim pszFile As PTSTR
+    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    *pszFile = *plpszPath[PATH_VGMPLAY]
+    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    PathCchRenameExtension(pszFile, Cast(SIZE_T, SizeOf(pszFile) / SizeOf(TCHAR)), "ini")
+    
     Dim lpszWriteStr As LPTSTR
     
     Select Case IsDlgButtonChecked(hWnd, IDC_CHK_WAVOUT)
@@ -960,13 +973,13 @@ Function GetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) 
         Case BST_CHECKED : lpszWriteStr = "1"
         Case BST_INDETERMINATE : lpszWriteStr = "2"
     End Select
-    If (WritePrivateProfileString(lpszIniSec, @VGMPLAY_SETTINGS.LogSound, lpszWriteStr, lpszFile) = FALSE) Then Return(FALSE)
+    If (WritePrivateProfileString(@VGMPLAY_SETTINGS_SECTIONS.General, @VGMPLAY_SETTINGS.LogSound, lpszWriteStr, pszFile) = FALSE) Then Return(FALSE)
     
     Select Case IsDlgButtonChecked(hWnd, IDC_CHK_PREFJAPTAGS)
         Case BST_UNCHECKED : lpszWriteStr = "False"
         Case BST_CHECKED : lpszWriteStr = "True"
     End Select
-    If (WritePrivateProfileString(lpszIniSec, @VGMPLAY_SETTINGS.PreferJapTag, lpszWriteStr, lpszFile) = FALSE) Then Return(FALSE)
+    If (WritePrivateProfileString(@VGMPLAY_SETTINGS_SECTIONS.General, @VGMPLAY_SETTINGS.PreferJapTag, lpszWriteStr, pszFile) = FALSE) Then Return(FALSE)
     
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
