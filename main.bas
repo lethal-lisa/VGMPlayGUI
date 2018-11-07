@@ -533,7 +533,6 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPTSTR) As BOOL
     
 End Function
 
-
 ''starts the options property sheet
 Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
     
@@ -906,18 +905,7 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
-                    Dim lpszVGMPlayIni As LPTSTR
-                    Dim lpszWriteStr As LPTSTR
-                    
-                    Select Case IsDlgButtonChecked(hWnd, IDC_CHK_WAVOUT)
-                        Case BST_CHECKED
-                            lpszWriteStr = "1"
-                        Case BST_UNCHECKED
-                            lpszWriteStr = "0"
-                        Case BST_INDETERMINATE
-                            lpszWriteStr = "2"
-                    End Select
-                    If (WritePrivateProfileString("General", "LogSound", lpszWriteStr, lpszVGMPlayIni) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (GetVGMPlaySettings(hWnd, "VGMPlay.ini") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                     Select Case IsDlgButtonChecked(hWnd, IDC_CHK_PREFJAPTAGS)
                         Case BST_CHECKED
@@ -947,6 +935,7 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
 End Function
 
 Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
+    
     Dim lpszIniSec As LPTSTR = "General"
     Dim szGetValue As ZString*6
     Dim dwSetValue As DWORD32
@@ -964,6 +953,29 @@ Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) 
         Case "True" : dwSetValue = BST_CHECKED
     End Select
     If (CheckDlgButton(hWnd, IDC_CHK_PREFJAPTAGS, dwSetValue) = FALSE) Then Return(FALSE)
+    
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Function GetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
+    
+    Dim lpszIniSec As LPTSTR = "General"
+    Dim lpszWriteStr As LPTSTR
+    
+    Select Case IsDlgButtonChecked(hWnd, IDC_CHK_WAVOUT)
+        Case BST_UNCHECKED : lpszWriteStr = "0"
+        Case BST_CHECKED : lpszWriteStr = "1"
+        Case BST_INDETERMINATE : lpszWriteStr = "2"
+    End Select
+    If (WritePrivateProfileString(lpszIniSec, @VGMPLAY_SETTINGS.LogSound, lpszWriteStr, lpszFile) = FALSE) Then Return(FALSE)
+    
+    Select Case IsDlgButtonChecked(hWnd, IDC_CHK_PREFJAPTAGS)
+        Case BST_UNCHECKED : lpszWriteStr = "False"
+        Case BST_CHECKED : lpszWriteStr = "True"
+    End Select
+    If (WritePrivateProfileString(lpszIniSec, @VGMPLAY_SETTINGS.PreferJapTag, lpszWriteStr, lpszFile) = FALSE) Then Return(FALSE)
     
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
