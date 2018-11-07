@@ -955,13 +955,22 @@ End Function
 
 Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
     Dim lpszIniSec As LPTSTR = "General"
-    Dim dwLogSound As DWORD32
+    Dim szGetValue As ZString*6
+    Dim dwSetValue As DWORD32
     
     Select Case GetPrivateProfileInt(lpszIniSec, "LogSound", 0, lpszFile)
-        Case 0 : dwLogSound = BST_UNCHECKED
-        Case 1 : dwLogSound = BST_CHECKED
-        Case 2 : dwLogSound = BST_INDETERMINATE
+        Case 0 : dwSetValue = BST_UNCHECKED
+        Case 1 : dwSetValue = BST_CHECKED
+        Case 2 : dwSetValue = BST_INDETERMINATE
     End Select
+    If (CheckDlgButton(hWnd, IDC_CHK_WAVOUT, dwSetValue) = FALSE) Then Return(FALSE)
+    
+    GetPrivateProfileString(lpszIniSec, "PreferJapTag", "False", @szGetValue, SizeOf(szGetValue), lpszFile)
+    Select Case szGetValue
+        Case "False" : dwSetValue = BST_UNCHECKED
+        Case "True" : dwSetValue = BST_CHECKED
+    End Select
+    If (CheckDlgButton(hWnd, IDC_CHK_PREFJAPTAGS, dwSetValue) = FALSE) Then Return(FALSE)
     
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
