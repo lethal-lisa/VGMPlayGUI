@@ -958,14 +958,14 @@ Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) 
     Dim szGetValue As ZString*6
     Dim dwSetValue As DWORD32
     
-    Select Case GetPrivateProfileInt(lpszIniSec, "LogSound", 0, lpszFile)
+    Select Case GetPrivateProfileInt(lpszIniSec, @VGMPLAY_SETTINGS.LogSound, 0, lpszFile)
         Case 0 : dwSetValue = BST_UNCHECKED
         Case 1 : dwSetValue = BST_CHECKED
         Case 2 : dwSetValue = BST_INDETERMINATE
     End Select
     If (CheckDlgButton(hWnd, IDC_CHK_WAVOUT, dwSetValue) = FALSE) Then Return(FALSE)
     
-    GetPrivateProfileString(lpszIniSec, "PreferJapTag", "False", @szGetValue, SizeOf(szGetValue), lpszFile)
+    GetPrivateProfileString(lpszIniSec, @VGMPLAY_SETTINGS.PreferJapTag, "False", @szGetValue, SizeOf(szGetValue), lpszFile)
     Select Case szGetValue
         Case "False" : dwSetValue = BST_UNCHECKED
         Case "True" : dwSetValue = BST_CHECKED
@@ -976,16 +976,17 @@ Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) 
     Return(TRUE)
     
 End Function
-            
-Sub PrpshCancelPrompt (ByVal hDlg As HWND)
+
+Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
     
-    Select Case ProgMsgBox(hInstance, hDlg, IDS_MSGTXT_CHANGES, IDS_MSGCAP_CHANGES, MB_ICONWARNING Or MB_YESNOCANCEL)
+    Dim dwReturn As DWORD32 = ProgMsgBox(hInstance, hDlg, IDS_MSGTXT_CHANGES, IDS_MSGCAP_CHANGES, MB_ICONWARNING Or MB_YESNOCANCEL)
+    Select Case dwReturn
         Case IDYES      ''"Yes" button, save settings and close
             
             ''send a PSN_APPLY notification to the property sheet and let it close
             Dim nmh As NMHDR
             nmh.code = PSN_APPLY
-            SendMessage(hDlg, WM_NOTIFY, 0, Cast(LPARAM, @nmh))
+            SendMessage(hDlg, WM_NOTIFY, NULL, Cast(LPARAM, @nmh))
             SetWindowLong(hDlg, DWL_MSGRESULT, Cast(LONG32, FALSE))
             
         Case IDNO       ''"No" button, close
@@ -1000,7 +1001,9 @@ Sub PrpshCancelPrompt (ByVal hDlg As HWND)
             
     End Select
     
-End Sub
+    Return(dwReturn)
+    
+End Function
 
 ''starts VGMPlay
 Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
