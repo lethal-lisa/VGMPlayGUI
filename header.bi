@@ -113,6 +113,7 @@ Declare Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal w
 Declare Sub SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32)
 Declare Function GetFileFiltProc (ByVal hWnd As HWND) As DWORD32
 Declare Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+Declare Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
 
 ''shows the cancel prompt
 Declare Sub PrpshCancelPrompt (ByVal hDlg As HWND)
