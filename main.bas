@@ -40,7 +40,6 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     Dim msg As MSG                  ''message
     Dim wcxMainClass As WNDCLASSEX  ''class information for MainClass
     
-    
     ''setup and register classes
     ZeroMemory(@wcxMainClass, SizeOf(wcxMainClass))
     With wcxMainClass
@@ -907,14 +906,6 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     
                     If (GetVGMPlaySettings(hWnd, "VGMPlay.ini") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
-                    Select Case IsDlgButtonChecked(hWnd, IDC_CHK_PREFJAPTAGS)
-                        Case BST_CHECKED
-                            lpszWriteStr = "True"
-                        Case BST_UNCHECKED
-                            lpszWriteStr = "False"
-                    End Select
-                    If (WritePrivateProfileString("General", "PreferJapTag", lpszWriteStr, lpszVGMPlayIni) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                    
                 Case PSN_HELP                           ''user has pressed the help button
                     
                     ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
@@ -1133,7 +1124,6 @@ Function FreeMem () As BOOL
     
 End Function
 
-
 ''loads the needed string resources
 Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     
@@ -1159,7 +1149,6 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     Return(TRUE)
     
 End Function
-
 
 ''config functions:
 ''loads the config from the registry
