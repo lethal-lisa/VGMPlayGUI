@@ -1,2 +1,12 @@
 # Auto detect text files and perform LF normalization
-* text=auto
+*     text=auto eol=lf
+*.txt text=auto eol=lf
+*.bas text=auto eol=lf
+*.bi  text=auto eol=lf
+*.rc  text=auto eol=lf
+*.fbp text=auto eol=lf
+# Auto detect binaries
+*.a   -text -diff
+*.dll -text -diff
+*.exe -text -diff
+*.res -text -diff
