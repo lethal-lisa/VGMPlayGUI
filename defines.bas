@@ -33,13 +33,11 @@
 #Define IDC_CHK_WAVOUT          &h0518 /'1304'/
 #Define IDC_CHK_PREFJAPTAGS     &h0519 /'1305'/
 
-
 ''defines from icons.rc:
 #Define IDI_VGMPLAYGUI          &h0064 /'100'/
 #Define IDI_KAZUSOFT            &h0065 /'101'/
 #Define IDI_WRENCH              &h0066 /'102'/
 #Define IDI_PLAY                &h0067 /'103'/
-
 
 ''defines from strings.rc:
 #Define IDS_APPNAME             &h0001 /'1'/
@@ -100,7 +98,6 @@
 #Define IDM_LST_MAIN_BACK       &h4E23 /'20003'/
 #Define IDM_LST_DRIVES          &h4E24 /'20004'/
 #Define IDM_LST_DRIVES_REFRESH  &h4E25 /'20005'/
-
 
 ''heap object info:
 ''ID's for plpszPaths
