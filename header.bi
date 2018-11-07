@@ -44,8 +44,8 @@
 ''defines
 #Define MARGIN_SIZE 10
 #Define WINDOW_SIZE 30
-#Define MIN_SIZE_X  503
-#Define MIN_SIZE_Y  443
+#Define MIN_SIZE_X  504
+#Define MIN_SIZE_Y  444
 
 ''for some reason, this isn't defined in FB's 64-bit headers
 #Ifndef DWL_MSGRESULT
@@ -59,7 +59,7 @@
 Const MainClass = "MAINCLASS"
 
 Enum VGMPLAY_SETTINGS
-    LogSound = "LogSound"
+    LogSound    = "LogSound"
     PrefJapTags = "PreferJapTag"
 End Enum
 
@@ -97,9 +97,6 @@ Declare Function CreateToolTip (ByVal hDlg As HWND, ByVal dwToolID As DWORD32, B
 ''resizes the main dialog's child windows
 Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
 
-''displays an about message
-Declare Sub AboutMsgBox (ByVal hDlg As HWND)
-
 ''displays a context menu in the main dialog
 Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal y As WORD) As BOOL
 
@@ -118,9 +115,10 @@ Declare Sub SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32)
 Declare Function GetFileFiltProc (ByVal hWnd As HWND) As DWORD32
 Declare Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 Declare Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
+Declare Function GetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
 
 ''shows the cancel prompt
-Declare Sub PrpshCancelPrompt (ByVal hDlg As HWND)
+Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
 
 ''starts VGMPlay
 Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
