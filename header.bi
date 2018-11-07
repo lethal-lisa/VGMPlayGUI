@@ -58,6 +58,10 @@
 ''define constants
 Const MainClass = "MAINCLASS"
 
+Enum VGMPLAY_SETTINGS
+    LogSound = "LogSound"
+    PrefJapTags = "PreferJapTag"
+End Enum
 
 ''declare shared variables
 Dim Shared hInstance As HMODULE ''instance handle
