@@ -81,7 +81,6 @@ Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE
 ''subroutine used to start the main dialog. called by WinMain
 Declare Sub StartMainDialog (ByVal hInst As HINSTANCE, ByVal nShowCmd As INT32, ByVal lParam As LPARAM)
 
-
 ''main dialog procedure
 Declare Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 
@@ -103,7 +102,6 @@ Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal 
 ''changes directories and refreshes directory listings
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPTSTR) As BOOL
 
-
 ''starts the options property sheet
 Declare Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
 
@@ -124,7 +122,6 @@ Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
 
 ''opens a VGM file
 Declare Function OpenVGMFile (ByVal hDlg As HWND) As BOOL
-
 
 ''memory macro functions
 Declare Function InitMem () As BOOL
