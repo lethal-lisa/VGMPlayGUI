@@ -59,10 +59,8 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     End With
     RegisterClassEx(@wcxMainClass)
     
-    
     ''create, show, and update the main window
     StartMainDialog(hInst, nShowCmd, NULL)
-    
     
     ''start message loop
     While (GetMessage(@msg, hWin, 0, 0) = TRUE)
@@ -71,7 +69,6 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
             DispatchMessage(@msg)
         End If
     Wend
-    
     
     ''return
     UnregisterClass(@MainClass, hInst)
@@ -103,12 +100,10 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VGMPLAYGUI))))
             SetCursor(LoadCursor(NULL, IDC_APPSTARTING))
             
-            
             ''create the heap, init memory, and load resources
             hHeap = HeapCreate(0, 0, 0)
             If (InitMem() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             If (LoadStringResources(hInstance) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-            
             
             ''open program hkey and load settings
             Dim dwKeyDisp As DWORD32    ''key disposition for OpenProgHKey
@@ -121,7 +116,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                 If (SetDefConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             End If
             
-            
             ''create child windows
             If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
@@ -131,7 +125,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             If (CheckLongErrCode(RegCloseKey(*phkProgKey)) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
             If (FreeMem() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
             If (HeapDestroy(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            
             
             ''post quit message with success code
             PostQuitMessage(ERROR_SUCCESS)
@@ -268,12 +261,10 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             Dim rcSbr As RECT       ''statusbar rect
             Dim rcParent As RECT    ''main dialog rect
             
-            
             ''get rects for statusbar and main dialog, and subtract the statusbar's height from that of the main window
             If (GetClientRect(hWnd, @rcParent) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             If (GetClientRect(GetDlgItem(hWnd, IDC_SBR), @rcSbr) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             rcParent.bottom -= rcSbr.bottom
-            
             
             ''resize the child windows
             If (EnumChildWindows(hWnd, @ResizeChildren, Cast(LPARAM, @rcParent)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
@@ -282,7 +273,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             
             ''get windowpos structure from lParam
             Dim pwp As WINDOWPOS Ptr = Cast(WINDOWPOS Ptr, lParam)
-            
             
             ''prevent window from getting too small
             If (pwp->cx < MIN_SIZE_X) Then pwp->cx = MIN_SIZE_X
@@ -318,10 +308,8 @@ Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
     CreateWindowEx(NULL, WC_BUTTON, "[..]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_BACK), hInstance, NULL)
     CreateWindowEx(NULL, WC_BUTTON, "[.]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_REFRESH), hInstance, NULL)
     
-    
     ''set IDI_PLAY to IDC_BTN_PLAY
     SendMessage(GetDlgItem(hDlg, IDC_BTN_PLAY), BM_SETIMAGE, IMAGE_ICON, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PLAY))))
-    
     
     ''create tooltips
     CreateToolTip(hDlg, IDC_LST_DRIVES, IDS_TIP_DRIVELIST, TTS_ALWAYSTIP, NULL)
@@ -329,7 +317,6 @@ Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
     CreateToolTip(hDlg, IDC_BTN_GO, IDS_TIP_GOBTN, TTS_ALWAYSTIP, NULL)
     CreateToolTip(hDlg, IDC_BTN_BACK, IDS_TIP_BACKBTN, TTS_ALWAYSTIP, NULL)
     CreateToolTip(hDlg, IDC_BTN_REFRESH, IDS_TIP_REFRESHBTN, TTS_ALWAYSTIP, NULL)
-    
     
     ''return
     SetLastError(ERROR_SUCCESS)
@@ -458,7 +445,6 @@ Sub AboutMsgBox (ByVal hDlg As HWND)
         .dwLanguageId       = LANG_NEUTRAL
     End With
     
-    
     ''display message box
     MessageBeep(MB_ICONASTERISK)
     MessageBoxIndirect(@mbp)
@@ -472,15 +458,12 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal y As WOR
     Dim hMenu As HMENU      ''top level menu
     Dim hMenuSub As HMENU   ''sub menu to return
     
-    
     ''set waiting cursor
     Dim hCurPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
-    
     
     ''load the top level menu
     hMenu = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENUCONTEXT))
     If (hMenu = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    
     
     ''get a handle for the child window that was clicked in
     Dim ptMouse As Point
@@ -491,7 +474,6 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal y As WOR
     If (ScreenToClient(hDlg, @ptMouse) = FALSE) Then Return(FALSE)
     Dim hwndChild As HWND = ChildWindowFromPoint(hDlg, ptMouse)
     If (hwndChild = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    
     
     ''select the child window's appropriate context menu
     Select Case GetWindowLong(hwndChild, GWL_ID)
@@ -505,13 +487,11 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal y As WOR
             Return(FALSE)                                       ''return FALSE
     End Select
     
-    
     ''display context menu
     If (TrackPopupMenu(hMenuSub, TPM_LEFTALIGN Or TPM_TOPALIGN Or TPM_RIGHTBUTTON Or TPM_NOANIMATION, x, y, 0, hDlg, NULL) = FALSE) Then
         DestroyMenu(hMenu)  ''destroy the top-level menu
         Return(FALSE)       ''return FALSE
     End If
-    
     
     ''return
     SetCursor(hCurPrev)
@@ -526,17 +506,14 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPTSTR) As BOOL
     
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
-    
     ''set waiting cursor
     Dim hCurPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
-    
     
     ''make sure path exists and is a directory
     If ((PathFileExists(lpszPath) = FALSE) Or (PathIsDirectory(lpszPath) = FALSE)) Then
         HeapUnlock(hHeap)
         Return(FALSE)
     End If
-    
     
     ''change directories
     If (ChDir(*lpszPath) <> 0) Then
@@ -545,18 +522,15 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPTSTR) As BOOL
         Return(FALSE)
     End If
     
-    
     ''update UI
     SetDlgItemText(hDlg, IDC_EDT_PATH, CurDir())
     SetDlgItemText(hDlg, IDC_EDT_FILE, NULL)
-    
     
     ''refresh directory listings
     If ((DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, dwFileFilt) = 0) Or (DlgDirList(hDlg, NULL, IDC_LST_DRIVES, NULL, (DDL_DRIVES Or DDL_EXCLUSIVE)) = 0)) Then
         HeapUnlock(hHeap)
         Return(FALSE)
     End If
-    
     
     ''return
     SetCursor(hCurPrev)
@@ -580,7 +554,6 @@ Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
     lpPsp = Cast(LPPROPSHEETPAGE, LocalAlloc(LPTR, Cast(SIZE_T, (3 * SizeOf(PROPSHEETPAGE)))))
     If (lpPsp = NULL) Then Return(FALSE)
     
-    
     ''setup "paths" page
     With lpPsp[0]
         .dwSize         = SizeOf(PROPSHEETPAGE)
@@ -593,7 +566,6 @@ Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .lParam         = NULL
         .pfnCallback    = NULL
     End With
-    
     
     ''setup "file filter" page
     With lpPsp[1]
@@ -621,7 +593,6 @@ Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .pfnCallback    = NULL
     End With
     
-    
     ''setup property sheet header
     ZeroMemory(@psh, SizeOf(PROPSHEETHEADER))
     With psh
@@ -637,10 +608,8 @@ Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .pfnCallback    = NULL
     End With
     
-    
     ''start property sheet
     PropertySheet(@psh)
-    
     
     ''return
     LocalFree(Cast(HLOCAL, lpPsp))
@@ -827,7 +796,6 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
             
             
         Case WM_COMMAND     ''commands
-            
             Select Case HiWord(wParam)  ''event code
                 Case BN_CLICKED         ''button clicked
                     
@@ -929,6 +897,14 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     CheckDlgButton(hWnd, IDC_CHK_WAVOUT, BST_INDETERMINATE)
             End Select
             
+        Case WM_COMMAND     ''commands
+            Select Case HiWord(wParam) ''event code
+                Case BN_CLICKED        ''button clicked
+                    
+                    SendMessage(hwndPrsht, PSM_CHANGED, Cast(WPARAM, hWnd), NULL)
+                    
+            End Select
+            
         Case WM_NOTIFY      ''notifications
             
             Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
@@ -945,25 +921,27 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
-                    'Dim lpszVGMPlayIni As LPTSTR
+                    Dim lpszVGMPlayIni As LPTSTR
                     
                     Select Case IsDlgButtonChecked(hWnd, IDC_CHK_WAVOUT)
                         Case BST_CHECKED
-                            WritePrivateProfileString("General", "LogSound", "1", "VGMPlay.ini")
+                            WritePrivateProfileString("General", "LogSound", "1", lpszVGMPlayIni)
                         Case BST_UNCHECKED
-                            WritePrivateProfileString("General", "LogSound", "0", "VGMPlay.ini")
+                            WritePrivateProfileString("General", "LogSound", "0", lpszVGMPlayIni)
                         Case BST_INDETERMINATE
-                            WritePrivateProfileString("General", "LogSound", "2", "VGMPlay.ini")
+                            WritePrivateProfileString("General", "LogSound", "2", lpszVGMPlayIni)
                     End Select
                     
                     Select Case IsDlgButtonChecked(hWnd, IDC_CHK_PREFJAPTAGS)
                         Case BST_CHECKED
-                            WritePrivateProfileString("General", "PreferJapTag", "True", "VGMPlay.ini")
+                            WritePrivateProfileString("General", "PreferJapTag", "True", lpszVGMPlayIni)
                         Case BST_UNCHECKED
-                            WritePrivateProfileString("General", "PreferJapTag", "False", "VGMPlay.ini")
+                            WritePrivateProfileString("General", "PreferJapTag", "False", lpszVGMPlayIni)
                     End Select
                     
                 Case PSN_HELP                           ''user has pressed the help button
+                    
+                    ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
                     
                 Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
                     
