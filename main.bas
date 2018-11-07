@@ -174,7 +174,25 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                         Case IDM_ABOUT          ''display the about message
                             
-                            AboutMsgBox(hWnd)
+                            ''declare and setup mbp
+                            Dim mbp As MSGBOXPARAMS
+                            ZeroMemory(@mbp, SizeOf(mbp))
+                            With mbp
+                                .cbSize             = SizeOf(mbp)
+                                .hwndOwner          = hDlg
+                                .hInstance          = hInstance
+                                .lpszText           = MAKEINTRESOURCE(IDS_MSGTXT_ABOUT)
+                                .lpszCaption        = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
+                                .dwStyle            = (MB_OK Or MB_DEFBUTTON1 Or MB_APPLMODAL Or MB_SETFOREGROUND Or MB_USERICON)
+                                .lpszIcon           = MAKEINTRESOURCE(IDI_KAZUSOFT)
+                                .dwContextHelpId    = NULL
+                                .lpfnMsgBoxCallback = NULL
+                                .dwLanguageId       = LANG_NEUTRAL
+                            End With
+                            
+                            ''display message box
+                            MessageBeep(MB_ICONASTERISK)
+                            MessageBoxIndirect(@mbp)
                             
                         Case IDC_BTN_PLAY       ''start VGMPlay
                             
@@ -425,31 +443,6 @@ Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
     Return(TRUE)
     
 End Function
-
-''displays an about message
-Sub AboutMsgBox (ByVal hDlg As HWND)
-    
-    ''declare and setup mbp
-    Dim mbp As MSGBOXPARAMS 
-    ZeroMemory(@mbp, SizeOf(mbp))
-    With mbp
-        .cbSize             = SizeOf(mbp)
-        .hwndOwner          = hDlg
-        .hInstance          = hInstance
-        .lpszText           = MAKEINTRESOURCE(IDS_MSGTXT_ABOUT)
-        .lpszCaption        = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
-        .dwStyle            = (MB_OK Or MB_DEFBUTTON1 Or MB_APPLMODAL Or MB_SETFOREGROUND Or MB_USERICON)
-        .lpszIcon           = MAKEINTRESOURCE(IDI_KAZUSOFT)
-        .dwContextHelpId    = NULL
-        .lpfnMsgBoxCallback = NULL
-        .dwLanguageId       = LANG_NEUTRAL
-    End With
-    
-    ''display message box
-    MessageBeep(MB_ICONASTERISK)
-    MessageBoxIndirect(@mbp)
-    
-End Sub
 
 ''displays a context menu in the main dialog
 Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal y As WORD) As BOOL
