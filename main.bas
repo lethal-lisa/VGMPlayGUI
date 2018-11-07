@@ -880,22 +880,14 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
         Case WM_INITDIALOG  ''initialize dialog
             
             ''create tooltips
-            For i As UINT32 = 0 To 1
-                If (CreateToolTip(hWnd, (IDC_CBX_CHIP + i), (IDS_TIP_CHIP + i), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
+            For iTip As UINT32 = 0 To 1
+                If (CreateToolTip(hWnd, (IDC_CBX_CHIP + iTip), (IDS_TIP_CHIP + iTip), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
                     SysErrMsgBox(hWnd, GetLastError(), NULL)
                     Exit For
                 End If
-            Next i
+            Next iTip
             
-            ''load settings from VGMPlay.ini
-            Select Case GetPrivateProfileInt("General", "LogSound", 0, "VGMPlay.ini")
-                Case 0
-                    CheckDlgButton(hWnd, IDC_CHK_WAVOUT, BST_UNCHECKED)
-                Case 1
-                    CheckDlgButton(hWnd, IDC_CHK_WAVOUT, BST_CHECKED)
-                Case 2
-                    CheckDlgButton(hWnd, IDC_CHK_WAVOUT, BST_INDETERMINATE)
-            End Select
+            If (SetVGMPlaySettingsProc(hWnd, "VGMPlay.ini") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case WM_COMMAND     ''commands
             Select Case HiWord(wParam) ''event code
@@ -922,22 +914,25 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
                     Dim lpszVGMPlayIni As LPTSTR
+                    Dim lpszWriteStr As LPTSTR
                     
                     Select Case IsDlgButtonChecked(hWnd, IDC_CHK_WAVOUT)
                         Case BST_CHECKED
-                            WritePrivateProfileString("General", "LogSound", "1", lpszVGMPlayIni)
+                            lpszWriteStr = "1"
                         Case BST_UNCHECKED
-                            WritePrivateProfileString("General", "LogSound", "0", lpszVGMPlayIni)
+                            lpszWriteStr = "0"
                         Case BST_INDETERMINATE
-                            WritePrivateProfileString("General", "LogSound", "2", lpszVGMPlayIni)
+                            lpszWriteStr = "2"
                     End Select
+                    If (WritePrivateProfileString("General", "LogSound", lpszWriteStr, lpszVGMPlayIni) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                     Select Case IsDlgButtonChecked(hWnd, IDC_CHK_PREFJAPTAGS)
                         Case BST_CHECKED
-                            WritePrivateProfileString("General", "PreferJapTag", "True", lpszVGMPlayIni)
+                            lpszWriteStr = "True"
                         Case BST_UNCHECKED
-                            WritePrivateProfileString("General", "PreferJapTag", "False", lpszVGMPlayIni)
+                            lpszWriteStr = "False"
                     End Select
+                    If (WritePrivateProfileString("General", "PreferJapTag", lpszWriteStr, lpszVGMPlayIni) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                 Case PSN_HELP                           ''user has pressed the help button
                     
@@ -958,6 +953,21 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
     
 End Function
 
+Function SetVGMPlaySettingsProc (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
+    Dim lpszIniSec As LPTSTR = "General"
+    Dim dwLogSound As DWORD32
+    
+    Select Case GetPrivateProfileInt(lpszIniSec, "LogSound", 0, lpszFile)
+        Case 0 : dwLogSound = BST_UNCHECKED
+        Case 1 : dwLogSound = BST_CHECKED
+        Case 2 : dwLogSound = BST_INDETERMINATE
+    End Select
+    
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+            
 Sub PrpshCancelPrompt (ByVal hDlg As HWND)
     
     Select Case ProgMsgBox(hInstance, hDlg, IDS_MSGTXT_CHANGES, IDS_MSGCAP_CHANGES, MB_ICONWARNING Or MB_YESNOCANCEL)
