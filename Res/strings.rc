@@ -41,8 +41,8 @@
 #define IDS_TIP_SYSTEM          0x004B //75
 #define IDS_TIP_READONLY        0x004C //76
 #define IDS_TIP_EXCLUSIVE       0x004D //77
-#define IDS_TIP_CHIP            0x004E //78
-#define IDS_TIP_CORE            0x004F //79
+#define IDS_TIP_WAVOUT          0x004E //78
+#define IDS_TIP_PREFERJAPTAG    0x004F //79
 
 STRINGTABLE
 LANGUAGE 9, 1
@@ -84,8 +84,8 @@ BEGIN
     IDS_TIP_SYSTEM "Include files with the system attribute set"
     IDS_TIP_READONLY "Include read-only files"
     IDS_TIP_EXCLUSIVE "Show only files with the attributes selected above"
-    IDS_TIP_CHIP "Chip"
-    IDS_TIP_CORE "Emulator core to use"
+    IDS_TIP_WAVOUT "Enable WAV file output"
+    IDS_TIP_PREFERJAPTAG "Prefer Japanese GD3 tags\nThis will not work unless you have a unicode-enabled console\nUse at your own risk"
 END
 
 //EOF
