@@ -27,11 +27,8 @@
 
 ''core select property sheet:
 #Define IDD_VGMPLAYSETTINGS     &h0514 /'1300'/
-#Define IDC_GRP_CORESEL         &h0515 /'1301'/
-#Define IDC_CBX_CHIP            &h0516 /'1302'/
-#Define IDC_CBX_CORE            &h0517 /'1303'/
-#Define IDC_CHK_WAVOUT          &h0518 /'1304'/
-#Define IDC_CHK_PREFJAPTAGS     &h0519 /'1305'/
+#Define IDC_CHK_WAVOUT          &h0515 /'1301'/
+#Define IDC_CHK_PREFJAPTAGS     &h0516 /'1302'/
 
 ''defines from icons.rc:
 #Define IDI_VGMPLAYGUI          &h0064 /'100'/
