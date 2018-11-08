@@ -25,7 +25,6 @@
 
 //file filters
 #define IDS_FILT_VGMPLAY            0x0031 //49
-#define IDS_FILT_VGMFILE            0x0032 //50
 
 //tooltips
 #define IDS_TIP_DRIVELIST           0x0041 //65
@@ -73,7 +72,6 @@ BEGIN
     IDS_REG_FILEFILTER "File Filter"
     //filters
     IDS_FILT_VGMPLAY "VGMPlay (VGMPlay.exe)\0VGMPLAY.EXE\0All Files (*.*)\0*.*\0"
-    IDS_FILT_VGMFILE "Accepted File Types\0*.VGM;*.VGZ;*.CMF;*.DRO;*.M3U\0VGM Files (*.vgm, *.vgz)\0*.VGM;*.VGZ\0Creative Music Files (*.cmf)\0*.CMF\0DOSBox OPL Logs (*.dro)\0*.DRO\0Playlist Files (*.m3u)\0*.M3U\0All Files (*.*)\0*.*\0"
     //tooltips
     IDS_TIP_DRIVELIST "List of available drives"
     IDS_TIP_BACKBTN "Go up one directory"
