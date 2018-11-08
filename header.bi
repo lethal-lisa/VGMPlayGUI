@@ -58,15 +58,6 @@
 ''define constants
 Const MainClass = "MAINCLASS"
 
-Enum VGMPLAY_SETTINGS_SECTIONS
-    General = "General"
-End Enum
-
-Enum VGMPLAY_SETTINGS
-    LogSound    = "LogSound"
-    PrefJapTags = "PreferJapTag"
-End Enum
-
 ''declare shared variables
 Dim Shared hInstance As HMODULE ''instance handle
 Dim Shared lpszCmdLine As LPSTR ''command line
@@ -118,8 +109,6 @@ Declare Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal w
 Declare Sub SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32)
 Declare Function GetFileFiltProc (ByVal hWnd As HWND) As DWORD32
 Declare Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-Declare Function SetVGMPlaySettingsProc (ByVal hWnd As HWND) As BOOL
-Declare Function GetVGMPlaySettingsProc (ByVal hWnd As HWND) As BOOL
 
 ''shows the cancel prompt
 Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
