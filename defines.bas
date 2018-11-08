@@ -78,8 +78,8 @@
 #Define IDS_TIP_SYSTEM          &h004B /'75'/
 #Define IDS_TIP_READONLY        &h004C /'76'/
 #Define IDS_TIP_EXCLUSIVE       &h004D /'77'/
-#Define IDS_TIP_CHIP            &h004E /'78'/
-#Define IDS_TIP_CORE            &h004F /'79'/
+#Define IDS_TIP_WAVOUT          &h004E /'78'/
+#Define IDS_TIP_PREFERJAPTAG    &h004F /'79'/
 
 ''defines from menus.rc
 #Define IDR_MENU1               &h2710 /'10000'/
