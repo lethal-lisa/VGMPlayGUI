@@ -62,7 +62,6 @@
 
 ''file filters
 #Define IDS_FILT_VGMPLAY            &h0031 /'49'/
-#Define IDS_FILT_VGMFILE            &h0032 /'50'/
 
 ''tooltips
 #Define IDS_TIP_DRIVELIST           &h0041 /'65'/
