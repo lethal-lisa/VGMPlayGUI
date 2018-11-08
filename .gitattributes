@@ -11,3 +11,4 @@
 *.exe -text -diff
 *.res -text -diff
 *.ico -text -diff
+*.vgm -text -diff
