@@ -98,19 +98,15 @@ Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal 
 ''changes directories and refreshes directory listings
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPTSTR) As BOOL
 
-''starts the options property sheet
+''options property sheet functions
 Declare Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
-
-''options property sheet page procedures
 Declare Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 Declare Function SetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
 Declare Function GetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
 Declare Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-Declare Sub SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32)
-Declare Function GetFileFiltProc (ByVal hWnd As HWND) As DWORD32
+Declare Function SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32) As BOOL
+Declare Function GetFileFiltProc (ByVal hWnd As HWND, ByRef dwValue As DWORD32) As BOOL
 Declare Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-
-''shows the cancel prompt
 Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
 
 ''starts VGMPlay
