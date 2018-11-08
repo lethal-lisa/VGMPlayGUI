@@ -10,3 +10,4 @@
 *.dll -text -diff
 *.exe -text -diff
 *.res -text -diff
+*.ico -text -diff
