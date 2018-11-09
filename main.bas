@@ -735,33 +735,37 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
     
 End Function
 
-Function SetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
+Function SetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
     
     ''set values
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    SetDlgItemText(hWnd, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY])
-    SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT])
-    SetDlgItemText(hWnd, IDC_EDT_WAVOUTPATH, plpszValue[PATH_WAVOUT])
+    SetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY])
+    SetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT])
+    SetDlgItemText(hDlg, IDC_EDT_WAVOUTPATH, plpszValue[PATH_WAVOUT])
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
+    If (GetLastError() <> ERROR_SUCCESS) Then
+        Return(FALSE)
+    Else
+        Return(TRUE)
+    End If
     
 End Function
 
-Function GetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
+Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
     
     ''get values
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    GetDlgItemText(hWnd, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY], MAX_PATH)
-    GetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT], MAX_PATH)
-    GetDlgItemText(hWnd, IDC_EDT_WAVOUTPATH, plpszValue[PATH_WAVOUT], MAX_PATH)
+    GetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY], MAX_PATH)
+    GetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT], MAX_PATH)
+    GetDlgItemText(hDlg, IDC_EDT_WAVOUTPATH, plpszValue[PATH_WAVOUT], MAX_PATH)
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
+    If (GetLastError() <> ERROR_SUCCESS) Then
+        Return(FALSE)
+    Else
+        Return(TRUE)
+    End If
     
 End Function
 
@@ -783,8 +787,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
             Next i
             
             ''display current
-            SetFileFiltProc(hWnd, dwFileFilt)
-            
+            If (SetFileFiltProc(hWnd, dwFileFilt) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case WM_COMMAND     ''commands
             Select Case HiWord(wParam)  ''event code
@@ -822,7 +825,8 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                     
                 Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
                     
-                    Dim dwCurrent As DWORD32 = GetFileFiltProc(hWnd)
+                    Dim dwCurrent As DWORD32
+                    If (GetFileFiltProc(hWnd, dwCurrent) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     If (dwCurrent <> dwFileFilt) Then PrpshCancelPrompt(hWnd)
                     
             End Select
@@ -837,27 +841,37 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
     
 End Function
 
-Sub SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32)
+Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL
     
-    If (dwValue And DDL_ARCHIVE) Then CheckDlgButton(hWnd, IDC_CHK_ARCHIVE, BST_CHECKED)
-    If (dwValue And DDL_HIDDEN) Then CheckDlgButton(hWnd, IDC_CHK_HIDDEN, BST_CHECKED)
-    If (dwValue And DDL_SYSTEM) Then CheckDlgButton(hWnd, IDC_CHK_SYSTEM, BST_CHECKED)
-    If (dwValue And DDL_READONLY) Then CheckDlgButton(hWnd, IDC_CHK_READONLY, BST_CHECKED)
-    If (dwValue And DDL_EXCLUSIVE) Then CheckDlgButton(hWnd, IDC_CHK_EXCLUSIVE, BST_CHECKED)
+    If (dwValue And DDL_ARCHIVE) Then CheckDlgButton(hDlg, IDC_CHK_ARCHIVE, BST_CHECKED)
+    If (dwValue And DDL_HIDDEN) Then CheckDlgButton(hDlg, IDC_CHK_HIDDEN, BST_CHECKED)
+    If (dwValue And DDL_SYSTEM) Then CheckDlgButton(hDlg, IDC_CHK_SYSTEM, BST_CHECKED)
+    If (dwValue And DDL_READONLY) Then CheckDlgButton(hDlg, IDC_CHK_READONLY, BST_CHECKED)
+    If (dwValue And DDL_EXCLUSIVE) Then CheckDlgButton(hDlg, IDC_CHK_EXCLUSIVE, BST_CHECKED)
     
-End Sub
+    If (GetLastError() <> ERROR_SUCCESS) Then
+        Return(FALSE)
+    Else
+        Return(TRUE)
+    End If
+    
+End Function
 
-Function GetFileFiltProc (ByVal hWnd As HWND) As DWORD32
+Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
     
-    Dim dwReturnValue As DWORD32 = DDL_DIRECTORY
+    Dim dwValue As DWORD32 = DDL_DIRECTORY
     
-    If (IsDlgButtonChecked(hWnd, IDC_CHK_ARCHIVE) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_ARCHIVE)
-    If (IsDlgButtonChecked(hWnd, IDC_CHK_HIDDEN) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_HIDDEN)
-    If (IsDlgButtonChecked(hWnd, IDC_CHK_SYSTEM) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_SYSTEM)
-    If (IsDlgButtonChecked(hWnd, IDC_CHK_READONLY) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_READONLY)
-    If (IsDlgButtonChecked(hWnd, IDC_CHK_EXCLUSIVE) = BST_CHECKED) Then dwReturnValue = (dwReturnValue Or DDL_EXCLUSIVE)
+    If (IsDlgButtonChecked(hDlg, IDC_CHK_ARCHIVE) = BST_CHECKED) Then dwValue = (dwValue Or DDL_ARCHIVE)
+    If (IsDlgButtonChecked(hDlg, IDC_CHK_HIDDEN) = BST_CHECKED) Then dwValue = (dwValue Or DDL_HIDDEN)
+    If (IsDlgButtonChecked(hDlg, IDC_CHK_SYSTEM) = BST_CHECKED) Then dwValue = (dwValue Or DDL_SYSTEM)
+    If (IsDlgButtonChecked(hDlg, IDC_CHK_READONLY) = BST_CHECKED) Then dwReturnValue = (dwValue Or DDL_READONLY)
+    If (IsDlgButtonChecked(hDlg, IDC_CHK_EXCLUSIVE) = BST_CHECKED) Then dwValue = (dwValue Or DDL_EXCLUSIVE)
     
-    Return(dwReturnValue)
+    If (GetLastError() <> ERROR_SUCCESS) Then
+        Return(FALSE)
+    Else
+        Return(TRUE)
+    End If
     
 End Function
 
