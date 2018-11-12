@@ -43,7 +43,7 @@ Delete=
 1004=Mod\WinAPICheck.bas
 20=Res\icons.rc
 21=Res\versioninfo.rc
-22=
+22=Res\chip-settings\sega-psg.rc
 [FileInfo]
 5=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 4=0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
