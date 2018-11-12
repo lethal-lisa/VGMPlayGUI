@@ -3,7 +3,7 @@
 #define IDR_VERSIONINFO 1
 
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 13, 14, 0
+FILEVERSION     1, 13, 14, 3
 PRODUCTVERSION  2, 11, 0, 45
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       VS_FF_DEBUG | VS_FF_SPECIALBUILD //| VS_FF_PRIVATEBUILD
@@ -15,7 +15,7 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion", "1.13.14.0\0"
+            VALUE "FileVersion", "1.13.14.3\0"
             VALUE "ProductVersion", "2.11.0.45\0"
             VALUE "CompanyName", "Kazusoft Co.\0"
             VALUE "FileDescription", "Windows GUI for VGMPlay\0"

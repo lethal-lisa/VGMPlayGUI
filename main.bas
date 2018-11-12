@@ -144,7 +144,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             ''make sure VGMPlay's path is valid
             If (PathFileExists(plpszPath[PATH_VGMPLAY]) = FALSE) Then
                 If (ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_VGMPMISS, IDS_MSGCAP_VGMPMISS, MB_YESNO Or MB_ICONWARNING) = IDYES) Then
-                    If (DoOptionsPropSheet(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    DoOptionsPropSheet(hWnd)
                 End If
             End If
             
@@ -169,7 +169,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                         Case IDM_OPTIONS        ''start the options property sheet
                             
-                            If (DoOptionsPropSheet(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            DoOptionsPropSheet(hWnd)
                             
                         Case IDM_ABOUT          ''display the about message
                             
@@ -571,7 +571,7 @@ Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .pfnCallback    = NULL
     End With
     
-    ''setup "core select" page
+    ''setup "vgmplay settings" page
     With lpPsp[2]
         .dwSize         = SizeOf(PROPSHEETPAGE)
         .dwFlags        = (PSP_USEICONID Or PSP_HASHELP)
@@ -623,10 +623,9 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
             ''create tooltips
             CreateToolTip(hWnd, IDC_EDT_VGMPLAYPATH, IDS_TIP_VGMPLAYPATH, TTS_ALWAYSTIP, NULL)
             CreateToolTip(hWnd, IDC_EDT_DEFAULTPATH, IDS_TIP_DEFAULTPATH, TTS_ALWAYSTIP, NULL)
-            CreateToolTip(hWnd, IDC_EDT_WAVOUTPATH, IDS_TIP_WAVOUTPATH, TTS_ALWAYSTIP, NULL)
             
             ''set text in path options
-            If (SetPathsProc(hWnd, plpszPath) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            SetPathsProc(hWnd, plpszPath)
             
         Case WM_COMMAND     ''commands
             
@@ -677,13 +676,6 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                             If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             
                         Case IDC_BTN_DEFAULTPATH        ''set default path to current one
-                            
-                            If (SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, CurDir()) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                            
-                        Case IDC_BTN_WAVOUTPATH         ''browse for a wav output path
-                            
-                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_OK Or MB_ICONWARNING)
-                            
                     End Select
                     
                 Case EN_CHANGE          ''edit control changing
@@ -741,7 +733,6 @@ Function SetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BO
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     SetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY])
     SetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT])
-    SetDlgItemText(hDlg, IDC_EDT_WAVOUTPATH, plpszValue[PATH_WAVOUT])
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
     If (GetLastError() <> ERROR_SUCCESS) Then
@@ -758,7 +749,6 @@ Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BO
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     GetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY], MAX_PATH)
     GetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT], MAX_PATH)
-    GetDlgItemText(hDlg, IDC_EDT_WAVOUTPATH, plpszValue[PATH_WAVOUT], MAX_PATH)
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
     If (GetLastError() <> ERROR_SUCCESS) Then
@@ -787,7 +777,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
             Next i
             
             ''display current
-            If (SetFileFiltProc(hWnd, dwFileFilt) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            SetFileFiltProc(hWnd, dwFileFilt)
             
         Case WM_COMMAND     ''commands
             Select Case HiWord(wParam)  ''event code
@@ -814,7 +804,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
                     ''get values from sheet
-                    dwFileFilt = GetFileFiltProc(hWnd)
+                    If (GetFileFiltProc(hWnd, dwFileFilt) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                     ''save to registry
                     If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
@@ -859,12 +849,12 @@ End Function
 
 Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
     
-    Dim dwValue As DWORD32 = DDL_DIRECTORY
+    dwValue = DDL_DIRECTORY
     
     If (IsDlgButtonChecked(hDlg, IDC_CHK_ARCHIVE) = BST_CHECKED) Then dwValue = (dwValue Or DDL_ARCHIVE)
     If (IsDlgButtonChecked(hDlg, IDC_CHK_HIDDEN) = BST_CHECKED) Then dwValue = (dwValue Or DDL_HIDDEN)
     If (IsDlgButtonChecked(hDlg, IDC_CHK_SYSTEM) = BST_CHECKED) Then dwValue = (dwValue Or DDL_SYSTEM)
-    If (IsDlgButtonChecked(hDlg, IDC_CHK_READONLY) = BST_CHECKED) Then dwReturnValue = (dwValue Or DDL_READONLY)
+    If (IsDlgButtonChecked(hDlg, IDC_CHK_READONLY) = BST_CHECKED) Then dwValue = (dwValue Or DDL_READONLY)
     If (IsDlgButtonChecked(hDlg, IDC_CHK_EXCLUSIVE) = BST_CHECKED) Then dwValue = (dwValue Or DDL_EXCLUSIVE)
     
     If (GetLastError() <> ERROR_SUCCESS) Then
@@ -886,7 +876,7 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
             
             ''create tooltips
             For iTip As UINT32 = 0 To 1
-                If (CreateToolTip(hWnd, (IDC_CBX_CHIP + iTip), (IDS_TIP_CHIP + iTip), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
+                If (CreateToolTip(hWnd, (IDC_CHK_WAVOUT + iTip), (IDS_TIP_WAVOUT + iTip), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
                     SysErrMsgBox(hWnd, GetLastError(), NULL)
                     Exit For
                 End If
@@ -1098,12 +1088,10 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     ''load the strings
     If (LoadString(hInst, IDS_REG_VGMPLAYPATH, plpszKeyName[KEY_VGMPLAYPATH], CCH_KEY) = 0) Then Return(FALSE)
     If (LoadString(hInst, IDS_REG_DEFAULTPATH, plpszKeyName[KEY_DEFAULTPATH], CCH_KEY) = 0) Then Return(FALSE)
-    If (LoadString(hInst, IDS_REG_WAVOUTPATH, plpszKeyName[KEY_WAVOUTPATH], CCH_KEY) = 0) Then Return(FALSE)
     If (LoadString(hInst, IDS_REG_FILEFILTER, plpszKeyName[KEY_FILEFILTER], CCH_KEY) = 0) Then Return(FALSE)
     
     If (LoadString(hInst, IDS_APPNAME, plpszStrRes[STR_APPNAME], CCH_STRRES) = 0) Then Return(FALSE)
     If (LoadString(hInst, IDS_FILT_VGMPLAY, plpszStrRes[STR_FILT_VGMPLAY], CCH_STRRES) = 0) Then Return(FALSE)
-    If (LoadString(hInst, IDS_FILT_VGMFILE, plpszStrRes[STR_FILT_VGMFILE], CCH_STRRES) = 0) Then Return(FALSE)
     If (LoadString(hInst, IDS_OPTIONS, plpszStrRes[STR_OPTIONS], CCH_STRRES) = 0) Then Return(FALSE)
     
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
