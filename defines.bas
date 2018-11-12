@@ -72,7 +72,8 @@
 #Define IDS_TIP_SYSTEM              &h004A /'74'/
 #Define IDS_TIP_READONLY            &h004B /'75'/
 #Define IDS_TIP_EXCLUSIVE           &h004C /'76'/
-#Define IDS_TIP_PREFERJAPTAG        &h004D /'77'/
+#Define IDS_TIP_WAVOUT              &h004D /'77'/
+#Define IDS_TIP_PREFERJAPTAG        &h004E /'78'/
 
 ''VGMPlay.ini sections and options
 #Define IDS_INI_SEC_GENERAL         &h0100
