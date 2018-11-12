@@ -20,8 +20,7 @@
 //registry key names
 #define IDS_REG_VGMPLAYPATH         0x0021 //33
 #define IDS_REG_DEFAULTPATH         0x0022 //34
-#define IDS_REG_WAVOUTPATH          0x0023 //35
-#define IDS_REG_FILEFILTER          0x0024 //36
+#define IDS_REG_FILEFILTER          0x0023 //35
 
 //file filters
 #define IDS_FILT_VGMPLAY            0x0031 //49
@@ -34,14 +33,13 @@
 #define IDS_TIP_PLAYBTN             0x0045 //69
 #define IDS_TIP_VGMPLAYPATH         0x0046 //70
 #define IDS_TIP_DEFAULTPATH         0x0047 //71
-#define IDS_TIP_WAVOUTPATH          0x0048 //72
-#define IDS_TIP_ARCHIVE             0x0049 //73
-#define IDS_TIP_HIDDEN              0x004A //74
-#define IDS_TIP_SYSTEM              0x004B //75
-#define IDS_TIP_READONLY            0x004C //76
-#define IDS_TIP_EXCLUSIVE           0x004D //77
-#define IDS_TIP_WAVOUT              0x004E //78
-#define IDS_TIP_PREFERJAPTAG        0x004F //79
+#define IDS_TIP_ARCHIVE             0x0048 //72
+#define IDS_TIP_HIDDEN              0x0049 //73
+#define IDS_TIP_SYSTEM              0x004A //74
+#define IDS_TIP_READONLY            0x004B //75
+#define IDS_TIP_EXCLUSIVE           0x004C //76
+#define IDS_TIP_WAVOUT              0x004D //77
+#define IDS_TIP_PREFERJAPTAG        0x004E //78
 
 #define IDS_INI_SEC_GENERAL         0x0100
 #define IDS_INI_OPT_LOGSOUND        0x0101
@@ -68,7 +66,6 @@ BEGIN
     //registry keys
     IDS_REG_VGMPLAYPATH "VGMPlay Path"
     IDS_REG_DEFAULTPATH "Default Path"
-    IDS_REG_WAVOUTPATH "Wave File Output Path"
     IDS_REG_FILEFILTER "File Filter"
     //filters
     IDS_FILT_VGMPLAY "VGMPlay (VGMPlay.exe)\0VGMPLAY.EXE\0All Files (*.*)\0*.*\0"
@@ -80,7 +77,6 @@ BEGIN
     IDS_TIP_PLAYBTN "Play"
     IDS_TIP_VGMPLAYPATH "Path to VGMPlay's executable"
     IDS_TIP_DEFAULTPATH "Initial path"
-    IDS_TIP_WAVOUTPATH "Path for rendered wave files"
     IDS_TIP_ARCHIVE "Include files with the archive attribute set"
     IDS_TIP_HIDDEN "Include hidden files"
     IDS_TIP_SYSTEM "Include files with the system attribute set"

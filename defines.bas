@@ -12,9 +12,6 @@
 #Define IDC_STC_DEFAULTPATH         &h0450 /'1104'/
 #Define IDC_EDT_DEFAULTPATH         &h0451 /'1105'/
 #Define IDC_BTN_DEFAULTPATH         &h0452 /'1106'/
-#Define IDC_STC_WAVOUTPATH          &h0453 /'1107'/
-#Define IDC_EDT_WAVOUTPATH          &h0454 /'1108'/
-#Define IDC_BTN_WAVOUTPATH          &h0455 /'1109'/
 
 ''file filter property sheet:
 #Define IDD_FILEFILT                &h04B0 /'1200'/
@@ -58,7 +55,6 @@
 #Define IDS_REG_VGMPLAYPATH         &h0021 /'33'/
 #Define IDS_REG_DEFAULTPATH         &h0022 /'34'/
 #Define IDS_REG_WAVOUTPATH          &h0023 /'35'/
-#Define IDS_REG_FILEFILTER          &h0024 /'36'/
 
 ''file filters
 #Define IDS_FILT_VGMPLAY            &h0031 /'49'/
@@ -71,14 +67,13 @@
 #Define IDS_TIP_PLAYBTN             &h0045 /'69'/
 #Define IDS_TIP_VGMPLAYPATH         &h0046 /'70'/
 #Define IDS_TIP_DEFAULTPATH         &h0047 /'71'/
-#Define IDS_TIP_WAVOUTPATH          &h0048 /'72'/
-#Define IDS_TIP_ARCHIVE             &h0049 /'73'/
-#Define IDS_TIP_HIDDEN              &h004A /'74'/
-#Define IDS_TIP_SYSTEM              &h004B /'75'/
-#Define IDS_TIP_READONLY            &h004C /'76'/
-#Define IDS_TIP_EXCLUSIVE           &h004D /'77'/
-#Define IDS_TIP_WAVOUT              &h004E /'78'/
-#Define IDS_TIP_PREFERJAPTAG        &h004F /'79'/
+#Define IDS_TIP_ARCHIVE             &h0048 /'72'/
+#Define IDS_TIP_HIDDEN              &h0049 /'73'/
+#Define IDS_TIP_SYSTEM              &h004A /'74'/
+#Define IDS_TIP_READONLY            &h004B /'75'/
+#Define IDS_TIP_EXCLUSIVE           &h004C /'76'/
+#Define IDS_TIP_WAVOUT              &h004D /'77'/
+#Define IDS_TIP_PREFERJAPTAG        &h004E /'78'/
 
 ''VGMPlay.ini sections and options
 #Define IDS_INI_SEC_GENERAL         &h0100
