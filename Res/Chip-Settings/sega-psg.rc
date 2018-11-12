@@ -1,13 +1,13 @@
 //sega-psg.rc
 
-#define IDD_SEGAPSG 1100
-#define IDC_CHK_ENABLE 1101
-#define IDC_GRP_CHANNELS 1102
-#define IDC_CHK_CH1 1103
-#define IDC_CHK_CH2 1104
-#define IDC_CHK_CH3 1105
-#define IDC_CHK_CH4 1106
-#define IDC_CBX_CORE 1107
+#define IDD_SEGAPSG 2100
+#define IDC_CHK_ENABLE 2101
+#define IDC_GRP_CHANNELS 2102
+#define IDC_CHK_CH1 2103
+#define IDC_CHK_CH2 2104
+#define IDC_CHK_CH3 2105
+#define IDC_CHK_CH4 2106
+#define IDC_CBX_CORE 2107
 
 LANGUAGE 9, 1
 
