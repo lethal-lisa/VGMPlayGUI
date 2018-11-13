@@ -36,7 +36,7 @@
 #Include Once "win/prpsht.bi"
 
 ''declare functions
-Declare Function DoChipSettingsPropSheet (ByVal hDlg As HWND) As DWORD32
+Declare Function DoChipSettingsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As DWORD32
 Declare Function SegaPsgProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 Declare Function NesApuProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 Declare Function OplProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
