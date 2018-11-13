@@ -1,0 +1,6 @@
+//chip-settings.rc
+
+#include "nes-apu.rc"
+#include "sega-psg.rc"
+
+//EOF
