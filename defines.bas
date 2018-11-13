@@ -54,7 +54,7 @@
 ''registry key names
 #Define IDS_REG_VGMPLAYPATH         &h0021 /'33'/
 #Define IDS_REG_DEFAULTPATH         &h0022 /'34'/
-#Define IDS_REG_WAVOUTPATH          &h0023 /'35'/
+#Define IDS_REG_FILEFILTER          &h0023 /'35'/
 
 ''file filters
 #Define IDS_FILT_VGMPLAY            &h0031 /'49'/

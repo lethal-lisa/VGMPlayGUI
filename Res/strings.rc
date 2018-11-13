@@ -50,7 +50,6 @@ LANGUAGE 9, 1
 BEGIN
     IDS_APPNAME "VGMPlayGUI"
     IDS_OPTIONS "Options"
-    //message text and captions
     IDS_MSGTXT_ABOUT "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nCopyright (c) 2018 Kazusoft Co."
     IDS_MSGCAP_ABOUT "About VGMPlayGUI"
     IDS_MSGTXT_NYI "This feature is not implemented yet.\nSorry."
@@ -63,13 +62,10 @@ BEGIN
     IDS_MSGCAP_FILTHELP "File Filter Help"
     IDS_MSGTXT_DELFILE "Are you sure you want to delete %1?\nThis action cannot be undone."
     IDS_MSGCAP_DELFILE "Delete File?"
-    //registry keys
     IDS_REG_VGMPLAYPATH "VGMPlay Path"
     IDS_REG_DEFAULTPATH "Default Path"
     IDS_REG_FILEFILTER "File Filter"
-    //filters
     IDS_FILT_VGMPLAY "VGMPlay (VGMPlay.exe)\0VGMPLAY.EXE\0All Files (*.*)\0*.*\0"
-    //tooltips
     IDS_TIP_DRIVELIST "List of available drives"
     IDS_TIP_BACKBTN "Go up one directory"
     IDS_TIP_GOBTN "Go to entered directory"
@@ -84,7 +80,6 @@ BEGIN
     IDS_TIP_EXCLUSIVE "Show only files with the attributes selected above"
     IDS_TIP_WAVOUT "Enable WAV file output"
     IDS_TIP_PREFERJAPTAG "Prefer Japanese GD3 tags\nThis will not work unless you have a unicode-enabled console\nUse at your own risk"
-    //VGMPlay.ini settings
     IDS_INI_SEC_GENERAL "General"
     IDS_INI_OPT_LOGSOUND "LogSound"
     IDS_INI_OPT_PREFERJAPTAG "PreferJapTag"

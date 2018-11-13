@@ -7,18 +7,6 @@ VGMPlayGUI - List of Planned Functions:
         
             The header data can be stored in a UDT from a library.
         
-    -Add a Message Box for if VGMPlay.exe isn't found.
-        
-            If the user attempts to play a file before setting a path to
-        VGMPlay; a "Yes/No" message box with the text of:
-            
-            "The path to "VGMPlay.exe" is invalid or not specified.
-            Would you like to specifiy its path now?"
-            
-        will be displayed. Clicking "Yes" will prompt the user to provide
-        a path to VGMPlay via an 'open' Common Dialog Box, and clicking "No"
-        will close the message box.
-        
     -Add command line parameters.
         
             The user should be able to pass command line parameters to
