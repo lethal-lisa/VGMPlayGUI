@@ -25,7 +25,7 @@ BEGIN
             VALUE "OriginalFilename", "VGMPlayGUI.exe\0"
             VALUE "ProductName", "VGMPlayGUI\0"
             //VALUE "PrivateBuild", "\0"
-            VALUE "SpecialBuild", "Pre-Release Version\0"
+            VALUE "SpecialBuild", "Built for testing the chip settings menu.\0"
         END
     END
     BLOCK "VarFileInfo"

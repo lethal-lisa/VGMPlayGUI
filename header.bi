@@ -40,6 +40,7 @@
 #Include "inc/errmsgbox.bi"
 #Include "inc/regint.bi"
 #Include "inc/winapicheck.bi"
+#Include "mod/chip-settings/chip-settings.bi"
 
 ''defines
 #Define MARGIN_SIZE 10
