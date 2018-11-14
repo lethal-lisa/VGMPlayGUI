@@ -1,2 +1,2 @@
 #ignore any compiled files:
-*.a, *.exe
+*.a, *.exe, *.res, *.obj
