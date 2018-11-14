@@ -38,7 +38,6 @@
 #Include Once "win/commdlg.bi"
 #Include Once "win/prsht.bi"
 #Include "inc/errmsgbox.bi"
-#Include "inc/regint.bi"
 #Include "inc/winapicheck.bi"
 #Include "mod/chip-settings/chip-settings.bi"
 
@@ -127,5 +126,6 @@ Declare Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
 Declare Function LoadConfig () As BOOL
 Declare Function SaveConfig () As BOOL
 Declare Function SetDefConfig () As BOOL
+Declare Function OpenProgHKey (ByRef phkProgKey As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As BOOL
 
 ''EOF
