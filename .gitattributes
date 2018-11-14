@@ -3,7 +3,7 @@
 *.txt text=auto eol=lf
 *.bas text=auto eol=lf
 *.bi  text=auto eol=lf
-*.rc  text=auto eol=lf
+*.rc  text=auto eol=crlf
 *.fbp text=auto eol=lf
 # Auto detect binaries
 *.a   -text -diff
