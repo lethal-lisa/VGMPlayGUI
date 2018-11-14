@@ -1,0 +1,14 @@
+//chip-settings.rc
+
+//define property sheet sizes
+#define PROP_SM_CXDLG   212
+#define PROP_SM_CYDLG   188
+#define PROP_MED_CXDLG  227
+#define PROP_MED_CYDLG  215
+#define PROP_LG_CXDLG   252
+#define PROP_LG_CYDLG   218
+
+#include "nes-apu.rc"
+#include "sega-psg.rc"
+
+//EOF

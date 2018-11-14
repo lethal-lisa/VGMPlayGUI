@@ -5,7 +5,7 @@
     VGMPlayGUI v2 - Main module.
     
     Compile with:
-        fbc -s -gui -mt "main.bas" "resource.rc" -x "VGMPlayGUI.exe"
+        fbc -s gui -mt "main.bas" "resource.rc" -x "VGMPlayGUI.exe"
     
     Copyright (c) 2018 Kazusoft Co.
     Kazusoft is a TradeMark of Lisa Murray.
