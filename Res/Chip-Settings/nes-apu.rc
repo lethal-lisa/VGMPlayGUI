@@ -1,14 +1,14 @@
 //nes-apu.rc
 
 #define IDD_NESAPU              1100
-#define IDC_CHK_NES_ENABLE      1101
-#define IDC_GRP_NES_CHANNELS    1102
-#define IDC_CHK_NES_PULSE1      1103
-#define IDC_CHK_NES_PULSE2      1104
-#define IDC_CHK_NES_TRIANGLE    1105
-#define IDC_CHK_NES_NOISE       1106
-#define IDC_CHK_NES_DPCM        1107
-#define IDC_CBX_NES_CORE        1108
+#define IDC_GRP_NES_CHANNELS    1101
+#define IDC_CHK_NES_PULSE1      1102
+#define IDC_CHK_NES_PULSE2      1103
+#define IDC_CHK_NES_TRIANGLE    1104
+#define IDC_CHK_NES_NOISE       1105
+#define IDC_CHK_NES_DPCM        1106
+#define IDC_CBX_NES_CORE        1107
+#define IDC_CHK_NES_ENABLE      1108
 
 IDD_NESAPU DIALOGEX 10, 10, PROP_SM_CXDLG, PROP_SM_CYDLG
 CAPTION "NES APU"
