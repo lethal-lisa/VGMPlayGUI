@@ -24,7 +24,7 @@ REM Compile main module
 ECHO.
 ECHO COMPILING MAIN MODULE.
 ECHO.
-gorc /r ".\resource.rc"
+GoRC /r ".\resource.rc"
 fbc -s gui -mt ".\main.bas" ".\resource.res" -x "VGMPlayGUI.exe"
 
 REM Clean up directory
