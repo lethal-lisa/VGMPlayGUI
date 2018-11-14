@@ -1,11 +1,12 @@
 # Auto detect text files and perform LF normalization
-*     text=auto eol=lf
-*.txt text=auto eol=lf
 *.bas text=auto eol=lf
 *.bi  text=auto eol=lf
-*.rc  text=auto eol=crlf
 *.fbp text=auto eol=lf
-# Auto detect binaries
+*.bat text=auto eol=crlf
+*.txt text=auto eol=crlf
+*.TXT text=auto eol=crlf
+*.rc  text=auto eol=crlf
+# Auto detect binary files
 *.a   -text -diff
 *.dll -text -diff
 *.exe -text -diff
