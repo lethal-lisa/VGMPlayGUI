@@ -3,7 +3,7 @@
 #define IDR_VERSIONINFO 1
 
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 13, 14, r
+FILEVERSION     1, 13, 14, 4
 PRODUCTVERSION  2, 11, 0, 45
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       VS_FF_DEBUG VS_FF_PRIVATEBUILD | VS_FF_SPECIALBUILD
@@ -25,7 +25,7 @@ BEGIN
             VALUE "OriginalFilename", "VGMPlayGUI.exe\0"
             VALUE "ProductName", "VGMPlayGUI\0"
             //VALUE "PrivateBuild", "\0"
-            //VALUE "SpecialBuild", "\0"
+            VALUE "SpecialBuild", "Testing the chip settings library.\0"
         END
     END
     BLOCK "VarFileInfo"
