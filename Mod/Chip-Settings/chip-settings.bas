@@ -9,6 +9,10 @@
     
 '/
 
+#IfDef __FB_MAIN__
+#Error "This must be compilied as the main module."
+#EndIf
+
 ''include header
 #Include Once "chip-settings.bi"
 
