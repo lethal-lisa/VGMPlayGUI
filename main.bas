@@ -179,12 +179,16 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             Dim lpszAboutMsgSrc As LPTSTR = HeapAlloc(hHeap, 0, Cast(SIZE_T, (256 * SizeOf(TCHAR)))) ''source string
                             Dim ppdwArgs As DWORD_PTR Ptr = HeapAlloc(hHeap, 0, Cast(SIZE_T, (1 * SizeOf(DWORD_PTR)))) ''argument array
                             
+                            ''check allocation
+                            If ((Cast(LPVOID, lpszAboutMsgSrc) = NULL) Or (Cast(LPVOID, ppdwArgs) = NULL)) Then
+                                HeapUnlock(hHeap)
+                                SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            End If
+                            
                             ''get arguments
                             Dim szBuildDate As ZString*32 = (__DATE_ISO__ + " " + __TIME__) ''build date
                             ppdwArgs[0] = @szBuildDate
-                            If (LoadString(hInstance, IDS_ABOUT, lpszAboutMsgSrc, 256) = 0) Then
-                                SysErrMsgBox(hWnd, GetLastError(), NULL)
-                            End If
+                            If (LoadString(hInstance, IDS_MSGTXT_ABOUT, lpszAboutMsgSrc, 256) = 0) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             If (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER Or FORMAT_MESSAGE_ARGUMENT_ARRAY Or FORMAT_MESSAGE_FROM_STRING, FORMAT_MESSAGE_FROM_STRING, lpszAboutMsgSrc, NULL, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), lpszAboutMsg, 256, ppdwArgs) = 0) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             
                             ''setup messageboxparams
@@ -206,6 +210,11 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             ''display message box
                             MessageBeep(MB_ICONASTERISK)
                             MessageBoxIndirect(@mbp)
+                            
+                           ''free memory
+                           LocalFree(lpszAboutMsg)
+                           If ((HeapFree(hHeap, 0, Cast(LPVOID, lpszAboutMsgSrc)) = FALSE) Or (HeapFree(hHeap, 0, Cast(LPVOID, ppdwArgs)) = FALSE)) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                           If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             
                         Case IDC_BTN_PLAY       ''start VGMPlay
                             
