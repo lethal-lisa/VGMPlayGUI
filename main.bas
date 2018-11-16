@@ -297,7 +297,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             
         Case WM_CONTEXTMENU         ''display the context menu
             
-            DisplayContextMenu(hWnd, LoWord(lParam), HiWord(lParam))
+            If (DisplayContextMenu(hWnd, LoWord(lParam), HiWord(lParam)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case Else                   ''otherwise
             
