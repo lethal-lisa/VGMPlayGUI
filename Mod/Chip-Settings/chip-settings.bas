@@ -9,7 +9,7 @@
     
 '/
 
-#IfDef __FB_MAIN__
+#Ifndef __FB_MAIN__
 #Error "This must be compilied as the main module."
 #EndIf
 
