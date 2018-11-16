@@ -173,14 +173,28 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                         Case IDM_ABOUT          ''display the about message
                             
-                            ''declare and setup mbp
+                            ''allocate space for arguments
+                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            Dim lpszAboutMsg As LPTSTR ''about message buffer
+                            Dim lpszAboutMsgSrc As LPTSTR = HeapAlloc(hHeap, 0, Cast(SIZE_T, (256 * SizeOf(TCHAR)))) ''source string
+                            Dim ppdwArgs As DWORD_PTR Ptr = HeapAlloc(hHeap, 0, Cast(SIZE_T, (1 * SizeOf(DWORD_PTR)))) ''argument array
+                            
+                            ''get arguments
+                            Dim szBuildDate As ZString*32 = (__DATE_ISO__ + " " + __TIME__) ''build date
+                            ppdwArgs[0] = @szBuildDate
+                            If (LoadString(hInstance, IDS_ABOUT, lpszAboutMsgSrc, 256) = 0) Then
+                                SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            End If
+                            If (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER Or FORMAT_MESSAGE_ARGUMENT_ARRAY Or FORMAT_MESSAGE_FROM_STRING, FORMAT_MESSAGE_FROM_STRING, lpszAboutMsgSrc, NULL, MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL), lpszAboutMsg, 256, ppdwArgs) = 0) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            
+                            ''setup messageboxparams
                             Dim mbp As MSGBOXPARAMS
                             ZeroMemory(@mbp, SizeOf(mbp))
                             With mbp
                                 .cbSize             = SizeOf(mbp)
                                 .hwndOwner          = hWnd
                                 .hInstance          = hInstance
-                                .lpszText           = MAKEINTRESOURCE(IDS_MSGTXT_ABOUT)
+                                .lpszText           = lpszAboutMsg
                                 .lpszCaption        = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
                                 .dwStyle            = (MB_OK Or MB_DEFBUTTON1 Or MB_APPLMODAL Or MB_SETFOREGROUND Or MB_USERICON)
                                 .lpszIcon           = MAKEINTRESOURCE(IDI_KAZUSOFT)
