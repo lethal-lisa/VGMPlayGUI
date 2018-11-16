@@ -103,4 +103,10 @@ v2.10.2:
     
     -       Removed the 'Open File' option, as it wasn't frequently used.
     
+v2.11:
+    
+    +       Added a VGMPlay Settings property sheet.
+    *       Typo fixes.
+    *       Optimization fixes.
+    
 EOF
