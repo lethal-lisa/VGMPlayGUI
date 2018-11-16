@@ -175,13 +175,14 @@ v2.11:
     *       Optimized the order of certain commands.
     -       Removed old, unnecessary source files.
     +       Added some comments.
-    *       Changed all ID's to hexadecimal.
+    *       Changed some ID's to hexadecimal.
     *       Optimized the WinAPICheck module.
     *       Split defines.bas off of header.bi.
     +       Added an "VGMPlay Settings" Property Sheet page.
     *       VGMPlayGUI now checks if its path to VGMPlay.exe is correct and
         prompts the user to correct it if it isn't.
     +       Added tooltips to most controls in the options menu.
-    *       Fixed some typos.
+    *       Fixed some typos in the string resources.
+    +       Added chip-settings.dll.
     
 EOF
