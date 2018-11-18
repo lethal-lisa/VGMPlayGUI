@@ -1,6 +1,7 @@
 //strings.rc
 
 #define IDS_APPNAME                 0x0001 //1
+#define IDS_OPTIONS                 0x0002 //2
 
 //message captions and text
 #define IDS_MSGTXT_ABOUT            0x0011 //17
