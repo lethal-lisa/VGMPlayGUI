@@ -39,18 +39,6 @@
 #Include Once "win/prsht.bi"
 #Include "inc/errmsgbox.bi"
 #Include "inc/winapicheck.bi"
-#Include "mod/chip-settings/chip-settings.bi"
-
-''defines
-#Define MARGIN_SIZE 10
-#Define WINDOW_SIZE 30
-#Define MIN_SIZE_X  504
-#Define MIN_SIZE_Y  444
-
-''for some reason, this isn't defined in FB's 64-bit headers
-#Ifndef DWL_MSGRESULT
-#Define DWL_MSGRESULT 0
-#EndIf
 
 #Include Once "defines.bas"
 
@@ -59,18 +47,18 @@
 Const MainClass = "MAINCLASS"
 
 ''declare shared variables
-Dim Shared hInstance As HMODULE ''instance handle
-Dim Shared lpszCmdLine As LPSTR ''command line
-Dim Shared hWin As HWND         ''main window handle
-Dim Shared hHeap As HANDLE      ''heap handle
+Dim Shared hInstance As HMODULE                     ''global application instance handle
+Dim Shared lpszCmdLine As LPSTR                     ''command line parameters pointer
+Dim Shared hWin As HWND                             ''main window handle
+Dim Shared hHeap As HANDLE                          ''application heap handle
 
 Dim Shared plpszPath As LPTSTR Ptr                  ''paths
 Dim Shared plpszKeyName As LPTSTR Ptr               ''registry key names
 Dim Shared plpszStrRes As LPTSTR Ptr                ''misc. string resources
-Dim Shared phkProgKey As PHKEY                      ''program hkey
+Dim Shared phkProgKey As PHKEY                      ''application hkey
 Dim Shared ppiProcInfo As PROCESS_INFORMATION Ptr   ''process info for CreateProcess
 Dim Shared psiStartInfo As STARTUPINFO Ptr          ''startup info for CreateProcess
-Dim Shared dwFileFilt As DWORD32                    ''file filter
+Dim Shared dwFileFilt As DWORD32                    ''file attribute filter
 
 
 ''declare functions
@@ -111,9 +99,6 @@ Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
 
 ''starts VGMPlay
 Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
-
-''opens a VGM file
-Declare Function OpenVGMFile (ByVal hDlg As HWND) As BOOL
 
 ''memory macro functions
 Declare Function InitMem () As BOOL

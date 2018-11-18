@@ -49,8 +49,13 @@ STRINGTABLE
 LANGUAGE 9, 1
 BEGIN
     IDS_APPNAME "VGMPlayGUI"
+<<<<<<< HEAD
     IDS_OPTIONS "Options"
     IDS_MSGTXT_ABOUT "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nBuild date:\t%1\nCopyright (c) 2018 Kazusoft Co.\nKazusoft and the Kazusoft logo are trademarks of Lisa Murray."
+=======
+    IDS_OPTIONS "Options Menu"
+    IDS_MSGTXT_ABOUT "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nCopyright (c) 2018 Kazusoft Co."
+>>>>>>> dc7295fb0454ccc1187cd7e2974799455b3ce3e6
     IDS_MSGCAP_ABOUT "About VGMPlayGUI"
     IDS_MSGTXT_NYI "This feature is not implemented yet.\nSorry."
     IDS_MSGCAP_NYI "NYI"

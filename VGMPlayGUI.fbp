@@ -5,14 +5,14 @@ Api=fb (FreeBASIC),win (Windows)
 Grouping=1
 AddMainFiles=1
 AddModuleFiles=0
-ResExport=Inc\Resource.bi
+ResExport=
 CompileIfNewer=1
 IncVersion=0
 RunCmd=0
 [Make]
 Module=Module Build,fbc -lib
 Recompile=2
-Current=2
+Current=1
 1=Debug Build,fbc -g -mt
 2=Release Build,fbc -s gui -mt
 Output=VGMPlayGUI.exe
@@ -20,35 +20,17 @@ Run=
 Delete=
 [File]
 1=main.bas
-2=resource.rc
-3=header.bi
-4=Doc\AUTHORS.TXT
-5=Doc\MANIFEST.TXT
-1002=Mod\ErrMsgBox.bas
-6=Inc\ErrMsgBox.bi
-1003=Mod\RegInt.bas
-7=Doc\BUGS.TXT
-8=Doc\CHANGES.TXT
-9=Doc\DEVNOTES.TXT
-10=Doc\INSTALL.TXT
-11=Doc\THANKS.TXT
-12=Inc\RegInt.bi
-13=Doc\README.TXT
-14=Doc\TODO.TXT
-15=Doc\NEWS.TXT
-16=Inc\WinAPICheck.bi
-17=Res\menus.rc
-18=defines.bas
-19=Res\strings.rc
-1004=Mod\WinAPICheck.bas
-20=Res\icons.rc
-21=Res\versioninfo.rc
-22=Res\chip-settings\sega-psg.rc
-23=Res\Chip-Settings\chip-settings.rc
-24=Res\Chip-Settings\nes-apu.rc
-25=Mod\Chip-Settings\chip-settings.bas
-26=Mod\Chip-Settings\chip-settings.bi
+2=header.bi
+3=resource.rc
+4=defines.bas
+5=Res\menus.rc
+6=Res\strings.rc
+1001=Mod\ErrMsgBox.bas
+1002=Mod\WinAPICheck.bas
+7=Inc\ErrMsgBox.bi
+8=Inc\WinAPICheck.bi
 [FileInfo]
+<<<<<<< HEAD
 5=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 4=0,56,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 1=0,937,1,133988223,-4194308,1669293054,0,0,0,0,0,0,0,0,0,0,0,0,0
@@ -83,13 +65,17 @@ Delete=
 26=0,31,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 [TabOrder]
 TabOrder=1,2,3,4,6,7
+=======
+1=0,1107,1,-251686913,-268435457,6534687,0,0,0,0,0,0,0,0,0,0,0,0,0
+2=0,18,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+3=0,113,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+[TabOrder]
+TabOrder=1,2,3,4
+>>>>>>> dc7295fb0454ccc1187cd7e2974799455b3ce3e6
 [BreakPoint]
 1=
-22=
-21=
-2=
-18=
 3=
+<<<<<<< HEAD
 19=
 24=
 23=
@@ -98,3 +84,8 @@ TabOrder=1,2,3,4,6,7
 20=
 17=
 6=
+=======
+6=
+4=
+2=
+>>>>>>> dc7295fb0454ccc1187cd7e2974799455b3ce3e6
