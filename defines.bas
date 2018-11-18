@@ -138,19 +138,19 @@
 ''ID's for plpszKeyName
 #Define CCH_KEY                     &h0020 /'32'/
 #Define CB_KEY                      Cast(SIZE_T, (SizeOf(TCHAR) * CCH_KEY))
-#Define NUM_KEY                     &h0004 /'4'/
+#Define NUM_KEY                     &h0003 /'3'/
 #Define SIZE_KEY                    Cast(SIZE_T, (NUM_KEY * CB_KEY))
 #Define KEY_VGMPLAYPATH             &h0000 /'0'/
 #Define KEY_DEFAULTPATH             &h0001 /'1'/
-#Define KEY_WAVOUTPATH              &h0002 /'2'/
-#Define KEY_FILEFILTER              &h0003 /'3'/
+#Define KEY_FILEFILTER              &h0002 /'2'/
 
 ''ID's for plpszStrRes
 #Define CCH_STRRES                  &h0200 /'512'/
 #Define CB_STRRES                   Cast(SIZE_T, (SizeOf(TCHAR) * CCH_STRRES))
-#Define NUM_STRRES                  &h0004 /'2'/
+#Define NUM_STRRES                  &h0003 /'3'/
 #Define SIZE_STRRES                 Cast(SIZE_T, (NUM_STRRES * CB_STRRES))
 #Define STR_APPNAME                 &h0000 /'0'/
-#Define STR_FILT_VGMPLAY            &h0004 /'1'/
+#Define STR_OPTIONS                 &h0001 /'1'/
+#Define STR_FILT_VGMPLAY            &h0002 /'2'/
 
 ''EOF
