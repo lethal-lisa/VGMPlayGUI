@@ -12,7 +12,7 @@ RunCmd=0
 [Make]
 Module=Module Build,fbc -lib
 Recompile=2
-Current=2
+Current=1
 1=Debug Build,fbc -g -mt
 2=Release Build,fbc -s gui -mt
 Output=VGMPlayGUI.exe
@@ -35,3 +35,6 @@ Delete=
 3=0,113,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 [TabOrder]
 TabOrder=1,2,3,4
+[BreakPoint]
+1=
+3=

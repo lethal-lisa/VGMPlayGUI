@@ -1095,8 +1095,6 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     If (LoadString(hInst, IDS_REG_FILEFILTER, plpszKeyName[KEY_FILEFILTER], CCH_KEY) = 0) Then Return(FALSE)
     
     If (LoadString(hInst, IDS_APPNAME, plpszStrRes[STR_APPNAME], CCH_STRRES) = 0) Then Return(FALSE)
-    If (LoadString(hInst, IDS_FILT_VGMPLAY, plpszStrRes[STR_FILT_VGMPLAY], CCH_STRRES) = 0) Then Return(FALSE)
-    If (LoadString(hInst, IDS_OPTIONS, plpszStrRes[STR_OPTIONS], CCH_STRRES) = 0) Then Return(FALSE)
     
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
