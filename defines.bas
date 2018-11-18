@@ -1,8 +1,36 @@
+/'
+    
+    defines.bas
+    
+    Defines for VGMPlayGUI
+    
+'/
 
 #Pragma Once
 
-''defines from resource.rc
+''defines
+#Define MARGIN_SIZE                 &h000A /'10'/
+#Define WINDOW_SIZE                 &h001E /'30'/
+#Define MIN_SIZE_X                  &h01F8 /'504'/
+#Define MIN_SIZE_Y                  &h01BC /'444'/
+
+''for some reason, this isn't defined in FB's 64-bit headers
+#Ifndef DWL_MSGRESULT
+#Define DWL_MSGRESULT 0
+#EndIf
+
+''defines from resource files:
+''main dialog:
 #Define IDD_MAIN                    &h03E8 /'1000'/
+#Define IDC_SBR                     &h03E9 /'1001'/
+#Define IDC_LST_MAIN                &h03EA /'1002'/
+#Define IDC_LST_DRIVES              &h03EB /'1003'/
+#Define IDC_EDT_FILE                &h03EC /'1004'/
+#Define IDC_BTN_PLAY                &h03ED /'1005'/
+#Define IDC_EDT_PATH                &h03EE /'1006'/
+#Define IDC_BTN_GO                  &h03EF /'1007'/
+#Define IDC_BTN_BACK                &h03F0 /'1008'/
+#Define IDC_BTN_REFRESH             &h03F1 /'1009'/
 
 ''paths property sheet:
 #Define IDD_PATHS                   &h044C /'1100'/
@@ -22,22 +50,22 @@
 #Define IDC_CHK_READONLY            &h04B5 /'1205'/
 #Define IDC_CHK_EXCLUSIVE           &h04B6 /'1206'/
 
-''core select property sheet:
+''vgmplay settings property sheet:
 #Define IDD_VGMPLAYSETTINGS         &h0514 /'1300'/
 #Define IDC_CHK_WAVOUT              &h0515 /'1301'/
 #Define IDC_CHK_PREFJAPTAGS         &h0516 /'1302'/
 
-''defines from icons.rc:
+''icons:
 #Define IDI_VGMPLAYGUI              &h0064 /'100'/
 #Define IDI_KAZUSOFT                &h0065 /'101'/
 #Define IDI_WRENCH                  &h0066 /'102'/
 #Define IDI_PLAY                    &h0067 /'103'/
 
-''defines from strings.rc:
+''strings:
 #Define IDS_APPNAME                 &h0001 /'1'/
 #Define IDS_OPTIONS                 &h0002 /'2'/
 
-''message captions and text
+''message captions and text:
 #Define IDS_MSGTXT_ABOUT            &h0011 /'17'/
 #Define IDS_MSGCAP_ABOUT            &h0012 /'18'/
 #Define IDS_MSGTXT_NYI              &h0013 /'19'/
@@ -76,9 +104,9 @@
 #Define IDS_TIP_PREFERJAPTAG        &h004E /'78'/
 
 ''VGMPlay.ini sections and options
-#Define IDS_INI_SEC_GENERAL         &h0100
-#Define IDS_INI_OPT_LOGSOUND        &h0101
-#Define IDS_INI_OPT_PREFERJAPTAG    &h0102
+#Define IDS_INI_SEC_GENERAL         &h0100 /'256'/
+#Define IDS_INI_OPT_LOGSOUND        &h0101 /'257'/
+#Define IDS_INI_OPT_PREFERJAPTAG    &h0102 /'258'/
 
 ''defines from menus.rc
 #Define IDR_MENU1                   &h2710 /'10000'/
@@ -100,42 +128,29 @@
 ''ID's for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (SizeOf(TCHAR) * CCH_PATH))
-#Define NUM_PATH                    4
+#Define NUM_PATH                    &h0004 /'4'/
 #Define SIZE_PATH                   Cast(SIZE_T, (NUM_PATH * CB_PATH))
-#Define PATH_VGMPLAY                0
-#Define PATH_DEFAULT                1
-#Define PATH_CURRENT                2
-#Define PATH_WAVOUT                 3
+#Define PATH_VGMPLAY                &h0000 /'0'/
+#Define PATH_DEFAULT                &h0001 /'1'/
+#Define PATH_CURRENT                &h0002 /'2'/
+#Define PATH_WAVOUT                 &h0003 /'3'/
 
 ''ID's for plpszKeyName
-#Define CCH_KEY                     32
+#Define CCH_KEY                     &h0020 /'32'/
 #Define CB_KEY                      Cast(SIZE_T, (SizeOf(TCHAR) * CCH_KEY))
-#Define NUM_KEY                     4
+#Define NUM_KEY                     &h0004 /'4'/
 #Define SIZE_KEY                    Cast(SIZE_T, (NUM_KEY * CB_KEY))
-#Define KEY_VGMPLAYPATH             0
-#Define KEY_DEFAULTPATH             1
-#Define KEY_WAVOUTPATH              2
-#Define KEY_FILEFILTER              3
+#Define KEY_VGMPLAYPATH             &h0000 /'0'/
+#Define KEY_DEFAULTPATH             &h0001 /'1'/
+#Define KEY_WAVOUTPATH              &h0002 /'2'/
+#Define KEY_FILEFILTER              &h0003 /'3'/
 
 ''ID's for plpszStrRes
-#Define CCH_STRRES                  512
+#Define CCH_STRRES                  &h0200 /'512'/
 #Define CB_STRRES                   Cast(SIZE_T, (SizeOf(TCHAR) * CCH_STRRES))
-#Define NUM_STRRES                  4
+#Define NUM_STRRES                  &h0004 /'2'/
 #Define SIZE_STRRES                 Cast(SIZE_T, (NUM_STRRES * CB_STRRES))
-#Define STR_APPNAME                 0
-#Define STR_FILT_VGMPLAY            1
-#Define STR_FILT_VGMFILE            2
-#Define STR_OPTIONS                 3
-
-''child window ID's
-#Define IDC_SBR                     &h03E9 /'1001'/
-#Define IDC_LST_MAIN                &h03EA /'1002'/
-#Define IDC_LST_DRIVES              &h03EB /'1003'/
-#Define IDC_EDT_FILE                &h03EC /'1004'/
-#Define IDC_BTN_PLAY                &h03ED /'1005'/
-#Define IDC_EDT_PATH                &h03EE /'1006'/
-#Define IDC_BTN_GO                  &h03EF /'1007'/
-#Define IDC_BTN_BACK                &h03F0 /'1008'/
-#Define IDC_BTN_REFRESH             &h03F1 /'1009'/
+#Define STR_APPNAME                 &h0000 /'0'/
+#Define STR_FILT_VGMPLAY            &h0004 /'1'/
 
 ''EOF

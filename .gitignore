@@ -1,0 +1,5 @@
+# ignore comiled files
+*.exe, *.dll, *.res, *.a
+
+# ignore project files
+*.fbp

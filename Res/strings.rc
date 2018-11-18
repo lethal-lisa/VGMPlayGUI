@@ -1,7 +1,6 @@
 //strings.rc
 
 #define IDS_APPNAME                 0x0001 //1
-#define IDS_OPTIONS                 0x0002 //2
 
 //message captions and text
 #define IDS_MSGTXT_ABOUT            0x0011 //17
@@ -49,7 +48,6 @@ STRINGTABLE
 LANGUAGE 9, 1
 BEGIN
     IDS_APPNAME "VGMPlayGUI"
-    IDS_OPTIONS "Options"
     IDS_MSGTXT_ABOUT "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nCopyright (c) 2018 Kazusoft Co."
     IDS_MSGCAP_ABOUT "About VGMPlayGUI"
     IDS_MSGTXT_NYI "This feature is not implemented yet.\nSorry."

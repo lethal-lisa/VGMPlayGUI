@@ -839,6 +839,8 @@ Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL
     If (dwValue And DDL_READONLY) Then CheckDlgButton(hDlg, IDC_CHK_READONLY, BST_CHECKED)
     If (dwValue And DDL_EXCLUSIVE) Then CheckDlgButton(hDlg, IDC_CHK_EXCLUSIVE, BST_CHECKED)
     
+    
+    '' TODO : correct this error checking
     If (GetLastError() <> ERROR_SUCCESS) Then
         Return(FALSE)
     Else
@@ -857,6 +859,8 @@ Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
     If (IsDlgButtonChecked(hDlg, IDC_CHK_READONLY) = BST_CHECKED) Then dwValue = (dwValue Or DDL_READONLY)
     If (IsDlgButtonChecked(hDlg, IDC_CHK_EXCLUSIVE) = BST_CHECKED) Then dwValue = (dwValue Or DDL_EXCLUSIVE)
     
+    
+    '' TODO : correct this error checking
     If (GetLastError() <> ERROR_SUCCESS) Then
         Return(FALSE)
     Else
