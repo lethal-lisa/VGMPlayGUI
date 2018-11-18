@@ -95,27 +95,73 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
     Select Case uMsg                ''messages:
         Case WM_CREATE              ''creating window
             
+            #If __FB_DEBUG__
+            ? "Calling WM_CREATE"
+            ? "Setting icon and cursor."
+            #EndIf
+            
             ''set the program's icon and set a loading cursor
             SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VGMPLAYGUI))))
             SetCursor(LoadCursor(NULL, IDC_APPSTARTING))
             
-            ''create the heap, init memory, and load resources
-            hHeap = HeapCreate(0, 0, 0)
-            If (InitMem() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-            If (LoadStringResources(hInstance) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            #If __FB_DEBUG__
+            ? "Creating the heap."
+            #EndIf
             
-            ''open program hkey and load settings
+            ''create the heap
+            hHeap = HeapCreate(0, 0, 0)
+            If (hHeap = INVALID_HANDLE_VALUE) Then 
+                SysErrMsgBox(hWnd, GetLastError(), NULL)
+                PostQuitMessage(GetLastError())
+            End If
+            
+            #If __FB_DEBUG__
+            ? "Initialzing memory."
+            #EndIf
+            If (InitMem() = FALSE) Then
+                SysErrMsgBox(hWnd, GetLastError(), NULL)
+                PostQuitMessage(GetLastError())
+            End If
+            
+            #If __FB_DEBUG__
+            ? "Loading string resources."
+            #EndIf
+            
+            If (LoadStringResources(hInstance) = FALSE) Then
+                SysErrMsgBox(hWnd, GetLastError(), NULL)
+                PostQuitMessage(GetLastError())
+            End If
+            
+            #If __FB_DEBUG__
+            ? "Opening program HKEY."
+            #EndIf
+            
+            ''open program hkey
             Dim dwKeyDisp As DWORD32    ''key disposition for OpenProgHKey
             If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-            If (OpenProgHKey(phkProgKey, plpszStrRes[STR_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (OpenProgHKey(phkProgKey, plpszStrRes[STR_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then
+                SysErrMsgBox(hWnd, GetLastError(), NULL)
+                HeapUnlock(hHeap)
+                PostQuitMessage(GetLastError())
+            End If
             If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            
             If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
+                #If __FB_DEBUG__
+                ? "Loading config from registry."
+                #EndIf
                 If (LoadConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             Else
+                #If __FB_DEBUG__
+                ? "Using default config and writing to registry."
+                #EndIf
                 If (SetDefConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             End If
             
             ''create child windows
+            #If __FB_DEBUG__
+            ? "Creating child windows for main dialog."
+            #EndIf
             If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case WM_DESTROY             ''destroying window
@@ -130,16 +176,28 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             
         Case WM_INITDIALOG          ''initializing dialog
             
+            #If __FB_DEBUG__
+            ? "Init. dir. listings."
+            #EndIf
+            
             ''initialize directory listings to default directory
             If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
-            ''set the default keyboard focus to IDC_LST_MAIN
-            If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            '''set the default keyboard focus to IDC_LST_MAIN
+            'If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            
+            #If __FB_DEBUG__
+            ? "Setting the cursor."
+            #EndIf
             
             ''set the arrow cursor
             SetCursor(LoadCursor(NULL, IDC_ARROW))
+            
+            #If __FB_DEBUG__
+            ? "making sure VGMPlay's path is valid."
+            #EndIf
             
             ''make sure VGMPlay's path is valid
             If (PathFileExists(plpszPath[PATH_VGMPLAY]) = FALSE) Then
@@ -889,6 +947,12 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
         Case WM_COMMAND     ''commands
             Select Case HiWord(wParam) ''event code
                 Case BN_CLICKED        ''button clicked
+                    Select Case LoWord(wParam)
+                        Case IDC_BTN_CHIPSETTINGS
+                            
+                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
+                            
+                    End Select
                     
                     SendMessage(hwndPrsht, PSM_CHANGED, Cast(WPARAM, hWnd), NULL)
                     
@@ -1088,13 +1152,10 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
     ''load the strings
-    'If (LoadString(hInst, IDS_REG_VGMPLAYPATH, plpszKeyName[KEY_VGMPLAYPATH], CCH_KEY) = 0) Then Return(FALSE)
-    'If (LoadString(hInst, IDS_REG_DEFAULTPATH, plpszKeyName[KEY_DEFAULTPATH], CCH_KEY) = 0) Then Return(FALSE)
-    'If (LoadString(hInst, IDS_REG_FILEFILTER, plpszKeyName[KEY_FILEFILTER], CCH_KEY) = 0) Then Return(FALSE)
     
     ''load the registry key names
     For iReg As UINT32 = 0 To (NUM_KEY - 1)
-        If (LoadString(hInst, IDS_TEG_VGMPLAYPATH + iReg, plpszKeyName[KEY_VGMPLAYPATH + iReg], CCH_KEY) = 0) Then
+        If (LoadString(hInst, IDS_REG_VGMPLAYPATH + iReg, plpszKeyName[KEY_VGMPLAYPATH + iReg], CCH_KEY) = 0) Then
             HeapUnlock(hHeap)
             Return(FALSE)
         End If
@@ -1103,17 +1164,11 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     ''If (LoadString(hInst, IDS_APPNAME, plpszStrRes[STR_APPNAME], CCH_STRRES) = 0) Then Return(FALSE)
     ''load misc strings
     For iMisc As UINT32 = 0 To 1
-        If (LoadString(hInst, IDS_APPNAME + iMisc, plpszStrRes[STR_APPNAME + iMisc], CCH_STRRES) = 0) Then
-            HeapUnlock(hHeap)
-            Return(FALSE)
-        End If
+        If (LoadString(hInst, IDS_APPNAME + iMisc, plpszStrRes[STR_APPNAME + iMisc], CCH_STRRES) = 0) Then Return(FALSE)
     Next iMisc
     
     '' TODO : clean this up
-    If (LoadString(hInst, IDS_FILT_VGMPLAY, plpszStrRes[STR_FILT_VGMPLAY], CCH_STRRES) = 0) Then
-        HeapUnlock(hHeap)
-        Return(FALSE)
-    End If
+    If (LoadString(hInst, IDS_FILT_VGMPLAY, plpszStrRes[STR_FILT_VGMPLAY], CCH_STRRES) = 0) Then Return(FALSE)
     
     
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
@@ -1138,8 +1193,6 @@ Function LoadConfig () As BOOL
     If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_VGMPLAYPATH], 0, NULL, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), @cbValue)) = FALSE) Then Return(FALSE)
     cbValue = CB_PATH
     If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_DEFAULTPATH], 0, NULL, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), @cbValue)) = FALSE) Then Return(FALSE)
-    cbValue = CB_PATH
-    If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_WAVOUTPATH], 0, NULL, Cast(LPBYTE, plpszPath[PATH_WAVOUT]), @cbValue)) = FALSE) Then Return(FALSE)
     cbValue = SizeOf(DWORD32)
     If (CheckLongErrCode(RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_FILEFILTER], 0, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue)) = FALSE) Then Return(FALSE)
     
@@ -1159,7 +1212,6 @@ Function SaveConfig () As BOOL
     ''save configuration
     If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_VGMPLAYPATH], 0, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH)) = FALSE) Then Return(FALSE)
     If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_DEFAULTPATH], 0, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), CB_PATH)) = FALSE) Then Return(FALSE)
-    If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_WAVOUTPATH], 0, REG_SZ, Cast(LPBYTE, plpszPath[PATH_WAVOUT]), CB_PATH)) = FALSE) Then Return(FALSE)
     If (CheckLongErrCode(RegSetValueEx(*phkProgKey, plpszKeyName[KEY_FILEFILTER], 0, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32))) = FALSE) Then Return(FALSE)
     
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)

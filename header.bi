@@ -39,7 +39,6 @@
 #Include Once "win/prsht.bi"
 #Include "inc/errmsgbox.bi"
 #Include "inc/winapicheck.bi"
-''#Include "mod/chip-settings/chip-settings.bi"
 
 #Include Once "defines.bas"
 

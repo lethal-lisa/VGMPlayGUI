@@ -54,6 +54,7 @@
 #Define IDD_VGMPLAYSETTINGS         &h0514 /'1300'/
 #Define IDC_CHK_WAVOUT              &h0515 /'1301'/
 #Define IDC_CHK_PREFJAPTAGS         &h0516 /'1302'/
+#Define IDC_BTN_CHIPSETTINGS        &h0517 /'1303'/
 
 ''icons:
 #Define IDI_VGMPLAYGUI              &h0064 /'100'/
