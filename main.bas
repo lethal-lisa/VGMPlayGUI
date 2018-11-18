@@ -1085,16 +1085,36 @@ End Function
 ''loads the needed string resources
 Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     
-    If (hInst = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
     ''load the strings
-    If (LoadString(hInst, IDS_REG_VGMPLAYPATH, plpszKeyName[KEY_VGMPLAYPATH], CCH_KEY) = 0) Then Return(FALSE)
-    If (LoadString(hInst, IDS_REG_DEFAULTPATH, plpszKeyName[KEY_DEFAULTPATH], CCH_KEY) = 0) Then Return(FALSE)
-    If (LoadString(hInst, IDS_REG_FILEFILTER, plpszKeyName[KEY_FILEFILTER], CCH_KEY) = 0) Then Return(FALSE)
+    'If (LoadString(hInst, IDS_REG_VGMPLAYPATH, plpszKeyName[KEY_VGMPLAYPATH], CCH_KEY) = 0) Then Return(FALSE)
+    'If (LoadString(hInst, IDS_REG_DEFAULTPATH, plpszKeyName[KEY_DEFAULTPATH], CCH_KEY) = 0) Then Return(FALSE)
+    'If (LoadString(hInst, IDS_REG_FILEFILTER, plpszKeyName[KEY_FILEFILTER], CCH_KEY) = 0) Then Return(FALSE)
     
-    If (LoadString(hInst, IDS_APPNAME, plpszStrRes[STR_APPNAME], CCH_STRRES) = 0) Then Return(FALSE)
+    ''load the registry key names
+    For iReg As UINT32 = 0 To (NUM_KEY - 1)
+        If (LoadString(hInst, IDS_TEG_VGMPLAYPATH + iReg, plpszKeyName[KEY_VGMPLAYPATH + iReg], CCH_KEY) = 0) Then
+            HeapUnlock(hHeap)
+            Return(FALSE)
+        End If
+    Next iReg
+    
+    ''If (LoadString(hInst, IDS_APPNAME, plpszStrRes[STR_APPNAME], CCH_STRRES) = 0) Then Return(FALSE)
+    ''load misc strings
+    For iMisc As UINT32 = 0 To 1
+        If (LoadString(hInst, IDS_APPNAME + iMisc, plpszStrRes[STR_APPNAME + iMisc], CCH_STRRES) = 0) Then
+            HeapUnlock(hHeap)
+            Return(FALSE)
+        End If
+    Next iMisc
+    
+    '' TODO : clean this up
+    If (LoadString(hInst, IDS_FILT_VGMPLAY, plpszStrRes[STR_FILT_VGMPLAY], CCH_STRRES) = 0) Then
+        HeapUnlock(hHeap)
+        Return(FALSE)
+    End If
+    
     
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
