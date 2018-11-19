@@ -50,7 +50,7 @@ LANGUAGE 9, 1
 BEGIN
     IDS_APPNAME "VGMPlayGUI"
     IDS_OPTIONS "Options Menu"
-    IDS_MSGTXT_ABOUT "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nCopyright (c) 2018 Kazusoft Co."
+    IDS_MSGTXT_ABOUT "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nCopyright (c) 2018 Kazusoft Co.\nKazusoft and the Kazusoft logo are trademarks of Lisa Murray."
     IDS_MSGCAP_ABOUT "About VGMPlayGUI"
     IDS_MSGTXT_NYI "This feature is not implemented yet.\nSorry."
     IDS_MSGCAP_NYI "NYI"

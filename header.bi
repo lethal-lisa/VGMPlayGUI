@@ -37,6 +37,7 @@
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
 #Include Once "win/prsht.bi"
+#Include "mod/chip-settings/chip-settings.bi"
 #Include "inc/errmsgbox.bi"
 #Include "inc/winapicheck.bi"
 

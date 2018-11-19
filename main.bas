@@ -95,6 +95,11 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
     Select Case uMsg                ''messages:
         Case WM_CREATE              ''creating window
             
+            #If __FB_DEBUG__
+            ? "Calling WM_CREATE"
+            ? "Setting icon and cursor."
+            #EndIf
+            
             ''set the program's icon and set a loading cursor
             SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VGMPLAYGUI))))
             SetCursor(LoadCursor(NULL, IDC_APPSTARTING))
@@ -139,6 +144,9 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             End If
             
             ''create child windows
+            #If __FB_DEBUG__
+            ? "Creating child windows for main dialog."
+            #EndIf
             If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case WM_DESTROY             ''destroying window
@@ -165,16 +173,8 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             '''set the default keyboard focus to IDC_LST_MAIN
             'If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
-            #If __FB_DEBUG__
-            ? "Setting the cursor."
-            #EndIf
-            
             ''set the arrow cursor
             SetCursor(LoadCursor(NULL, IDC_ARROW))
-            
-            #If __FB_DEBUG__
-            ? "making sure VGMPlay's path is valid."
-            #EndIf
             
             ''make sure VGMPlay's path is valid
             If (PathFileExists(plpszPath[PATH_VGMPLAY]) = FALSE) Then
@@ -208,7 +208,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                         Case IDM_ABOUT          ''display the about message
                             
-                            ''declare and setup mbp
+                            ''setup messageboxparams
                             Dim mbp As MSGBOXPARAMS
                             ZeroMemory(@mbp, SizeOf(mbp))
                             With mbp
@@ -217,11 +217,11 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                                 .hInstance          = hInstance
                                 .lpszText           = MAKEINTRESOURCE(IDS_MSGTXT_ABOUT)
                                 .lpszCaption        = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
-                                .dwStyle            = (MB_OK Or MB_DEFBUTTON1 Or MB_APPLMODAL Or MB_SETFOREGROUND Or MB_USERICON)
+                                .dwStyle            = (MB_OK Or MB_DEFBUTTON1 Or MB_USERICON)
                                 .lpszIcon           = MAKEINTRESOURCE(IDI_KAZUSOFT)
                                 .dwContextHelpId    = NULL
                                 .lpfnMsgBoxCallback = NULL
-                                .dwLanguageId       = LANG_NEUTRAL
+                                .dwLanguageId       = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
                             End With
                             
                             ''display message box
