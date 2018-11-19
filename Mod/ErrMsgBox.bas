@@ -2,6 +2,8 @@
     
     ErrMsgBox.bas
     
+    Error Message Box Library
+    
     Copyright (c) 2018 Kazusoft Co.
     
     Compile with:
@@ -29,18 +31,11 @@
 Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorID As DWORD32, ByVal pdwArgs As PDWORD32) As DWORD32
     
     ''declare local variables
-    Dim mbp As MSGBOXPARAMS
-    Dim lpszError As LPTSTR
-    
-    ''allocate lpszError
-    lpszError = Cast(LPTSTR, LocalAlloc(LPTR, Cast(SIZE_T, (SizeOf(TCHAR) * 1024))))
-    If (lpszError = NULL) Then Return(GetLastError())
+    Dim mbp As MSGBOXPARAMS ''message box parameters
+    Dim lpszError As LPTSTR ''error message buffer
     
     ''format message
-    If (FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM Or FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, dwErrorID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), Cast(LPTSTR, lpszError), 1024, Cast(LPVOID, pdwArgs)) = 0) Then
-        LocalFree(Cast(HLOCAL, lpszError))
-        Return(GetLastError())
-    End If
+    If (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER Or FORMAT_MESSAGE_FROM_SYSTEM Or FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, dwErrorID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), Cast(LPTSTR, lpszError), 512, Cast(LPVOID, pdwArgs)) = 0) Then Return(GetLastError())
     
     ''setup mbp
     ZeroMemory(@mbp, SizeOf(mbp))
@@ -54,7 +49,7 @@ Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorID As DWORD32, By
         .lpszIcon = NULL
         .dwContextHelpId = NULL
         .lpfnMsgBoxCallback = NULL
-        .dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT)
+        .dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
     End With
     
     ''show messagebox
@@ -89,7 +84,7 @@ Public Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal 
         .lpszIcon           = NULL
         .dwContextHelpId    = NULL
         .lpfnMsgBoxCallback = NULL
-        .dwLanguageId       = MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT)
+        .dwLanguageId       = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
     End With
     
     ''play sound and show message box

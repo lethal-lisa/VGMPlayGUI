@@ -1,3 +1,13 @@
+/'
+    
+    ErrMsgBox.bi
+    
+    Error Message Box Library Header
+    
+    Copyright (c) 2018 Kazusoft Co.
+    
+'/
+
 #Pragma Once
 
 #If __FB_OUT_EXE__
@@ -15,3 +25,5 @@
 
 Declare Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorID As DWORD32, ByVal pdwArgs As PDWORD32) As DWORD32
 Declare Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal wTextID As WORD, ByVal wCaptionID As WORD, ByVal dwStyle As DWORD32) As DWORD32
+
+''EOF
