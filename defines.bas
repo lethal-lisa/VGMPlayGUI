@@ -115,8 +115,7 @@
 #Define IDM_ROOT                    &h2712 /'10002'/
 #Define IDM_EXIT                    &h2713 /'10003'/
 #Define IDM_OPTIONS                 &h2714 /'10004'/
-#Define IDM_CHIPSETTINGS            &h2715 /'10005'/
-#Define IDM_ABOUT                   &h2716 /'10006'/
+#Define IDM_ABOUT                   &h2715 /'10005'/
 
 #Define IDR_MENUCONTEXT             &h4E20 /'20000'/
 #Define IDM_LST_MAIN                &h4E21 /'20001'/
