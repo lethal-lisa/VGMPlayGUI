@@ -95,18 +95,9 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
     Select Case uMsg                ''messages:
         Case WM_CREATE              ''creating window
             
-            #If __FB_DEBUG__
-            ? "Calling WM_CREATE"
-            ? "Setting icon and cursor."
-            #EndIf
-            
             ''set the program's icon and set a loading cursor
             SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VGMPLAYGUI))))
             SetCursor(LoadCursor(NULL, IDC_APPSTARTING))
-            
-            #If __FB_DEBUG__
-            ? "Creating the heap."
-            #EndIf
             
             ''create the heap
             hHeap = HeapCreate(0, 0, 0)
@@ -115,26 +106,15 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                 PostQuitMessage(GetLastError())
             End If
             
-            #If __FB_DEBUG__
-            ? "Initialzing memory."
-            #EndIf
             If (InitMem() = FALSE) Then
                 SysErrMsgBox(hWnd, GetLastError(), NULL)
                 PostQuitMessage(GetLastError())
             End If
             
-            #If __FB_DEBUG__
-            ? "Loading string resources."
-            #EndIf
-            
             If (LoadStringResources(hInstance) = FALSE) Then
                 SysErrMsgBox(hWnd, GetLastError(), NULL)
                 PostQuitMessage(GetLastError())
             End If
-            
-            #If __FB_DEBUG__
-            ? "Opening program HKEY."
-            #EndIf
             
             ''open program hkey
             Dim dwKeyDisp As DWORD32    ''key disposition for OpenProgHKey
@@ -159,9 +139,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             End If
             
             ''create child windows
-            #If __FB_DEBUG__
-            ? "Creating child windows for main dialog."
-            #EndIf
             If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case WM_DESTROY             ''destroying window
