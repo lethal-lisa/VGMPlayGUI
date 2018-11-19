@@ -16,7 +16,6 @@ ECHO COMPILING MODULES.
 ECHO.
 CHDIR ".\Mod"
 fbc -lib ".\ErrMsgBox.bas"
-fbc -lib ".\RegInt.bas"
 fbc -lib ".\WinAPICheck.bas"
 CHDIR ".."
 
