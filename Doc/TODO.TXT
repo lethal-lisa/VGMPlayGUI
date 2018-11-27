@@ -26,15 +26,17 @@ VGMPlayGUI - List of Planned Functions:
         style, and sending the (LB_GETSELCOUNT/LB_GETSELITEMS) messages.
         
             The user can play mulitple files at once by pressing the play
-        button. This is done by creating a temporary M3U file. This file
+        button with multiple files selected. This is done by creating a 
+        temporary M3U file, which has its path passed to VGMPlay. This file
         contains the paths of the files selected by the user, and is passed
         to VGMPlay.
         
-    -Add capability of modifying VGMPlay's settings.
+    -Add capability of modifying VGMPlay's initialization file.
         
             This would take the form of a property sheet--likely with
         multiple pages--that allows the user to change the various settings
-        in 'VGMPlay.ini'.
+        in 'VGMPlay.ini', VGMPlay's configuration file. This file is found
+        in VGMPlay's folder, and contains VGMPlay's settings.
         
             As for implementation of the INI file access; Richard D. Clark's
         'iniObject' could be employed, since the Windows API functions for
@@ -50,11 +52,10 @@ VGMPlayGUI - List of Planned Functions:
         
             From the context menu, selecting "&Delete" (IDM_DELETE) or
         pressing the Delete key (VK_DEL), while having a file or
-        directory selected will bring up a MessageBox confirming the
+        directory selected will bring up a Message Box confirming the
         operation.
     
     Potential Functions (need flushing out):
-        -Add option to close VGMPlay when VGMPlayGUI is closed.
         -Add an M3U file (playlist) editor.
         -Add file history.
         
