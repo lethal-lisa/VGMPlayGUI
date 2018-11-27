@@ -37,16 +37,24 @@ VGMPlayGUI - List of Planned Functions:
         in 'VGMPlay.ini'.
         
             As for implementation of the INI file access; Richard D. Clark's
-        'iniObject' could be employed.
+        'iniObject' could be employed, since the Windows API functions for
+        reading/writing Private Profiles (INI files) are outdated and
+        unsupported.
         
     -Improve property sheet cancel prompt.
         
             Check to make sure there are in fact unsaved changes before
         displaying the prompt.
-            
+        
+    -Add file deletion functionality.
+        
+            From the context menu, selecting "&Delete" (IDM_DELETE) or
+        pressing the Delete key (VK_DEL), while having a file or
+        directory selected will bring up a MessageBox confirming the
+        operation.
+    
     Potential Functions (need flushing out):
         -Add option to close VGMPlay when VGMPlayGUI is closed.
-        -Add file deletion functionality.
         -Add an M3U file (playlist) editor.
         -Add file history.
         
