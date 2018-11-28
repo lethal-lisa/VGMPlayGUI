@@ -11,7 +11,7 @@ VGMPlayGUI - List of Planned Functions:
         
             The user should be able to pass command line parameters to
         VGMPlayGUI in order to accomplish various initialization options or
-        to play a VGM file on startup.
+        to play a specified VGM file on startup.
         
     -Make the about message more detailed.
         
@@ -55,8 +55,9 @@ VGMPlayGUI - List of Planned Functions:
         directory selected will bring up a Message Box confirming the
         operation.
     
-    Potential Functions (need flushing out):
+    Potential Items (need flushing out):
         -Add an M3U file (playlist) editor.
         -Add file history.
+        -GD3 tag editor.
         
 EOF
