@@ -22,7 +22,9 @@
   3. compile .\main.bas with these parameters:
     fbc.exe -s gui ".\main.bas" ".\resource.rc" -x "VGMPlayGUI.exe"
 
-## Contact Us
+## External Links
+  Get VGMPlay: http://www.smspower.org/Music/InVgm
   
-  Community Discord Server: https://discord.gg/mdN3sqp
-  
+### Get More Music At:
+  VGMRips: https://vgmrips.net/
+  SMS Power! Music Section: http://www.smspower.org/Music/Index
