@@ -95,11 +95,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
     Select Case uMsg                ''messages:
         Case WM_CREATE              ''creating window
             
-            #If __FB_DEBUG__
-            ? "Calling WM_CREATE"
-            ? "Setting icon and cursor."
-            #EndIf
-            
             ''set the program's icon and set a loading cursor
             SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VGMPLAYGUI))))
             SetCursor(LoadCursor(NULL, IDC_APPSTARTING))
@@ -111,11 +106,13 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                 PostQuitMessage(GetLastError())
             End If
             
+            ''initialize memory
             If (InitMem() = FALSE) Then
                 SysErrMsgBox(hWnd, GetLastError(), NULL)
                 PostQuitMessage(GetLastError())
             End If
             
+            ''load string resources
             If (LoadStringResources(hInstance) = FALSE) Then
                 SysErrMsgBox(hWnd, GetLastError(), NULL)
                 PostQuitMessage(GetLastError())
@@ -126,27 +123,17 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             If (OpenProgHKey(phkProgKey, plpszStrRes[STR_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then
                 SysErrMsgBox(hWnd, GetLastError(), NULL)
-                HeapUnlock(hHeap)
                 PostQuitMessage(GetLastError())
             End If
             If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
             If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
-                #If __FB_DEBUG__
-                ? "Loading config from registry."
-                #EndIf
                 If (LoadConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             Else
-                #If __FB_DEBUG__
-                ? "Using default config and writing to registry."
-                #EndIf
                 If (SetDefConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             End If
             
             ''create child windows
-            #If __FB_DEBUG__
-            ? "Creating child windows for main dialog."
-            #EndIf
             If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
         Case WM_DESTROY             ''destroying window
@@ -161,17 +148,13 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             
         Case WM_INITDIALOG          ''initializing dialog
             
-            #If __FB_DEBUG__
-            ? "Init. dir. listings."
-            #EndIf
-            
             ''initialize directory listings to default directory
             If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
-            '''set the default keyboard focus to IDC_LST_MAIN
-            'If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            ''set the default keyboard focus to IDC_LST_MAIN
+            If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
             ''set the arrow cursor
             SetCursor(LoadCursor(NULL, IDC_ARROW))
@@ -297,13 +280,13 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                     
                     ''display error message, and terminate program
                     SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY, NULL)
-                    If (DestroyWindow(hWnd) = FALSE) Then SysErrMsgBox(NULL, NULL, NULL)
+                    PostQuitMessage(ERROR_NOT_ENOUGH_MEMORY)
                     
                 Case EN_ERRSPACE                ''an editbox is out of memory
                     
                     ''display error message, and terminate program
                     SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY, NULL)
-                    If (DestroyWindow(hWnd) = FALSE) Then SysErrMsgBox(NULL, NULL, NULL)
+                    PostQuitMessage(ERROR_NOT_ENOUGH_MEMORY)
                     
             End Select
             
