@@ -1,5 +1,6 @@
 VGMPlayGUI - File List:
     
+    Files in Binary Packages:
     \
         default-settings.reg    -   Default registry settings.
         FILE_ID.DIZ             -   Zip file desctiption.
@@ -18,5 +19,35 @@ VGMPlayGUI - File List:
         README.TXT              -   General documentation
         THANKS.TXT              -   Special thanks.
         TODO.TXT                -   List of planned features.
+    
+    Files in Source Code Packages:
+    \
+        main.bas                -   Main source module.
+        header.bi               -   Main source module's header file.
+        resource.rc             -   Main resource script file.
+        defines.bas             -   Resource script and general definitions.
+        VGMPlayGUI.fbp          -   FbEdit project file.
+	README.md		-   GitHub readme file.
+    \Inc\
+        ErrMsgBox.bi            -   Header for the ErrMsgBox (Error Message Box) module (\Mod\ErrMsgBox.bas).
+        WinAPICheck.bi          -   Header for the WinAPICheck module (\Mod\WinAPICheck.bas).
+    \Mod\
+        ErrMsgBox.bas           -   Error Message Box Module.
+        WinAPICheck.bas		-   WinAPICheck module.
+    \Mod\Chip-Settings\
+        chip-settings.bas       -   Source module for "libchip-settings.dll".
+        chip-settings.bi        -   Header file for "chip-settings.bas".
+        cs_defines.bas          -   Definitions for the Chip Settings module.
+    \Res\
+        Kazusoft.ico		-   Kazusoft Co. logo icon.
+        Play.ico		-   Icon depicting a green "play" button.
+        VGMPlayGUI.ico          -   Application's icon.
+	wrench.ico              -   Icon depicting a wrench.
+	menus.rc		-   Resource script file for the menus.
+	strings.rc              -   Resource script file for the string tables.
+    \Res\Chip-Settings\
+	chip-settings.rc	-   Main resource script file for the Chip Settings module.
+	nes-apu.rc		-   Resource script file for the NES APU property sheet page.
+	sega-psg.rc		-   Resource script file for the SEGA PSG property sheet page.
     
 EOF

@@ -48,37 +48,37 @@
 Const MainClass = "MAINCLASS"
 
 ''declare shared variables
-Dim Shared hInstance As HMODULE                     ''global application instance handle
-Dim Shared lpszCmdLine As LPSTR                     ''command line parameters pointer
-Dim Shared hWin As HWND                             ''main window handle
-Dim Shared hHeap As HANDLE                          ''application heap handle
+Dim Shared hInstance As HMODULE                     ''handle to the application's instance
+Dim Shared lpszCmdLine As LPSTR                     ''pointer to the command line parameters
+Dim Shared hWin As HWND                             ''handle to the application's main window
+Dim Shared hHeap As HANDLE                          ''handle to the application's heap
 
 Dim Shared plpszPath As LPTSTR Ptr                  ''paths
 Dim Shared plpszKeyName As LPTSTR Ptr               ''registry key names
 Dim Shared plpszStrRes As LPTSTR Ptr                ''misc. string resources
-Dim Shared phkProgKey As PHKEY                      ''application hkey
-Dim Shared ppiProcInfo As PROCESS_INFORMATION Ptr   ''process info for CreateProcess
-Dim Shared psiStartInfo As STARTUPINFO Ptr          ''startup info for CreateProcess
-Dim Shared dwFileFilt As DWORD32                    ''file attribute filter
+Dim Shared phkProgKey As PHKEY                      ''handle to the application's registry key
+Dim Shared ppiProcInfo As PROCESS_INFORMATION Ptr   ''process info structure for calling CreateProcess to start VGMPlay
+Dim Shared psiStartInfo As STARTUPINFO Ptr          ''startup info structure for calling CreateProcess to start VGMPlay
+Dim Shared dwFileFilt As DWORD32                    ''file attribute filter variable loaded from the registry
 
 
 ''declare functions
 ''main function
 Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
 
-''subroutine used to start the main dialog. called by WinMain
+''subroutine used to start the main dialog. called by WinMain only, do not call this function
 Declare Sub StartMainDialog (ByVal hInst As HINSTANCE, ByVal nShowCmd As INT32, ByVal lParam As LPARAM)
 
 ''main dialog procedure
 Declare Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 
-''creates child windows for the main dialog
+''creates child windows for the main dialog, called exclusivly by MainProc, do not call this function
 Declare Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
 
 ''creates a tooltip and associates it with a control
 Declare Function CreateToolTip (ByVal hDlg As HWND, ByVal dwToolID As DWORD32, ByVal wTextID As WORD, ByVal dwStyle As DWORD32, ByVal uFlags As UINT32) As HWND
 
-''resizes the main dialog's child windows
+''EnumChildWindows procedure for resizing the main dialog's child windows
 Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
 
 ''displays a context menu in the main dialog
@@ -88,17 +88,30 @@ Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal 
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPTSTR) As BOOL
 
 ''options property sheet functions
+''starts the options property sheet up
 Declare Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
+
+''WindowProc for the paths page
 Declare Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+
+''get/set functions for the paths page, to be called only by PathsProc
 Declare Function SetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
 Declare Function GetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
+
+''WindowProc for the file filter page
 Declare Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+
+''get/set functions for the file filter page, to be called only by FileFiltProc
 Declare Function SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32) As BOOL
 Declare Function GetFileFiltProc (ByVal hWnd As HWND, ByRef dwValue As DWORD32) As BOOL
+
+''WindowProc for the VGMPlay settings page
 Declare Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+
+''cancel prompt for the property sheet
 Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
 
-''starts VGMPlay
+''function to start up VGMPlay with a file
 Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
 
 ''memory macro functions
@@ -109,9 +122,14 @@ Declare Function FreeMem () As BOOL
 Declare Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
 
 ''config functions
+''loads/saves the configuration to the registry
 Declare Function LoadConfig () As BOOL
 Declare Function SaveConfig () As BOOL
+
+''sets the default configuration values
 Declare Function SetDefConfig () As BOOL
+
+''opens a handle to the application's registry key
 Declare Function OpenProgHKey (ByRef phkProgKey As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As BOOL
 
 ''EOF
