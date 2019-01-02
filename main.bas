@@ -276,17 +276,11 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                     End Select
                     
-                Case Cast(UINT32, LBN_ERRSPACE) ''a listbox is out of memory
+                Case Cast(UINT32, LBN_ERRSPACE), EN_ERRSPACE ''a listbox or edit control is out of memory
                     
                     ''display error message, and terminate program
-                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY, NULL)
-                    PostQuitMessage(ERROR_NOT_ENOUGH_MEMORY)
-                    
-                Case EN_ERRSPACE                ''an editbox is out of memory
-                    
-                    ''display error message, and terminate program
-                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY, NULL)
-                    PostQuitMessage(ERROR_NOT_ENOUGH_MEMORY)
+                    SysErrMsgBox(hWnd, ERROR_OUTOFMEMORY, NULL)
+                    PostQuitMessage(ERROR_OUTOFMEMORY)
                     
             End Select
             
