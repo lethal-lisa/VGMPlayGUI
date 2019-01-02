@@ -9,10 +9,10 @@
 #Pragma Once
 
 ''defines
-#Define MARGIN_SIZE                 &h000A /'10'/
-#Define WINDOW_SIZE                 &h001E /'30'/
-#Define MIN_SIZE_X                  &h01F8 /'504'/
-#Define MIN_SIZE_Y                  &h01BC /'444'/
+#Define MARGIN_SIZE                 &h0000000A /'10'/
+#Define WINDOW_SIZE                 &h0000001E /'30'/
+#Define MIN_SIZE_X                  &h000001F8 /'504'/
+#Define MIN_SIZE_Y                  &h000001BC /'444'/
 
 ''for some reason, this isn't defined in FB's 64-bit headers
 #Ifndef DWL_MSGRESULT
