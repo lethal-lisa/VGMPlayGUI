@@ -225,11 +225,11 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             
-                        Case IDC_BTN_BACK       ''move up one directory
+                        Case IDC_BTN_BACK, IDM_LST_MAIN_BACK       ''move up one directory
                             
                             If (PopulateLists(hWnd, "..") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             
-                        Case IDC_BTN_REFRESH    ''refresh the current directory listing
+                        Case IDC_BTN_REFRESH, IDM_LST_MAIN_REFRESH, IDM_LST_DRIVES_REFRESH   ''refresh the current directory listing
                             
                             If (PopulateLists(hWnd, ".") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             
