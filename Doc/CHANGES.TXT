@@ -185,4 +185,8 @@ v2.11:
     *       Fixed some typos in the string resources.
     +       Added chip-settings.dll.
     
+v2.11.2:
+    
+    *       Fixed the context menus by adding cases for them in MainProc.
+    
 EOF

@@ -109,4 +109,8 @@ v2.11:
     *       Typo fixes.
     *       Optimization fixes.
     
+v2.11.2:
+    
+    *       Fixed the context menus.
+    
 EOF
