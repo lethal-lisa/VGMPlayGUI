@@ -1,54 +1,55 @@
 //resource.rc
 
-#define IDD_MAIN                0x03E8 //1000
+#define IDR_VERSIONINFO             0x0001 //1
 
-#define IDD_PATHS               0x044C //1100
-#define IDC_STC_VGMPLAYPATH     0x044D //1101
-#define IDC_EDT_VGMPLAYPATH     0x044E //1102
-#define IDC_BTN_VGMPLAYPATH     0x044F //1103
-#define IDC_STC_DEFAULTPATH     0x0450 //1104
-#define IDC_EDT_DEFAULTPATH     0x0451 //1105
-#define IDC_BTN_DEFAULTPATH     0x0452 //1106
+#define IDD_MAIN                    0x03E8 //1000
 
-#define IDD_FILEFILT            0x04B0 //1200
-#define IDC_GRP_ATTRIB          0x04B1 //1201
-#define IDC_CHK_ARCHIVE         0x04B2 //1202
-#define IDC_CHK_HIDDEN          0x04B3 //1203
-#define IDC_CHK_SYSTEM          0x04B4 //1204
-#define IDC_CHK_READONLY        0x04B5 //1205
-#define IDC_CHK_EXCLUSIVE       0x04B6 //1206
+#define IDD_PATHS                   0x044C //1100
+#define IDC_STC_VGMPLAYPATH         0x044D //1101
+#define IDC_EDT_VGMPLAYPATH         0x044E //1102
+#define IDC_BTN_VGMPLAYPATH         0x044F //1103
+#define IDC_STC_DEFAULTPATH         0x0450 //1104
+#define IDC_EDT_DEFAULTPATH         0x0451 //1105
+#define IDC_BTN_DEFAULTPATH         0x0452 //1106
 
-#define IDD_VGMPLAYSETTINGS     0x0514 //1300
-#define IDC_CHK_WAVOUT          0x0515 //1301
-#define IDC_CHK_PREFJAPTAGS     0x0516 //1302
-#define IDC_BTN_CHIPSETTINGS    0x0517 //1303
+#define IDD_FILEFILT                0x04B0 //1200
+#define IDC_GRP_ATTRIB              0x04B1 //1201
+#define IDC_CHK_ARCHIVE             0x04B2 //1202
+#define IDC_CHK_HIDDEN              0x04B3 //1203
+#define IDC_CHK_SYSTEM              0x04B4 //1204
+#define IDC_CHK_READONLY            0x04B5 //1205
+#define IDC_CHK_EXCLUSIVE           0x04B6 //1206
 
-#define IDR_VERSIONINFO         0x0001 //1
-#define IDR_MENU1               0x2710 //10000
-#define IDM_FILE                0x2711 //10001
-#define IDM_ROOT                0x2712 //10002
-#define IDM_EXIT                0x2713 //10003
-#define IDM_OPTIONS             0x2714 //10004
-#define IDM_ABOUT               0x2715 //10005
+#define IDD_VGMPLAYSETTINGS         0x0514 //1300
+#define IDC_CHK_WAVOUT              0x0515 //1301
+#define IDC_CHK_PREFJAPTAGS         0x0516 //1302
+#define IDC_BTN_CHIPSETTINGS        0x0517 //1303
 
-#define IDR_MENUCONTEXT         0x4E20 //20000
-#define IDM_LST_MAIN            0x4E21 //20001
-#define IDM_LST_MAIN_REFRESH    0x4E22 //20002
-#define IDM_LST_MAIN_BACK       0x4E23 //20003
-#define IDM_LST_DRIVES          0x4E24 //20004
-#define IDM_LST_DRIVES_REFRESH  0x4E25 //20005
+#define IDR_MENU1                   0x2710 //10000
+#define IDM_FILE                    0x2711 //10001
+#define IDM_ROOT                    0x2712 //10002
+#define IDM_EXIT                    0x2713 //10003
+#define IDM_OPTIONS                 0x2714 //10004
+#define IDM_ABOUT                   0x2715 //10005
 
-#define TXT_FILE                "&File"
-#define TXT_ROOT                "&Go To Drive Root"
-#define TXT_EXIT                "E&xit"
-#define TXT_OPTIONS             "&Options"
-#define TXT_ABOUT               "&About"
+#define IDR_MENUCONTEXT             0x4E20 //20000
+#define IDM_LST_MAIN                0x4E21 //20001
+#define IDM_LST_MAIN_REFRESH        0x4E22 //20002
+#define IDM_LST_MAIN_BACK           0x4E23 //20003
+#define IDM_LST_DRIVES              0x4E24 //20004
+#define IDM_LST_DRIVES_REFRESH      0x4E25 //20005
 
-#define TXT_LST_MAIN            "LST_MAIN"
-#define TXT_LST_MAIN_REFRESH    "&Refresh Listing"
-#define TXT_LST_MAIN_BACK       "&Go up a directory"
-#define TXT_LST_DRIVES          "LST_DRIVES"
-#define TXT_LST_DRIVES_REFRESH  "&Refresh Listing"
+//#define TXT_FILE                "&File"
+//#define TXT_ROOT                "&Go To Drive Root"
+//#define TXT_EXIT                "E&xit"
+//#define TXT_OPTIONS             "&Options"
+//#define TXT_ABOUT               "&About"
+
+//#define TXT_LST_MAIN            "LST_MAIN"
+//#define TXT_LST_MAIN_REFRESH    "&Refresh Listing"
+//#define TXT_LST_MAIN_BACK       "&Go up a directory"
+//#define TXT_LST_DRIVES          "LST_DRIVES"
+//#define TXT_LST_DRIVES_REFRESH  "&Refresh Listing"
 
 #define IDS_APPNAME                 0x0001 //1
 #define IDS_OPTIONS                 0x0002 //2
@@ -96,25 +97,25 @@
 #define IDS_INI_OPT_PREFERJAPTAG    0x0102
 
 //id's for icons
-#define IDI_VGMPLAYGUI          0x0064 //100
-#define IDI_KAZUSOFT            0x0065 //101
-#define IDI_WRENCH              0x0066 //102
-#define IDI_PLAY                0x0067 //103
+#define IDI_VGMPLAYGUI              0x0064 //100
+#define IDI_KAZUSOFT                0x0065 //101
+#define IDI_WRENCH                  0x0066 //102
+#define IDI_PLAY                    0x0067 //103
 
-//define property sheet sizes because GoRC doesn't include these definitions by default.
-#define PROP_SM_CXDLG           0x00D4 //212
-#define PROP_SM_CYDLG           0x00BC //188
-#define PROP_MED_CXDLG          0x00E3 //227
-#define PROP_MED_CYDLG          0x00D7 //215
-#define PROP_LG_CXDLG           0x00FC //252
-#define PROP_LG_CYDLG           0x00DA //218
+//define property sheet sizes because GoRC doesn't seem to include these definitions by default.
+#define PROP_SM_CXDLG               0x00D4 //212
+#define PROP_SM_CYDLG               0x00BC //188
+#define PROP_MED_CXDLG              0x00E3 //227
+#define PROP_MED_CYDLG              0x00D7 //215
+#define PROP_LG_CXDLG               0x00FC //252
+#define PROP_LG_CYDLG               0x00DA //218
 
 //#include "Res/menus.rc"
 //#include "Res/strings.rc"
 
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 3, 3, 1
-PRODUCTVERSION  2, 11, 2, 1
+FILEVERSION     1, 3, 3, 2
+PRODUCTVERSION  2, 11, 2, 2
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0 //VS_FF_DEBUG | VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD
 FILEOS          VOS_NT_WINDOWS32
@@ -125,8 +126,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion", "1.3.3.1\0"
-            VALUE "ProductVersion", "2.11.2.1\0"
+            VALUE "FileVersion", "1.3.3.2\0"
+            VALUE "ProductVersion", "2.11.2.2\0"
             VALUE "CompanyName", "Kazusoft Co.\0"
             VALUE "FileDescription", "Windows GUI for VGMPlay\0"
             VALUE "InternalName", "VGMPlayGUI\0"
@@ -248,27 +249,27 @@ END
 IDR_MENU1 MENUEX
 LANGUAGE 9, 1
 BEGIN
-    POPUP TXT_FILE, IDM_FILE, MFT_STRING, MFS_ENABLED
+    POPUP "&File", IDM_FILE, MFT_STRING, MFS_ENABLED
     BEGIN
-        MENUITEM TXT_ROOT, IDM_ROOT, MFT_STRING, MFS_ENABLED
+        MENUITEM "&Go to drive root", IDM_ROOT, MFT_STRING, MFS_ENABLED
         MENUITEM SEPARATOR
-        MENUITEM TXT_EXIT, IDM_EXIT, MFT_STRING, MFS_ENABLED
+        MENUITEM "E&xit", IDM_EXIT, MFT_STRING, MFS_ENABLED
     END
-    MENUITEM TXT_OPTIONS, IDM_OPTIONS, MFT_STRING, MFS_ENABLED
-    MENUITEM TXT_ABOUT, IDM_ABOUT, MFT_STRING, MFS_ENABLED
+    MENUITEM "&Options", IDM_OPTIONS, MFT_STRING, MFS_ENABLED
+    MENUITEM "&About", IDM_ABOUT, MFT_STRING, MFS_ENABLED
 END
 
 IDR_MENUCONTEXT MENUEX
 LANGUAGE 9, 1
 BEGIN
-    POPUP TXT_LST_MAIN, IDM_LST_MAIN, MFT_STRING, MFS_ENABLED
+    POPUP "IDC_LST_MAIN", IDM_LST_MAIN, MFT_STRING, MFS_ENABLED
     BEGIN
-        MENUITEM TXT_LST_MAIN_REFRESH, IDM_LST_MAIN_REFRESH, MFT_STRING, MFS_ENABLED
-        MENUITEM TXT_LST_MAIN_BACK, IDM_LST_MAIN_BACK, MFT_STRING, MFS_ENABLED
+        MENUITEM "&Refresh list", IDM_LST_MAIN_REFRESH, MFT_STRING, MFS_ENABLED
+        MENUITEM "&Go up a directory", IDM_LST_MAIN_BACK, MFT_STRING, MFS_ENABLED
     END
-    POPUP TXT_LST_DRIVES, IDM_LST_DRIVES, MFT_STRING, MFS_ENABLED
+    POPUP "IDC_LST_DRIVES", IDM_LST_DRIVES, MFT_STRING, MFS_ENABLED
     BEGIN
-        MENUITEM TXT_LST_DRIVES_REFRESH, IDM_LST_DRIVES_REFRESH, MFT_STRING, MFS_ENABLED
+        MENUITEM "&Refresh list", IDM_LST_DRIVES_REFRESH, MFT_STRING, MFS_ENABLED
     END
 END
 
