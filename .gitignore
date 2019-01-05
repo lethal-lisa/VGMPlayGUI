@@ -1,2 +1,8 @@
 # ignore comiled and project files
-*.exe, *.dll, *.res, *.obj, *.o, *.a, *.fbp
+*.exe
+*.dll
+*.res
+*.obj
+*.o
+*.a
+*.fbp
