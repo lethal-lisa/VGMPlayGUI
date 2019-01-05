@@ -1,4 +1,4 @@
-# ignore comiled and project files
+# ignore compiled and project files
 *.exe
 *.dll
 *.res

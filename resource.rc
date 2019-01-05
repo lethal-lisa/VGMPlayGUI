@@ -1,7 +1,9 @@
 //resource.rc
 
+//version information
 #define IDR_VERSIONINFO             0x0001 //1
 
+//dialog ID definitions
 #define IDD_MAIN                    0x03E8 //1000
 
 #define IDD_PATHS                   0x044C //1100
@@ -12,7 +14,7 @@
 #define IDC_EDT_DEFAULTPATH         0x0451 //1105
 #define IDC_BTN_DEFAULTPATH         0x0452 //1106
 
-#define IDD_FILEFILT                0x04B0 //1200
+#define IDD_FILEFILTER              0x04B0 //1200
 #define IDC_GRP_ATTRIB              0x04B1 //1201
 #define IDC_CHK_ARCHIVE             0x04B2 //1202
 #define IDC_CHK_HIDDEN              0x04B3 //1203
@@ -25,32 +27,22 @@
 #define IDC_CHK_PREFJAPTAGS         0x0516 //1302
 #define IDC_BTN_CHIPSETTINGS        0x0517 //1303
 
-#define IDR_MENU1                   0x2710 //10000
+//menus
+#define IDR_MENUMAIN                0x2710 //10000
 #define IDM_FILE                    0x2711 //10001
-#define IDM_ROOT                    0x2712 //10002
-#define IDM_EXIT                    0x2713 //10003
-#define IDM_OPTIONS                 0x2714 //10004
-#define IDM_ABOUT                   0x2715 //10005
+#define IDM_EXIT                    0x2712 //10002
+#define IDM_LIST					0x2713 //10003
+#define IDM_UP						0x2714 //10004
+#define IDM_ROOT					0x2715 //10005
+#define IDM_REFRESH					0x2716 //10006
+#define IDM_OPTIONS                 0x2717 //10007
+#define IDM_ABOUT                   0x2718 //10008
 
 #define IDR_MENUCONTEXT             0x4E20 //20000
-#define IDM_LST_MAIN                0x4E21 //20001
-#define IDM_LST_MAIN_REFRESH        0x4E22 //20002
-#define IDM_LST_MAIN_BACK           0x4E23 //20003
-#define IDM_LST_DRIVES              0x4E24 //20004
-#define IDM_LST_DRIVES_REFRESH      0x4E25 //20005
+#define IDM_LST_DRIVES              0x4E21 //20001
+#define IDM_LST_DRIVES_REFRESH      0x4E22 //20002
 
-//#define TXT_FILE                "&File"
-//#define TXT_ROOT                "&Go To Drive Root"
-//#define TXT_EXIT                "E&xit"
-//#define TXT_OPTIONS             "&Options"
-//#define TXT_ABOUT               "&About"
-
-//#define TXT_LST_MAIN            "LST_MAIN"
-//#define TXT_LST_MAIN_REFRESH    "&Refresh Listing"
-//#define TXT_LST_MAIN_BACK       "&Go up a directory"
-//#define TXT_LST_DRIVES          "LST_DRIVES"
-//#define TXT_LST_DRIVES_REFRESH  "&Refresh Listing"
-
+//strings
 #define IDS_APPNAME                 0x0001 //1
 #define IDS_OPTIONS                 0x0002 //2
 
@@ -73,12 +65,12 @@
 #define IDS_REG_DEFAULTPATH         0x0022 //34
 #define IDS_REG_FILEFILTER          0x0023 //35
 
-//file filters
+//VGMPlay path file filter
 #define IDS_FILT_VGMPLAY            0x0031 //49
 
-//tooltips
+//tooltip text
 #define IDS_TIP_DRIVELIST           0x0041 //65
-#define IDS_TIP_BACKBTN             0x0042 //66
+#define IDS_TIP_UPBTN               0x0042 //66
 #define IDS_TIP_GOBTN               0x0043 //67
 #define IDS_TIP_REFRESHBTN          0x0044 //68
 #define IDS_TIP_PLAYBTN             0x0045 //69
@@ -92,11 +84,12 @@
 #define IDS_TIP_WAVOUT              0x004D //77
 #define IDS_TIP_PREFERJAPTAG        0x004E //78
 
-#define IDS_INI_SEC_GENERAL         0x0100
-#define IDS_INI_OPT_LOGSOUND        0x0101
-#define IDS_INI_OPT_PREFERJAPTAG    0x0102
+//VGMPlay's INI file values
+#define IDS_INI_SEC_GENERAL         0x0100 //256
+#define IDS_INI_OPT_LOGSOUND        0x0101 //257
+#define IDS_INI_OPT_PREFERJAPTAG    0x0102 //258
 
-//id's for icons
+//ID's for icons
 #define IDI_VGMPLAYGUI              0x0064 //100
 #define IDI_KAZUSOFT                0x0065 //101
 #define IDI_WRENCH                  0x0066 //102
@@ -110,14 +103,12 @@
 #define PROP_LG_CXDLG               0x00FC //252
 #define PROP_LG_CYDLG               0x00DA //218
 
-//#include "Res/menus.rc"
-//#include "Res/strings.rc"
-
+//version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 3, 3, 2
-PRODUCTVERSION  2, 11, 2, 2
+FILEVERSION     1, 3, 4, 5
+PRODUCTVERSION  2, 11, 3, 5
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       0 //VS_FF_DEBUG | VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD
+FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD //VS_FF_DEBUG | VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     0
@@ -126,8 +117,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion", "1.3.3.2\0"
-            VALUE "ProductVersion", "2.11.2.2\0"
+            VALUE "FileVersion", "1.3.4.5\0"
+            VALUE "ProductVersion", "2.11.3.5\0"
             VALUE "CompanyName", "Kazusoft Co.\0"
             VALUE "FileDescription", "Windows GUI for VGMPlay\0"
             VALUE "InternalName", "VGMPlayGUI\0"
@@ -135,8 +126,8 @@ BEGIN
             VALUE "LegalTrademarks", "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename", "VGMPlayGUI.exe\0"
             VALUE "ProductName", "VGMPlayGUI\0"
-            //VALUE "PrivateBuild", "\0"
-            //VALUE "SpecialBuild", "\0"
+            VALUE "PrivateBuild", "Built by Lisa Murray for refining menus.\0"
+            VALUE "SpecialBuild", "Test build\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -165,9 +156,9 @@ BEGIN
     IDS_REG_VGMPLAYPATH "VGMPlay Path"
     IDS_REG_DEFAULTPATH "Default Path"
     IDS_REG_FILEFILTER "File Filter"
-    IDS_FILT_VGMPLAY "VGMPlay (VGMPlay.exe)\0VGMPLAY.EXE\0All Files (*.*)\0*.*\0"
+    IDS_FILT_VGMPLAY "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0"
     IDS_TIP_DRIVELIST "List of available drives"
-    IDS_TIP_BACKBTN "Go up one directory"
+    IDS_TIP_UPBTN "Go up one directory"
     IDS_TIP_GOBTN "Go to entered directory"
     IDS_TIP_REFRESHBTN "Refresh directory listing"
     IDS_TIP_PLAYBTN "Play"
@@ -196,7 +187,7 @@ IDD_MAIN DIALOGEX 10, 10, 300, 300
 CAPTION "VGMPlayGUI"
 FONT 10, "Tahoma", 400, 0, 0
 CLASS "MAINCLASS"
-MENU IDR_MENU1
+MENU IDR_MENUMAIN
 LANGUAGE 9, 1
 STYLE WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_OVERLAPPED | WS_OVERLAPPEDWINDOW | WS_SIZEBOX | WS_SYSMENU | WS_VISIBLE //0x10CF0000
 EXSTYLE WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING //| WS_EX_RIGHTSCROLLBAR //0x00040000
@@ -218,7 +209,7 @@ BEGIN
     CONTROL "Use Current", IDC_BTN_DEFAULTPATH, "Button", 0x50010000, 129, 42, 45, 12
 END
 
-IDD_FILEFILT DIALOGEX 10, 10, PROP_SM_CXDLG, PROP_SM_CYDLG
+IDD_FILEFILTER DIALOGEX 10, 10, PROP_SM_CXDLG, PROP_SM_CYDLG
 CAPTION "File Filter"
 FONT 10, "Tahoma", 400, 0, 0
 LANGUAGE 9, 1
@@ -246,30 +237,30 @@ BEGIN
 END
 
 //menus
-IDR_MENU1 MENUEX
+IDR_MENUMAIN MENUEX
 LANGUAGE 9, 1
 BEGIN
-    POPUP "&File", IDM_FILE, MFT_STRING, MFS_ENABLED
+    POPUP "&File\0", IDM_FILE, MFT_STRING, MFS_ENABLED
     BEGIN
-        MENUITEM "&Go to drive root", IDM_ROOT, MFT_STRING, MFS_ENABLED
-        MENUITEM SEPARATOR
-        MENUITEM "E&xit", IDM_EXIT, MFT_STRING, MFS_ENABLED
+        MENUITEM "E&xit\0", IDM_EXIT, MFT_STRING, MFS_ENABLED
     END
-    MENUITEM "&Options", IDM_OPTIONS, MFT_STRING, MFS_ENABLED
-    MENUITEM "&About", IDM_ABOUT, MFT_STRING, MFS_ENABLED
+	POPUP "&List\0", IDM_LIST, MFT_STRING, MFS_ENABLED
+	BEGIN
+		MENUITEM "Go &Up One Directory Level\0", IDM_UP, MFT_STRING, MFS_ENABLED
+		MENUITEM "Go to Drive &Root\0", IDM_ROOT, MFT_STRING, MFS_ENABLED
+		MENUITEM SEPARATOR
+		MENUITEM "Re&fresh List\0", IDM_REFRESH, MFT_STRING, MFS_ENABLED
+	END
+    MENUITEM "&Options\0", IDM_OPTIONS, MFT_STRING, MFS_ENABLED
+    MENUITEM "&About\0", IDM_ABOUT, MFT_STRING, MFS_ENABLED
 END
 
 IDR_MENUCONTEXT MENUEX
 LANGUAGE 9, 1
 BEGIN
-    POPUP "IDC_LST_MAIN", IDM_LST_MAIN, MFT_STRING, MFS_ENABLED
+    POPUP "IDC_LST_DRIVES\0", IDM_LST_DRIVES, MFT_STRING, MFS_ENABLED
     BEGIN
-        MENUITEM "&Refresh list", IDM_LST_MAIN_REFRESH, MFT_STRING, MFS_ENABLED
-        MENUITEM "&Go up a directory", IDM_LST_MAIN_BACK, MFT_STRING, MFS_ENABLED
-    END
-    POPUP "IDC_LST_DRIVES", IDM_LST_DRIVES, MFT_STRING, MFS_ENABLED
-    BEGIN
-        MENUITEM "&Refresh list", IDM_LST_DRIVES_REFRESH, MFT_STRING, MFS_ENABLED
+        MENUITEM "&Refresh List\0", IDM_LST_DRIVES_REFRESH, MFT_STRING, MFS_ENABLED
     END
 END
 
