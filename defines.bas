@@ -69,9 +69,10 @@
 #Define IDM_LIST					&h2713 /'10003'/
 #Define IDM_UP						&h2714 /'10004'/
 #Define IDM_ROOT					&h2715 /'10005'/
-#Define IDM_REFRESH					&h2716 /'10006'/
-#Define IDM_OPTIONS                 &h2717 /'10007'/
-#Define IDM_ABOUT                   &h2718 /'10008'/
+#Define IDM_BACK                    &h2716 /'10006'/
+#Define IDM_REFRESH					&h2717 /'10007'/
+#Define IDM_OPTIONS                 &h2718 /'10008'/
+#Define IDM_ABOUT                   &h2719 /'10009'/
 
 ''context menu
 #Define IDR_MENUCONTEXT             &h4E20 /'20000'/
@@ -135,13 +136,12 @@
 ''IDs for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (SizeOf(TCHAR) * CCH_PATH))
-#Define NUM_PATH                    &h00000004 /'4'/
+#Define NUM_PATH                    &h00000005 /'4'/
 #Define SIZE_PATH                   Cast(SIZE_T, (NUM_PATH * CB_PATH))
 #Define PATH_VGMPLAY                &h00000000 /'0'/
 #Define PATH_DEFAULT                &h00000001 /'1'/
 #Define PATH_CURRENT                &h00000002 /'2'/
-#Define PATH_WAVOUT                 &h00000003 /'3'/
-''#Define PATH_PREVIOUS				&h00000004 /'4'/
+#Define PATH_PREVIOUS               &h00000003 /'3'/
 
 ''IDs for plpszKeyName
 #Define CCH_KEY                     &h00000020 /'32'/

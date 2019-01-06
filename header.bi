@@ -17,6 +17,12 @@
 #Error "This file is for Windows only." 
 #EndIf
 
+#If __FB_OUT_EXE__
+#Print "Compiling VGMPlayGUI."
+#Else
+#Error "__FB_OUT_EXE__ = 0"
+#EndIf
+
 #Ifdef __FB_64BIT__
 #Print "Compiling for 64-bit Windows."
 #Else
@@ -39,7 +45,7 @@
 #Include Once "win/prsht.bi"
 #Include "mod/chip-settings/chip-settings.bi"
 #Include "inc/errmsgbox.bi"
-#Include "inc/winapicheck.bi"
+#Include "inc/heapptrlist.bi"
 
 #Include Once "defines.bas"
 
@@ -66,6 +72,9 @@ Dim Shared dwFileFilt As DWORD32                    ''file attribute filter vari
 ''main function
 Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
 
+''processes the command line. called by WinMain only, do not call this function
+'Declare Function CmdLineProc (ByVal lpszCmdLine As LPCTSTR) As LRESULT
+
 ''subroutine used to start the main dialog. called by WinMain only, do not call this function
 Declare Sub StartMainDialog (ByVal hInst As HINSTANCE, ByVal nShowCmd As INT32, ByVal lParam As LPARAM)
 
@@ -85,7 +94,7 @@ Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As 
 Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal y As WORD) As BOOL
 
 ''changes directories and refreshes directory listings
-Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPTSTR) As BOOL
+Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
 ''options property sheet functions
 ''starts the options property sheet up

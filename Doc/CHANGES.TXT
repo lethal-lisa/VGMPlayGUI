@@ -189,4 +189,14 @@ v2.11.2:
     
     *       Fixed the context menus by adding cases for them in MainProc.
     
+v2.11.3.29:
+    
+    *       Major code cleanup.
+    *       Changes to the menus.
+    *       Consolidated WinAPICheck with ErrMsgBox.
+    *       Consolidated menus.rc and strings.rc with resource.rc
+    *       Removed several files.
+    +       Integrated the HeapPtrList library.
+    +       Added compile-debug.bat.
+    
 EOF

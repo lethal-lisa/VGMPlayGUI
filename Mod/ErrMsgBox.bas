@@ -25,17 +25,31 @@
 #Print "Compiling for 32-bit Windows."
 #EndIf
 
+''show if debug mode is enabled
+#If __FB_DEBUG__
+#Print "Compiling in debug mode."
+#Else
+#Print "Compiling in release mode."
+#EndIf
+
 ''include header
 #Include "../inc/errmsgbox.bi"
 
-Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorID As DWORD32, ByVal pdwArgs As PDWORD32) As DWORD32
+Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32, ByVal pdwArgs As PDWORD32) As DWORD32
+    
+    #If __FB_DEBUG__
+    ? "Calling:", __FUNCTION__
+    #EndIf
+    
+    ''make sure we have an error to display
+    If (dwErrorId = ERROR_SUCCESS) Then Return(ERROR_SUCCESS)
     
     ''declare local variables
     Dim mbp As MSGBOXPARAMS ''message box parameters
     Dim lpszError As LPTSTR ''error message buffer
     
     ''format message
-    If (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER Or FORMAT_MESSAGE_FROM_SYSTEM Or FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, dwErrorID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), Cast(LPTSTR, lpszError), 512, Cast(LPVOID, pdwArgs)) = 0) Then Return(GetLastError())
+    If (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER Or FORMAT_MESSAGE_FROM_SYSTEM Or FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, dwErrorId, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), Cast(LPTSTR, lpszError), 512, Cast(LPVOID, pdwArgs)) = 0) Then Return(GetLastError())
     
     ''setup mbp
     ZeroMemory(@mbp, SizeOf(mbp))
@@ -64,7 +78,11 @@ Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorID As DWORD32, By
     
 End Function
 
-Public Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal wTextID As WORD, ByVal wCaptionID As WORD, ByVal dwStyle As DWORD32) As DWORD32
+Public Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal wTextId As WORD, ByVal wCaptionId As WORD, ByVal dwStyle As DWORD32) As DWORD32
+    
+    #If __FB_DEBUG__
+    ? "Calling:", __FUNCTION__
+    #EndIf
     
     ''check instance handle
     If (hInst = INVALID_HANDLE_VALUE) Then Return(ERROR_INVALID_HANDLE)
@@ -78,8 +96,8 @@ Public Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal 
         .cbSize             = SizeOf(MSGBOXPARAMSA)
         .hwndOwner          = hDlg
         .hInstance          = hInst
-        .lpszText           = MAKEINTRESOURCE(wTextID)
-        .lpszCaption        = MAKEINTRESOURCE(wCaptionID)
+        .lpszText           = MAKEINTRESOURCE(wTextId)
+        .lpszCaption        = MAKEINTRESOURCE(wCaptionId)
         .dwStyle            = dwStyle
         .lpszIcon           = NULL
         .dwContextHelpId    = NULL
@@ -95,3 +113,5 @@ Public Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal 
     Return(MessageBoxIndirect(@mbp))
     
 End Function
+
+''EOF

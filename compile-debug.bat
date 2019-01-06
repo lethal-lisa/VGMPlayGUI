@@ -15,8 +15,8 @@ ECHO.
 ECHO COMPILING MODULES.
 ECHO.
 CHDIR ".\Mod"
-fbc -lib ".\ErrMsgBox.bas"
-fbc -lib ".\WinAPICheck.bas"
+fbc -lib -g ".\ErrMsgBox.bas"
+fbc -lib -g ".\HeapPtrList.bas"
 CHDIR ".."
 
 REM Compile main module
