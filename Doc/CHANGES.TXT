@@ -199,4 +199,12 @@ v2.11.3.29:
     +       Integrated the HeapPtrList library.
     +       Added compile-debug.bat.
     
+v2.11.3.30:
+    
+    -       Commented out the string table entries for the unused delete
+        message.
+    *       Spelling and grammar fixes to the string table.
+    -       Removed unused item from string table.
+    +       Added indents in resource.rc where appropriate.
+    
 EOF

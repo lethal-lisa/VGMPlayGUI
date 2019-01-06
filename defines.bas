@@ -124,8 +124,7 @@
 #Define IDS_TIP_SYSTEM              &h004A /'74'/
 #Define IDS_TIP_READONLY            &h004B /'75'/
 #Define IDS_TIP_EXCLUSIVE           &h004C /'76'/
-#Define IDS_TIP_WAVOUT              &h004D /'77'/
-#Define IDS_TIP_PREFERJAPTAG        &h004E /'78'/
+#Define IDS_TIP_PREFERJAPTAG        &h004D /'77'/
 
 ''VGMPlay.ini sections and options
 #Define IDS_INI_SEC_GENERAL         &h0100 /'256'/
@@ -136,7 +135,7 @@
 ''IDs for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (SizeOf(TCHAR) * CCH_PATH))
-#Define NUM_PATH                    &h00000005 /'4'/
+#Define NUM_PATH                    &h00000004 /'4'/
 #Define SIZE_PATH                   Cast(SIZE_T, (NUM_PATH * CB_PATH))
 #Define PATH_VGMPLAY                &h00000000 /'0'/
 #Define PATH_DEFAULT                &h00000001 /'1'/

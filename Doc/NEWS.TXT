@@ -113,4 +113,9 @@ v2.11.2:
     
     *       Fixed the context menus.
     
+v2.11.3:
+    
+    *       Changed the menus around.
+    *       Major optimization fixes.
+    
 EOF
