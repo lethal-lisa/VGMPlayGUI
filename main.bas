@@ -158,7 +158,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             SetLastError(Cast(DWORD32, RegCloseKey(*phkProgKey)))
             If (GetLastError() <> ERROR_SUCCESS) Then PostQuitMessage(Cast(INT32, GetLastError()))
             If (FreeMem() = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
-            If (HeapDestroy(hHeap) = FALSE) PostQuitMessage(Cast(INT32, GetLastError()))
+            If (HeapDestroy(hHeap) = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
             
             ''post quit message with success code
             PostQuitMessage(ERROR_SUCCESS)
@@ -938,13 +938,14 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
     Select Case uMsg ''messages
         Case WM_INITDIALOG ''initialize dialog
             
-            ''create tooltips
-            For iTip As UINT32 = 0 To 1
-                If (CreateToolTip(hWnd, (IDC_CHK_WAVOUT + iTip), (IDS_TIP_WAVOUT + iTip), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
-                    SysErrMsgBox(hWnd, GetLastError(), NULL)
-                    Exit For
-                End If
-            Next iTip
+            '''create tooltips
+            'For iTip As UINT32 = 0 To 1
+            '    If (CreateToolTip(hWnd, (IDC_CHK_WAVOUT + iTip), (IDS_TIP_WAVOUT + iTip), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
+            '        SysErrMsgBox(hWnd, GetLastError(), NULL)
+            '        Exit For
+            '    End If
+            'Next iTip
+            CreateToolTip(hWnd, IDC_CHK_PREFERJAPTAG, IDS_TIP_PREFERJAPTAG, TTS_ALWAYSTIP, NULL)
 			
         Case WM_COMMAND ''commands
             Select Case HiWord(wParam) ''event code
