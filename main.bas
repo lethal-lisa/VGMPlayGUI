@@ -68,6 +68,28 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     End With
     RegisterClassEx(@wcxMainClass)
     
+    ''create the application heap
+    hHeap = HeapCreate(NULL, NULL, NULL)
+    If (hHeap = INVALID_HANDLE_VALUE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
+    
+    ''initialize memory
+    If (InitMem() = FALSE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
+    
+    ''load strings
+    If (LoadStringResources(hInst) = FALSE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
+    
+    ''load the configuration
+    Dim dwKeyDisp As DWORD32    ''key disposition for OpenProgHKey
+    If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+    If (OpenProgHKey(phkProgKey, plpszStrRes[STR_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
+    If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+    
+    If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
+        If (LoadConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+    Else
+        If (SetDefConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+    End If
+    
     ''create, show, and update the main window
     StartMainDialog(hInst, nShowCmd, NULL)
     
@@ -116,38 +138,34 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             SetCursor(LoadCursor(NULL, IDC_APPSTARTING))
             
             ''create the heap
-            hHeap = HeapCreate(0, 0, 0)
-            If (hHeap = INVALID_HANDLE_VALUE) Then 
-                SysErrMsgBox(NULL, GetLastError(), NULL)
-                PostQuitMessage(GetLastError())
-            End If
+            'hHeap = HeapCreate(0, 0, 0)
+            'If (hHeap = INVALID_HANDLE_VALUE) Then 
+            '    SysErrMsgBox(NULL, GetLastError(), NULL)
+            '    PostQuitMessage(GetLastError())
+            'End If
             
-            ''initialize memory
-            If (InitMem() = FALSE) Then
-                SysErrMsgBox(NULL, GetLastError(), NULL)
-                PostQuitMessage(GetLastError())
-            End If
+            
             
             ''load string resources
-            If (LoadStringResources(hInstance) = FALSE) Then
-                SysErrMsgBox(NULL, GetLastError(), NULL)
-                PostQuitMessage(GetLastError())
-            End If
+            'If (LoadStringResources(hInstance) = FALSE) Then
+            '    SysErrMsgBox(NULL, GetLastError(), NULL)
+            '    PostQuitMessage(GetLastError())
+            'End If
             
             ''open program hkey
-            Dim dwKeyDisp As DWORD32    ''key disposition for OpenProgHKey
-            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            If (OpenProgHKey(phkProgKey, plpszStrRes[STR_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then
-                SysErrMsgBox(NULL, GetLastError(), NULL)
-                PostQuitMessage(GetLastError())
-            End If
-            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            
-            If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
-                If (LoadConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            Else
-                If (SetDefConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            End If
+            'Dim dwKeyDisp As DWORD32    ''key disposition for OpenProgHKey
+            'If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+            'If (OpenProgHKey(phkProgKey, plpszStrRes[STR_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then
+            '    SysErrMsgBox(NULL, GetLastError(), NULL)
+            '    PostQuitMessage(GetLastError())
+            'End If
+            'If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+            '
+            'If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
+            '    If (LoadConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+            'Else
+            '    If (SetDefConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+            'End If
             
             ''create child windows
             If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)

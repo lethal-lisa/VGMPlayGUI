@@ -74,7 +74,7 @@ Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32, By
     LocalFree(Cast(HLOCAL, lpszError))
     
     ''return
-    Return(ERROR_SUCCESS)
+    Return(dwErrorId)
     
 End Function
 
