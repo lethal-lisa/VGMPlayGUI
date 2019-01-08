@@ -137,36 +137,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VGMPLAYGUI))))
             SetCursor(LoadCursor(NULL, IDC_APPSTARTING))
             
-            ''create the heap
-            'hHeap = HeapCreate(0, 0, 0)
-            'If (hHeap = INVALID_HANDLE_VALUE) Then 
-            '    SysErrMsgBox(NULL, GetLastError(), NULL)
-            '    PostQuitMessage(GetLastError())
-            'End If
-            
-            
-            
-            ''load string resources
-            'If (LoadStringResources(hInstance) = FALSE) Then
-            '    SysErrMsgBox(NULL, GetLastError(), NULL)
-            '    PostQuitMessage(GetLastError())
-            'End If
-            
-            ''open program hkey
-            'Dim dwKeyDisp As DWORD32    ''key disposition for OpenProgHKey
-            'If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            'If (OpenProgHKey(phkProgKey, plpszStrRes[STR_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then
-            '    SysErrMsgBox(NULL, GetLastError(), NULL)
-            '    PostQuitMessage(GetLastError())
-            'End If
-            'If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            '
-            'If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
-            '    If (LoadConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            'Else
-            '    If (SetDefConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-            'End If
-            
             ''create child windows
             If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
             
