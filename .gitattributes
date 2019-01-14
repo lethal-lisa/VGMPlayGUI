@@ -5,6 +5,8 @@
 *.txt text=auto eol=crlf
 *.TXT text=auto eol=crlf
 *.rc  text=auto eol=crlf
+
 # Auto detect binary files
 *.ico -text -diff
-*.vgm -text -diff
+
+# EOF
