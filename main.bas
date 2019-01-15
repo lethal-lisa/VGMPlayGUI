@@ -24,7 +24,7 @@
 hInstance = GetModuleHandle(NULL)
 lpszCmdLine = GetCommandLine()
 #If __FB_DEBUG__
-? "hInstance=", "0x" + Hex(hInstance)
+? "hInstance=", "0x" + Hex(hInstance, 8)
 ? "lpszCmdLine=", *lpszCmdLine
 #EndIf
 InitCommonControls()
@@ -78,17 +78,8 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     ''load strings
     If (LoadStringResources(hInst) = FALSE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
     
-    ''load the configuration
-    Dim dwKeyDisp As DWORD32    ''key disposition for OpenProgHKey
-    If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-    If (OpenProgHKey(phkProgKey, plpszStrRes[STR_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
-    If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-    
-    If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
-        If (LoadConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-    Else
-        If (SetDefConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
-    End If
+    ''load config from registry
+    If (LoadConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
     
     ''create, show, and update the main window
     StartMainDialog(hInst, nShowCmd, NULL)
@@ -143,8 +134,8 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
         Case WM_DESTROY ''destroying window
             
             ''close handles, free allocated memory, and destroy the heap
-            SetLastError(Cast(DWORD32, RegCloseKey(*phkProgKey)))
-            If (GetLastError() <> ERROR_SUCCESS) Then PostQuitMessage(Cast(INT32, GetLastError()))
+            'SetLastError(Cast(DWORD32, RegCloseKey(*phkProgKey)))
+            'If (GetLastError() <> ERROR_SUCCESS) Then PostQuitMessage(Cast(INT32, GetLastError()))
             If (FreeMem() = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
             If (HeapDestroy(hHeap) = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
             
@@ -965,7 +956,7 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     
                 Case PSN_APPLY ''user has pressed the apply button
                     
-                    ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
+                    'ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
                     
                 Case PSN_HELP ''user has pressed the help button
                     
@@ -1074,12 +1065,11 @@ Function InitMem () As BOOL
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszStrRes), CB_STRRES, NUM_STRRES)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    phkProgKey      = Cast(PHKEY, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(HKEY))))
     ppiProcInfo     = Cast(PROCESS_INFORMATION Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(PROCESS_INFORMATION))))
     psiStartInfo    = Cast(STARTUPINFO Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(STARTUPINFO))))
     
     ''check allocation
-    If ((plpszPath = NULL) Or (plpszKeyName = NULL) Or (plpszStrRes = NULL) Or (phkProgKey = NULL) Or (ppiProcInfo = FALSE) Or (psiStartInfo = FALSE)) Then Return(FALSE)
+    If ((plpszPath = NULL) Or (plpszKeyName = NULL) Or (plpszStrRes = NULL) Or (ppiProcInfo = FALSE) Or (psiStartInfo = FALSE)) Then Return(FALSE)
     
     ''release the lock on the heap
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
@@ -1107,7 +1097,6 @@ Function FreeMem () As BOOL
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszStrRes), CB_STRRES, NUM_STRRES)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    If (HeapFree(hHeap, 0, Cast(LPVOID, phkProgKey)) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, 0, Cast(LPVOID, ppiProcInfo)) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, 0, Cast(LPVOID, psiStartInfo)) = FALSE) Then Return(FALSE)
     
@@ -1163,20 +1152,31 @@ Function LoadConfig () As BOOL
 	''get a lock on the heap
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
-    ''declare local variables
-    Dim cbValue As DWORD32  ''size of value in bytes
+    ''open the program's registry key
+    Dim dwKeyDisp As DWORD32    ''disposition value for
+    Dim hkProgKey As HKEY       ''handle to the program's registry key 
+    If (OpenProgHKey(@hkProgKey, plpszStrRes[IDS_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then Return(FALSE)
     
-    ''load config
-    cbValue = CB_PATH
-    SetLastError(Cast(DWORD32, RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), @cbValue)))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+    ''load the config
+    Dim cbValue As DWORD32
+    If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
+        cbValue = CB_PATH
+        SetLastError(Cast(DWORD32, RegQueryValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), @cbValue)))
+        If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+        
+        cbValue = CB_PATH
+        SetLastError(Cast(DWORD32, RegQueryValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), @cbValue)))
+        If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+        
+        cbValue = SizeOf(DWORD32)
+        SetLastError(Cast(DWORD32, RegQueryValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue)))
+        If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+    Else
+        If (SetDefConfig() = FALSE) Then Return(FALSE)
+    End If
     
-    cbValue = CB_PATH
-    SetLastError(Cast(DWORD32, RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), @cbValue)))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    
-    cbValue = SizeOf(DWORD32)
-    SetLastError(Cast(DWORD32, RegQueryValueEx(*phkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue)))
+    ''close the key
+    SetLastError(Cast(DWORD32, RegCloseKey(hkProgKey)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     
 	''release the lock on the heap
@@ -1198,14 +1198,22 @@ Function SaveConfig () As BOOL
 	''get a lock on the heap
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
+    ''open the program's registry key
+    Dim hkProgKey As HKEY   ''handle to the program's registry key
+    If (OpenProgHKey(@hkProgKey, plpszStrRes[IDS_APPNAME], KEY_WRITE, NULL) = FALSE) Then Return(FALSE)
+    
     ''save the configuration to the registry
-    SetLastError(Cast(DWORD32, RegSetValueEx(*phkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH)))
+    SetLastError(Cast(DWORD32, RegSetValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     
-    SetLastError(Cast(DWORD32, RegSetValueEx(*phkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), CB_PATH)))
+    SetLastError(Cast(DWORD32, RegSetValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), CB_PATH)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     
-    SetLastError(Cast(DWORD32, RegSetValueEx(*phkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32))))
+    SetLastError(Cast(DWORD32, RegSetValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32))))
+    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+    
+    ''close the key
+    SetLastError(Cast(DWORD32, RegCloseKey(hkProgKey)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     
 	''release the lock on the heap
