@@ -49,6 +49,11 @@
 
 #Include Once "defines.bas"
 
+''define structures
+'Type OPTIONS
+'    plpszPath As LPTSTR Ptr
+'    dwFiltFilt As DWORD32
+'End Type
 
 ''define constants
 Const MainClass = "MAINCLASS"
@@ -93,11 +98,14 @@ Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal 
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
 ''options property sheet functions
-''starts the options property sheet up
+''starts the options property sheet
 Declare Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
 
 ''WindowProc for the paths page
 Declare Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+
+''begins a browsing window to find VGMPlay.exe
+Declare Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
 
 ''get/set functions for the paths page, to be called only by PathsProc
 Declare Function SetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL

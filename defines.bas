@@ -154,10 +154,10 @@
 ''IDs for plpszStrRes
 #Define CCH_STRRES                  &h00000200 /'512'/
 #Define CB_STRRES                   Cast(SIZE_T, (SizeOf(TCHAR) * CCH_STRRES))
-#Define NUM_STRRES                  &h00000003 /'3'/
+#Define NUM_STRRES                  &h00000002 /'2'/
 #Define SIZE_STRRES                 Cast(SIZE_T, (NUM_STRRES * CB_STRRES))
 #Define STR_APPNAME                 &h00000000 /'0'/
 #Define STR_OPTIONS                 &h00000001 /'1'/
-#Define STR_FILT_VGMPLAY            &h00000002 /'2'/
+'#Define STR_FILT_VGMPLAY            &h00000002 /'2'/
 
 ''EOF

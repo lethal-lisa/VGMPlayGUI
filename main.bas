@@ -535,10 +535,12 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
     ''make sure path exists and is a directory
-    If ((PathFileExists(lpszPath) = FALSE) Or (PathIsDirectory(lpszPath) = FALSE)) Then Return(FALSE)
+    If (PathFileExists(lpszPath) = FALSE) Then Return(FALSE)
+    If (PathIsDirectory(lpszPath) = FALSE) Then Return(FALSE)
     
     ''change directories
-    If (ChDir(*lpszPath) <> 0) Then
+    *plpszPath[PATH_PREVIOUS] = CurDir()
+    If (ChDir(*lpszPath)) Then
         SetLastError(ERROR_PATH_NOT_FOUND)
         Return(FALSE)
     End If
@@ -548,7 +550,8 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     SetDlgItemText(hDlg, IDC_EDT_FILE, NULL)
     
     ''refresh directory listings
-    If ((DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, dwFileFilt) = 0) Or (DlgDirList(hDlg, NULL, IDC_LST_DRIVES, NULL, (DDL_DRIVES Or DDL_EXCLUSIVE)) = 0)) Then Return(FALSE)
+    If (DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, dwFileFilt) = 0) Then Return(FALSE)
+    If (DlgDirList(hDlg, NULL, IDC_LST_DRIVES, NULL, (DDL_DRIVES Or DDL_EXCLUSIVE)) = 0) Then Return(FALSE)
     
     ''release the lock on the heap
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
@@ -639,6 +642,7 @@ Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
     
     ''return
     LocalFree(Cast(HLOCAL, lpPsp))
+    If (GetLastError()) Then Return(FALSE)
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
@@ -669,47 +673,8 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                     
                     Select Case LoWord(wParam) ''button IDs:
                         Case IDC_BTN_VGMPLAYPATH ''browse for vgmplay
-                            
-							''get a lock on the heap
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                            
-                            ''declare local variables
-                            Dim ofn As OPENFILENAME             ''ofn struct
-                            Dim szReturnTo As ZString*MAX_PATH  ''temp buffer for current path
-                            
-                            ''store current directory
-                            szReturnTo = CurDir()
-                            
-                            ''setup ofn
-                            ZeroMemory(@ofn, SizeOf(OPENFILENAME))
-                            With ofn
-                                .lStructSize        = SizeOf(OPENFILENAME)
-                                .hwndOwner          = hWnd
-                                .hInstance          = hInstance
-                                .lpstrFilter        = plpszStrRes[STR_FILT_VGMPLAY]
-                                .lpstrCustomFilter  = NULL
-                                .nMaxCustFilter     = 0
-                                .nFilterIndex       = 1
-                                .lpstrFile          = plpszPath[PATH_VGMPLAY]
-                                .nMaxFile           = MAX_PATH
-                                .lpstrFileTitle     = NULL
-                                .nMaxFileTitle      = 0
-                                .lpstrInitialDir    = NULL
-                                .lpstrTitle         = NULL
-                                .Flags              = (OFN_DONTADDTORECENT Or OFN_FILEMUSTEXIST Or OFN_HIDEREADONLY Or OFN_NONETWORKBUTTON Or OFN_PATHMUSTEXIST)
-                                .nFileOffset        = 0
-                                .nFileExtension     = 0
-                                .lpstrDefExt        = NULL
-                            End With
-                            
-                            ''browse for VGMPlay.exe
-                            GetOpenFileName(@ofn)
-                            If (SetDlgItemText(hWnd, IDC_EDT_VGMPLAYPATH, plpszPath[PATH_VGMPLAY]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                            
-                            ''return to current directory
-                            ChDir(szReturnTo)
-                            
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+							
+                            If (BrowseVGMPlay(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                             
                         Case IDC_BTN_DEFAULTPATH ''set default path to current one
 							
@@ -763,6 +728,73 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
             
     End Select
     
+    Return(TRUE)
+    
+End Function
+
+Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
+    
+    #If __FB_DEBUG__
+    ? "Calling:", __FUNCTION__
+    #EndIf
+    
+    ''get a lock on the heap
+    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    
+    ''store current path to return to upon function exit
+    Dim lpszReturnTo As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, (MAX_PATH * SizeOf(TCHAR)))))
+    If (lpszReturnTo = NULL) Then Return(FALSE)
+    *lpszReturnTo = CurDir()
+    
+    ''load file filter
+    Dim lpszFilter As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, (MAX_PATH * SizeOf(TCHAR)))))
+    If (lpszFilter = NULL) Then Return(FALSE)
+    If (LoadString(hInst, IDS_FILT_VGMPLAY, lpszFilter, 512) = 0) Then Return(FALSE)
+    
+    ''setup ofn
+    Dim ofn As OPENFILENAME
+    ZeroMemory(@ofn, SizeOf(OPENFILENAME))
+    With ofn
+        .lStructSize        = SizeOf(OPENFILENAME)
+        .hwndOwner          = hDlg
+        .hInstance          = hInst
+        .lpstrFilter        = Cast(LPCTSTR, lpszFilter)
+        .lpstrCustomFilter  = NULL
+        .nMaxCustFilter     = NULL
+        .nFilterIndex       = 1
+        .lpstrFile          = plpszPath[PATH_VGMPLAY]
+        .nMaxFile           = MAX_PATH
+        .lpstrFileTitle     = NULL
+        .nMaxFileTitle      = NULL
+        .lpstrInitialDir    = NULL
+        .lpstrTitle         = NULL
+        .Flags              = (OFN_DONTADDTORECENT Or OFN_FILEMUSTEXIST Or OFN_HIDEREADONLY Or OFN_NONETWORKBUTTON Or OFN_PATHMUSTEXIST Or OFN_READONLY)
+        .nFileOffset        = NULL
+        .nFileExtension     = NULL
+        .lpstrDefExt        = NULL
+    End With
+    
+    ''browse for VGMPlay.exe
+    GetOpenFileName(@ofn)
+    If (SetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszPath[PATH_VGMPLAY]) = FALSE) Then Return(FALSE)
+    
+    ''free memory allocated for lpszFilter
+    If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszFilter)) = FALSE) Then Return(FALSE)
+    
+    ''return to current directory
+    If (ChDir(*lpszReturnTo)) Then
+        SetLastError(ERROR_PATH_NOT_FOUND)
+        Return(FALSE)
+    End If
+    
+    ''free memory allocated for lpszReturnTo
+    If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszReturnTo)) = FALSE) Then Return(FALSE)
+    
+    ''release the lock on the heap
+    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    
+    ''return
+    SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
 End Function
@@ -923,14 +955,12 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
     Select Case uMsg ''messages
         Case WM_INITDIALOG ''initialize dialog
             
-            '''create tooltips
-            'For iTip As UINT32 = 0 To 1
-            '    If (CreateToolTip(hWnd, (IDC_CHK_WAVOUT + iTip), (IDS_TIP_WAVOUT + iTip), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
-            '        SysErrMsgBox(hWnd, GetLastError(), NULL)
-            '        Exit For
-            '    End If
-            'Next iTip
             CreateToolTip(hWnd, IDC_CHK_PREFERJAPTAG, IDS_TIP_PREFERJAPTAG, TTS_ALWAYSTIP, NULL)
+			
+			''disable windows until chip-settings.dll is done
+			EnableWindow(GetDlgItem(hWnd, IDC_CHK_LOGSOUND), FALSE)
+			EnableWindow(GetDlgItem(hWnd, IDC_CHK_PREFERJAPTAG), FALSE)
+			EnableWindow(GetDlgItem(hWnd, IDC_BTN_CHIPSETTINGS), FALSE)
 			
         Case WM_COMMAND ''commands
             Select Case HiWord(wParam) ''event code
@@ -1132,8 +1162,8 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
         If (LoadString(hInst, (IDS_APPNAME + iMisc), plpszStrRes[STR_APPNAME + iMisc], CCH_STRRES) = 0) Then Return(FALSE)
     Next iMisc
     
-    ''load the file filter for VGMPlay
-    If (LoadString(hInst, IDS_FILT_VGMPLAY, plpszStrRes[STR_FILT_VGMPLAY], CCH_STRRES) = 0) Then Return(FALSE)
+    '''load the file filter for VGMPlay
+    'If (LoadString(hInst, IDS_FILT_VGMPLAY, plpszStrRes[STR_FILT_VGMPLAY], CCH_STRRES) = 0) Then Return(FALSE)
     
     ''release the lock on the heap
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
