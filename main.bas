@@ -35,7 +35,7 @@ Dim uExitCode As UINT32 = WinMain(hInstance, NULL, lpszCmdLine, SW_SHOWNORMAL)
 
 ''exit
 #If __FB_DEBUG__
-? "Exit code", "= 0x" + Hex(uExitCode)
+? "Exit code", "= 0x" + Hex(uExitCode, 8)
 #EndIf
 ExitProcess(uExitCode)
 End(uExitCode)
@@ -1020,6 +1020,8 @@ Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     
     #If __FB_DEBUG__
     ? "Calling:", __FUNCTION__
+    ? "lpszFile", "= 0x"; Hex(lpszFile, 8)
+    ? "*lpszFile", "= "; *lpszFile
     #EndIf
     
 	''set loading cursor
@@ -1028,18 +1030,26 @@ Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
 	''get a lock on the heap
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
-    ''confirm path's existence, and add quotes if nessecary
+    ''allocate buffer for command line parameters
+    Dim lpszParam As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, (MAX_PATH * SizeOf(TCHAR)))))
+    If (lpszParam = NULL) Then Return(FALSE)
+    
+    ''format command line parameters
+    *lpszParam = (" " + Chr(34) + CurDir() + "\" + *lpszFile + Chr(34))
     If (PathFileExists(lpszFile) = FALSE) Then Return(FALSE)
-    PathQuoteSpaces(Cast(LPTSTR, lpszFile))
+    
+    Static piProcInfo As PROCESS_INFORMATION
+    Static siStartInfo As STARTUPINFO
     
     ''stop VGMPlay if it's already running
-    If (ppiProcInfo->hProcess <> INVALID_HANDLE_VALUE) Then TerminateProcess(ppiProcInfo->hProcess, ERROR_SINGLE_INSTANCE_APP)
-    
-    Dim szFile As ZString*MAX_PATH = (" " + *lpszFile)
+    If (piProcInfo.hProcess <> INVALID_HANDLE_VALUE) Then TerminateProcess(piProcInfo.hProcess, ERROR_SINGLE_INSTANCE_APP)
     
     ''start VGMPlay, and wait for an input idle code
-    If (CreateProcess(plpszPath[PATH_VGMPLAY], @szFile, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, psiStartInfo, ppiProcInfo) = FALSE) Then Return(FALSE)
-    WaitForInputIdle(ppiProcInfo->hProcess, INFINITE)
+    If (CreateProcess(plpszPath[PATH_VGMPLAY], lpszParam, NULL, NULL, FALSE, CREATE_NEW_CONSOLE, NULL, NULL, @siStartInfo, @piProcInfo) = FALSE) Then Return(FALSE)
+    WaitForInputIdle(piProcInfo.hProcess, INFINITE)
+    
+    ''free the buffer used for the command line parameters
+    If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszParam)) = FALSE) Then Return(FALSE)
     
 	''release the heap lock
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
@@ -1069,11 +1079,9 @@ Function InitMem () As BOOL
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszStrRes), CB_STRRES, NUM_STRRES)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    ppiProcInfo     = Cast(PROCESS_INFORMATION Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(PROCESS_INFORMATION))))
-    psiStartInfo    = Cast(STARTUPINFO Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(STARTUPINFO))))
     
     ''check allocation
-    If ((plpszPath = NULL) Or (plpszStrRes = NULL) Or (ppiProcInfo = FALSE) Or (psiStartInfo = FALSE)) Then Return(FALSE)
+    If ((plpszPath = NULL) Or (plpszStrRes = NULL)) Then Return(FALSE)
     
     ''release the lock on the heap
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
@@ -1099,8 +1107,6 @@ Function FreeMem () As BOOL
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszStrRes), CB_STRRES, NUM_STRRES)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    If (HeapFree(hHeap, 0, Cast(LPVOID, ppiProcInfo)) = FALSE) Then Return(FALSE)
-    If (HeapFree(hHeap, 0, Cast(LPVOID, psiStartInfo)) = FALSE) Then Return(FALSE)
     
     ''release the lock on the heap
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)

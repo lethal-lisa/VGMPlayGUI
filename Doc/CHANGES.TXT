@@ -207,4 +207,15 @@ v2.11.3.30:
     -       Removed unused item from string table.
     +       Added indents in resource.rc where appropriate.
     
+v2.11.4.5:
+    
+    *       Removed plpszKeyName from shared variables and made registry key
+        names load dynamically.
+    
+v2.11.4.10:
+    
+    *       Optimized StartVGMPlay(); it no longer uses shared variables for
+        PROCESS_INFORMATION and STARTUPINFO.
+    *       StartVGMPlay() now creates a definite path to lpszFile.
+    
 EOF

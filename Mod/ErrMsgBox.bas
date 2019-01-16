@@ -49,7 +49,7 @@ Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32, By
     Dim lpszError As LPTSTR ''error message buffer
     
     ''format message
-    If (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER Or FORMAT_MESSAGE_FROM_SYSTEM Or FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, dwErrorId, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), Cast(LPTSTR, lpszError), 512, Cast(LPVOID, pdwArgs)) = 0) Then Return(GetLastError())
+    If (FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER Or FORMAT_MESSAGE_FROM_SYSTEM Or FORMAT_MESSAGE_ARGUMENT_ARRAY, NULL, dwErrorId, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), lpszError, 512, Cast(LPVOID, pdwArgs)) = 0) Then Return(GetLastError())
     
     ''setup mbp
     ZeroMemory(@mbp, SizeOf(mbp))

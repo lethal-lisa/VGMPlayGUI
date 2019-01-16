@@ -61,8 +61,6 @@ Dim Shared hHeap As HANDLE                          ''handle to the application'
 
 Dim Shared plpszPath As LPTSTR Ptr                  ''paths
 Dim Shared plpszStrRes As LPTSTR Ptr                ''misc. string resources
-Dim Shared ppiProcInfo As PROCESS_INFORMATION Ptr   ''process info structure for calling CreateProcess to start VGMPlay
-Dim Shared psiStartInfo As STARTUPINFO Ptr          ''startup info structure for calling CreateProcess to start VGMPlay
 Dim Shared dwFileFilt As DWORD32                    ''file attribute filter variable loaded from the registry
 
 
