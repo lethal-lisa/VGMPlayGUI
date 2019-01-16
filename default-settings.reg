@@ -1,7 +1,0 @@
-﻿Windows Registry Editor Version 5.00
-
-[HKEY_CURRENT_USER\Software\VGMPlayGUI]
-"VGMPlay Path"=""
-"Default Path"=""
-"File Filter"=dword:00000010
-
