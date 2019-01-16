@@ -60,7 +60,6 @@ Dim Shared hWin As HWND                             ''handle to the application'
 Dim Shared hHeap As HANDLE                          ''handle to the application's heap
 
 Dim Shared plpszPath As LPTSTR Ptr                  ''paths
-Dim Shared plpszKeyName As LPTSTR Ptr               ''registry key names
 Dim Shared plpszStrRes As LPTSTR Ptr                ''misc. string resources
 Dim Shared ppiProcInfo As PROCESS_INFORMATION Ptr   ''process info structure for calling CreateProcess to start VGMPlay
 Dim Shared psiStartInfo As STARTUPINFO Ptr          ''startup info structure for calling CreateProcess to start VGMPlay

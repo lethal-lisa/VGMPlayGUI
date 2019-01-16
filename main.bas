@@ -24,8 +24,9 @@
 hInstance = GetModuleHandle(NULL)
 lpszCmdLine = GetCommandLine()
 #If __FB_DEBUG__
-? "hInstance=", "0x" + Hex(hInstance, 8)
-? "lpszCmdLine=", *lpszCmdLine
+? "hInstance", "= 0x"; Hex(hInstance, 8)
+? "lpszCmdLine", "= 0x"; Hex(lpszCmdLine, 8)
+? "Command line:", Chr(34); *lpszCmdLine; Chr(34)
 #EndIf
 InitCommonControls()
 
@@ -34,7 +35,7 @@ Dim uExitCode As UINT32 = WinMain(hInstance, NULL, lpszCmdLine, SW_SHOWNORMAL)
 
 ''exit
 #If __FB_DEBUG__
-? "Exit code:", "0x" + Hex(uExitCode)
+? "Exit code", "= 0x" + Hex(uExitCode)
 #EndIf
 ExitProcess(uExitCode)
 End(uExitCode)
@@ -134,8 +135,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
         Case WM_DESTROY ''destroying window
             
             ''close handles, free allocated memory, and destroy the heap
-            'SetLastError(Cast(DWORD32, RegCloseKey(*phkProgKey)))
-            'If (GetLastError() <> ERROR_SUCCESS) Then PostQuitMessage(Cast(INT32, GetLastError()))
             If (FreeMem() = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
             If (HeapDestroy(hHeap) = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
             
@@ -168,6 +167,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             If (DestroyWindow(hWnd) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
             
         Case WM_COMMAND ''command has been issued
+            
             Select Case HiWord(wParam) ''event:
                 Case BN_CLICKED ''a button has been pressed
                     Select Case LoWord(wParam) ''button IDs:
@@ -298,6 +298,12 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             
             ''get windowpos structure from lParam
             Dim pwp As WINDOWPOS Ptr = Cast(WINDOWPOS Ptr, lParam)
+            
+            #If __FB_DEBUG__
+            ? "Window Pos Changing:"
+            ? "(x, y)", "= ("; Str(pwp->x); ", "; Str(pwp->y); ")"
+            ? "(cx, cy)", "= ("; Str(pwp->cx); ", "; Str(pwp->cy); ")"
+            #EndIf
             
             ''prevent window from getting too small
             If (pwp->cx < MIN_SIZE_X) Then pwp->cx = MIN_SIZE_X
@@ -1061,15 +1067,13 @@ Function InitMem () As BOOL
     ''allocate memory
     SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszPath), CB_PATH, NUM_PATH)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, NUM_KEY)))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszStrRes), CB_STRRES, NUM_STRRES)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     ppiProcInfo     = Cast(PROCESS_INFORMATION Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(PROCESS_INFORMATION))))
     psiStartInfo    = Cast(STARTUPINFO Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(STARTUPINFO))))
     
     ''check allocation
-    If ((plpszPath = NULL) Or (plpszKeyName = NULL) Or (plpszStrRes = NULL) Or (ppiProcInfo = FALSE) Or (psiStartInfo = FALSE)) Then Return(FALSE)
+    If ((plpszPath = NULL) Or (plpszStrRes = NULL) Or (ppiProcInfo = FALSE) Or (psiStartInfo = FALSE)) Then Return(FALSE)
     
     ''release the lock on the heap
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
@@ -1092,8 +1096,6 @@ Function FreeMem () As BOOL
     
     ''free memory
     SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszPath), CB_PATH, NUM_PATH)))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, NUM_KEY)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszStrRes), CB_STRRES, NUM_STRRES)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
@@ -1118,11 +1120,6 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     
 	''get a lock on the heap
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''load the registry key names
-    For iReg As UINT32 = 0 To (NUM_KEY - 1)
-        If (LoadString(hInst, (IDS_REG_VGMPLAYPATH + iReg), plpszKeyName[KEY_VGMPLAYPATH + iReg], CCH_KEY) = 0) Then Return(FALSE)
-    Next iReg
     
     ''load misc strings
     For iMisc As UINT32 = 0 To 1
@@ -1153,13 +1150,26 @@ Function LoadConfig () As BOOL
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
     ''open the program's registry key
-    Dim dwKeyDisp As DWORD32    ''disposition value for
+    Dim dwKeyDisp As DWORD32    ''disposition value for OpenProgHKey
     Dim hkProgKey As HKEY       ''handle to the program's registry key 
     If (OpenProgHKey(@hkProgKey, plpszStrRes[IDS_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then Return(FALSE)
     
     ''load the config
-    Dim cbValue As DWORD32
+    Dim cbValue As DWORD32          ''size of items to write to the registry
+    Dim plpszKeyName As LPTSTR Ptr  ''pointer to a buffer for the key names
+    
     If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
+        
+        ''allocate a buffer for a list of strings to hold the key names
+        SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, NUM_KEY)))
+        If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+        
+        ''load the key names
+        For iKey As UINT32 = 0 To (NUM_KEY - 1)
+            If (LoadString(hInstance, Cast(UINT32, (IDS_REG_VGMPLAYPATH + iKey)), plpszKeyName[iKey], CCH_KEY) = 0) Then Return(FALSE)
+        Next iKey
+        
+        ''load the config
         cbValue = CB_PATH
         SetLastError(Cast(DWORD32, RegQueryValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), @cbValue)))
         If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
@@ -1171,8 +1181,15 @@ Function LoadConfig () As BOOL
         cbValue = SizeOf(DWORD32)
         SetLastError(Cast(DWORD32, RegQueryValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue)))
         If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+        
+        ''free the allocated buffer for the key names
+        SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, NUM_KEY)))
+        If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+        
     Else
+        
         If (SetDefConfig() = FALSE) Then Return(FALSE)
+        
     End If
     
     ''close the key
@@ -1202,6 +1219,16 @@ Function SaveConfig () As BOOL
     Dim hkProgKey As HKEY   ''handle to the program's registry key
     If (OpenProgHKey(@hkProgKey, plpszStrRes[IDS_APPNAME], KEY_WRITE, NULL) = FALSE) Then Return(FALSE)
     
+    ''allocate a buffer for a list of strings to hold the key names
+    Dim plpszKeyName As LPTSTR Ptr
+    SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, NUM_KEY)))
+    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+    
+    ''load the key names
+    For iKey As UINT32 = 0 To (NUM_KEY - 1)
+        If (LoadString(hInstance, Cast(UINT32, (IDS_REG_VGMPLAYPATH + iKey)), plpszKeyName[iKey], CCH_KEY) = 0) Then Return(FALSE)
+    Next iKey
+    
     ''save the configuration to the registry
     SetLastError(Cast(DWORD32, RegSetValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
@@ -1210,6 +1237,10 @@ Function SaveConfig () As BOOL
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     
     SetLastError(Cast(DWORD32, RegSetValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32))))
+    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+    
+    ''free the allocated buffer for the key names
+    SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, NUM_KEY)))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     
     ''close the key
