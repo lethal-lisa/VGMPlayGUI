@@ -33,7 +33,7 @@
 #EndIf
 
 ''include header
-#Include Once "../inc/heapptrlist.bi"
+#Include Once "heapptrlist.bi"
 
 Public Function HeapAllocPtrList (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As ULONG32) As LRESULT
     

@@ -44,8 +44,9 @@
 #Include Once "win/commdlg.bi"
 #Include Once "win/prsht.bi"
 #Include "mod/chip-settings/chip-settings.bi"
-#Include "inc/errmsgbox.bi"
-#Include "inc/heapptrlist.bi"
+#Include "mod/errmsgbox/errmsgbox.bi"
+#Include "mod/heapptrlist/heapptrlist.bi"
+#Include "mod/openproghkey/openproghkey.bi"
 
 #Include Once "defines.bas"
 
@@ -143,6 +144,6 @@ Declare Function SaveConfig () As BOOL
 Declare Function SetDefConfig () As BOOL
 
 ''opens a handle to the application's registry key
-Declare Function OpenProgHKey (ByRef phkProgKey As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As BOOL
+'Declare Function OpenProgHKey (ByRef phkProgKey As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As BOOL
 
 ''EOF

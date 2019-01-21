@@ -33,7 +33,7 @@
 #EndIf
 
 ''include header
-#Include "../inc/errmsgbox.bi"
+#Include "errmsgbox.bi"
 
 Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32, ByVal pdwArgs As PDWORD32) As DWORD32
     

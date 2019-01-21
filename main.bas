@@ -1188,7 +1188,8 @@ Function LoadConfig () As BOOL
     ''open the program's registry key
     Dim dwKeyDisp As DWORD32    ''disposition value for OpenProgHKey
     Dim hkProgKey As HKEY       ''handle to the program's registry key 
-    If (OpenProgHKey(@hkProgKey, plpszStrRes[IDS_APPNAME], KEY_ALL_ACCESS, @dwKeyDisp) = FALSE) Then Return(FALSE)
+    SetLastError(Cast(DWORD32, OpenProgHKey(@hkProgKey, plpszStrRes[IDS_APPNAME], NULL, KEY_ALL_ACCESS, @dwKeyDisp)))
+    If (GetLastError()) Then Return(FALSE)
     
     ''load the config
     Dim cbValue As DWORD32          ''size of items to write to the registry
@@ -1253,7 +1254,8 @@ Function SaveConfig () As BOOL
     
     ''open the program's registry key
     Dim hkProgKey As HKEY   ''handle to the program's registry key
-    If (OpenProgHKey(@hkProgKey, plpszStrRes[IDS_APPNAME], KEY_WRITE, NULL) = FALSE) Then Return(FALSE)
+    SetLastError(Cast(DWORD32, OpenProgHKey(@hkProgKey, plpszStrRes[IDS_APPNAME], NULL, KEY_WRITE,  NULL)))
+    If (GetLastError()) Then Return(FALSE)
     
     ''allocate a buffer for a list of strings to hold the key names
     Dim plpszKeyName As LPTSTR Ptr
@@ -1319,41 +1321,5 @@ Function SetDefConfig () As BOOL
     
 End Function
 
-''opens a handle to the program's registry key
-Function OpenProgHKey (ByRef phkProgKey As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As BOOL
-    
-    #If __FB_DEBUG__
-    ? "Calling:", __FUNCTION__
-    #EndIf
-    
-    ''declare local variables
-    Dim hkSoftware As HKEY  ''hkey to HKEY_CURRENT_USER\Software
-    Dim lResult As LONG32   ''result value
-    
-    ''open HKEY_CURRENT_USER\Software
-    lResult = RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, samDesired, @hkSoftware)
-    If (lResult <> ERROR_SUCCESS) Then
-        SetLastError(Cast(DWORD32, lResult))
-        Return(FALSE)
-    End If
-    
-    ''open/create HKEY_CURRENT_USER\Software\<appName>
-    lResult = RegCreateKeyEx(hkSoftware, lpszAppName, 0, NULL, 0, samDesired, NULL, phkProgKey, pdwDisp)
-    If (lResult <> ERROR_SUCCESS) Then
-        SetLastError(Cast(DWORD32, lResult))
-        Return(FALSE)
-    End If
-    
-    ''return
-    lResult = RegCloseKey(hkSoftware)
-    If (lResult <> ERROR_SUCCESS) Then
-        SetLastError(Cast(DWORD32, lResult))
-        Return(FALSE)
-    Else
-        SetLastError(ERROR_SUCCESS)
-        Return(TRUE)
-    End If
-    
-End Function
-
 ''EOF
+
