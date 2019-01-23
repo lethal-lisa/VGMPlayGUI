@@ -21,6 +21,11 @@
         #Else
             #Print "Compiling for 32-bit Windows."
         #EndIf
+        #If __FB_DEBUG__
+            #Print "Compiling in debug mode."
+        #Else
+            #Print "Compiling in release mode."
+        #EndIf
     #Else
         #Error "This file must be compiled as a static library."
     #EndIf

@@ -10,14 +10,28 @@
 
 #Pragma Once
 
-#If __FB_OUT_EXE__
-#Print "Including ErrMsgBox"
-#Inclib "errmsgbox"
-#EndIf
-
-''check target OS
-#Ifndef __FB_WIN32__
-#Error "Target OS must be Windows"
+''compiler output
+#Ifdef __FB_WIN32__
+    #If __FB_OUT_EXE__
+        #Print "Including ""ErrMsgBox.bi""."
+        #Inclib "errmsgbox"
+    #ElseIf __FB_OUT_LIB__
+        #Print "Compiling ""ErrMsgBox.bas""."
+        #Ifdef __FB_64BIT__
+            #Print "Compiling for 64-bit Windows."
+        #Else
+            #Print "Compiling for 32-bit Windows."
+        #EndIf
+        #If __FB_DEBUG__
+            #Print "Compiling in debug mode."
+        #Else
+            #Print "Compiling in release mode."
+        #EndIf
+    #Else
+        #Error "This file must be compiled as a static library."
+    #EndIf
+#Else
+    #Error "This file must be compiled for Windows."
 #EndIf
 
 ''include windows header

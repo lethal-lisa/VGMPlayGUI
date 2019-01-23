@@ -11,27 +11,6 @@
         
 '/
 
-''check compiler output type
-#If __FB_OUT_LIB__ = 0
-#Error "__FB_OUT_LIB__ = 0"
-#EndIf
-
-#Print Compiling "ErrMsgBox.bas"
-
-''show if 32- or 64-bit target
-#Ifdef __FB_64BIT__
-#Print "Compiling for 64-bit Windows."
-#Else
-#Print "Compiling for 32-bit Windows."
-#EndIf
-
-''show if debug mode is enabled
-#If __FB_DEBUG__
-#Print "Compiling in debug mode."
-#Else
-#Print "Compiling in release mode."
-#EndIf
-
 ''include header
 #Include "errmsgbox.bi"
 

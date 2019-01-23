@@ -20,8 +20,8 @@
 #include "res/sega-psg.rc"
 
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 0, 1, 1
-PRODUCTVERSION  2, 11, 4, 16
+FILEVERSION     1, 0, 1, 2
+PRODUCTVERSION  2, 11, 4, 27
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0 //VS_FF_DEBUG | VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD
 FILEOS          VOS_NT_WINDOWS32
@@ -32,8 +32,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.1.0.0\0"
-            VALUE "ProductVersion",     "2.11.4.14\0"
+            VALUE "FileVersion",        "1.0.1.2\0"
+            VALUE "ProductVersion",     "2.11.4.27\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Chip-Settings Library for VGMPlayGUI\0"
             VALUE "InternalName",       "Chip-Settings\0"

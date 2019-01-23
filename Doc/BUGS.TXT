@@ -3,4 +3,7 @@ VGMPlayGUI - Bug Tracker:
     -       The 'Browse' feature in the options menu does not work
         correctly. (Fixed).
     
+    -       Registry I/O functions write to the wrong location.
+        (fixed (v2.11.4)).
+    
 EOF

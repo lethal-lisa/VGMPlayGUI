@@ -14,25 +14,25 @@
 
 ''make sure target is Windows
 #Ifndef __FB_WIN32__
-#Error "This file is for Windows only." 
+    #Error "This file is for Windows only." 
 #EndIf
 
 #If __FB_OUT_EXE__
-#Print "Compiling VGMPlayGUI."
+    #Print "Compiling VGMPlayGUI."
 #Else
-#Error "__FB_OUT_EXE__ = 0"
+    #Error "__FB_OUT_EXE__ = 0"
 #EndIf
 
 #Ifdef __FB_64BIT__
-#Print "Compiling for 64-bit Windows."
+    #Print "Compiling for 64-bit Windows."
 #Else
-#Print "Compiling for 32-bit Windows."
+    #Print "Compiling for 32-bit Windows."
 #EndIf
 
 #If __FB_DEBUG__
-#Print "Compiling in debug mode."
+    #Print "Compiling in debug mode."
 #Else
-#Print "Compiling in release mode."
+    #Print "Compiling in release mode."
 #EndIf
 
 #LibPath "mod"
