@@ -17,7 +17,7 @@
 ''for some reason, DWL_MSGRESULT isn't defined in FB v1.05.0's 64-bit Windows
 ''headers, as this may be fixed in future versions, only define this if it isn't already
 #Ifndef DWL_MSGRESULT
-#Define DWL_MSGRESULT &h00000000 /'0'/
+    #Define DWL_MSGRESULT           &h00000000 /'0'/
 #EndIf
 
 ''defines from resource files:
@@ -135,12 +135,11 @@
 ''IDs for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (SizeOf(TCHAR) * CCH_PATH))
-#Define NUM_PATH                    &h00000004 /'4'/
+#Define NUM_PATH                    &h00000003 /'3'/
 #Define SIZE_PATH                   Cast(SIZE_T, (NUM_PATH * CB_PATH))
 #Define PATH_VGMPLAY                &h00000000 /'0'/
 #Define PATH_DEFAULT                &h00000001 /'1'/
 #Define PATH_CURRENT                &h00000002 /'2'/
-#Define PATH_PREVIOUS               &h00000003 /'3'/
 
 ''IDs for plpszKeyName
 #Define CCH_KEY                     &h00000020 /'32'/
@@ -158,6 +157,15 @@
 #Define SIZE_STRRES                 Cast(SIZE_T, (NUM_STRRES * CB_STRRES))
 #Define STR_APPNAME                 &h00000000 /'0'/
 #Define STR_OPTIONS                 &h00000001 /'1'/
-'#Define STR_FILT_VGMPLAY            &h00000002 /'2'/
+
+''IDs for plpszHistory
+/'
+        In the final version of this history feature, the value determined
+    currently by NUM_HIST will instead be loaded from the registry based on
+    the user's preference.
+'/
+#Define CCH_HIST                    MAX_PATH
+#Define CB_HIST                     Cast(SIZE_T, (SizeOf(TCHAR) * CCH_HIST))
+#Define NUM_HIST                    &h00000003 /'3'/
 
 ''EOF

@@ -47,6 +47,7 @@
 #Include "mod/errmsgbox/errmsgbox.bi"
 #Include "mod/heapptrlist/heapptrlist.bi"
 #Include "mod/openproghkey/openproghkey.bi"
+#Include "mod/createtooltip/createtooltip.bi"
 
 #Include Once "defines.bas"
 
@@ -86,8 +87,10 @@ Declare Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
 ''creates child windows for the main dialog, called exclusivly by MainProc, do not call this function
 Declare Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
 
+Declare Function CreateMainToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
+
 ''creates a tooltip and associates it with a control
-Declare Function CreateToolTip (ByVal hDlg As HWND, ByVal dwToolID As DWORD32, ByVal wTextID As WORD, ByVal dwStyle As DWORD32, ByVal uFlags As UINT32) As HWND
+'Declare Function CreateToolTip (ByVal hDlg As HWND, ByVal dwToolID As DWORD32, ByVal wTextID As WORD, ByVal dwStyle As DWORD32, ByVal uFlags As UINT32) As HWND
 
 ''EnumChildWindows procedure for resizing the main dialog's child windows
 Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
@@ -100,10 +103,12 @@ Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) A
 
 ''options property sheet functions
 ''starts the options property sheet
-Declare Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
+Declare Function DoOptionsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
 
 ''WindowProc for the paths page
 Declare Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+
+Declare Function CreatePathsToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
 
 ''begins a browsing window to find VGMPlay.exe
 Declare Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL

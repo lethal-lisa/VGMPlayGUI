@@ -22,7 +22,9 @@ IF NOT DEFINED FBPARAM (
 CHDIR %PROJROOT%\Mod
 
 REM Compile libErrMsgBox.a
+ECHO.
 ECHO COMPILING: "libErrMsgBox.a"
+ECHO.
 CHDIR ".\ErrMsgBox"
 IF EXIST ".\ErrMsgBox.bas" (
 	fbc %FBPARAM% ".\ErrMsgBox.bas"
@@ -63,13 +65,32 @@ ECHO COMPILING: "libOpenProgHKey.a"
 ECHO.
 CHDIR ".\OpenProgHKey"
 IF EXIST ".\OpenProgHKey.bas" (
-	fbc -lib ".\OpenProgHKey.bas"
+	fbc %FBPARAM% ".\OpenProgHKey.bas"
 ) ELSE (
 	SET ERRORLEVEL=3
 	GOTO ERR
 )
 IF EXIST ".\libOpenProgHKey.a" (
 	MOVE ".\libOpenProgHKey.a" %PROJROOT%\Mod
+	CHDIR %PROJROOT%\Mod
+) ELSE (
+	SET ERRORLEVEL=1
+	GOTO ERR
+)
+
+REM Compile libCreateToolTip.a
+ECHO.
+ECHO COMPILING: "libCreateToolTip.a"
+ECHO.
+CHDIR ".\CreateToolTip"
+IF EXIST ".\CreateToolTip.bas" (
+	fbc %FBPARAM% ".\CreateToolTip.bas"
+) ELSE (
+	SET ERRORLEVEL=3
+	GOTO ERR
+)
+If EXIST ".\libCreateToolTip.a" (
+	MOVE ".\libCreateToolTip.a" %PROJROOT%\Mod
 	CHDIR %PROJROOT%\Mod
 ) ELSE (
 	SET ERRORLEVEL=1

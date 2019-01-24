@@ -17,7 +17,7 @@
 Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32, ByVal pdwArgs As PDWORD32) As DWORD32
     
     #If __FB_DEBUG__
-    ? "Calling:", __FUNCTION__
+        ? "Calling:", __FUNCTION__
     #EndIf
     
     ''make sure we have an error to display
@@ -60,7 +60,7 @@ End Function
 Public Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal wTextId As WORD, ByVal wCaptionId As WORD, ByVal dwStyle As DWORD32) As DWORD32
     
     #If __FB_DEBUG__
-    ? "Calling:", __FUNCTION__
+        ? "Calling:", __FUNCTION__
     #EndIf
     
     ''check instance handle

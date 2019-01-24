@@ -13,10 +13,10 @@
 ''compiler output
 #Ifdef __FB_WIN32__
     #If __FB_OUT_EXE__
-        #Print "Including ""HeapPtrList.bi""."
+        #Print "Including ""HeapPtrList""."
         #Inclib "heapptrlist"
     #ElseIf __FB_OUT_LIB__
-        #Print "Compiling ""HeapPtrList.bas""."
+        #Print "Compiling ""HeapPtrList""."
         #Ifdef __FB_64BIT__
             #Print "Compiling for 64-bit Windows."
         #Else

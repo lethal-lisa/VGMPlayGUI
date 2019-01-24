@@ -6,16 +6,13 @@
 
 #Pragma Once
 
-''include windows headers
-#Include Once "windows.bi"
-
 ''compiler output
 #Ifdef __FB_WIN32__
     #If __FB_OUT_EXE__
-        #Print "Including ""OpenProgHKey.bi""."
+        #Print "Including ""OpenProgHKey""."
         #Inclib "openproghkey"
     #ElseIf __FB_OUT_LIB__
-        #Print "Compiling ""OpenProgHKey.bas""."
+        #Print "Compiling ""OpenProgHKey""."
         #Ifdef __FB_64BIT__
             #Print "Compiling for 64-bit Windows."
         #Else
@@ -32,6 +29,9 @@
 #Else
     #Error "This file must be compiled for Windows."
 #EndIf
+
+''include windows header
+#Include Once "windows.bi"
 
 Declare Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal lpszClass As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As LRESULT
 

@@ -13,10 +13,10 @@
 ''compiler output
 #Ifdef __FB_WIN32__
     #If __FB_OUT_EXE__
-        #Print "Including ""ErrMsgBox.bi""."
+        #Print "Including ""ErrMsgBox""."
         #Inclib "errmsgbox"
     #ElseIf __FB_OUT_LIB__
-        #Print "Compiling ""ErrMsgBox.bas""."
+        #Print "Compiling ""ErrMsgBox""."
         #Ifdef __FB_64BIT__
             #Print "Compiling for 64-bit Windows."
         #Else

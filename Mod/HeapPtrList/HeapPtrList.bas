@@ -12,12 +12,12 @@
 '/
 
 ''include header
-#Include Once "heapptrlist.bi"
+#Include "heapptrlist.bi"
 
 Public Function HeapAllocPtrList (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As ULONG32) As LRESULT
     
     #If __FB_DEBUG__
-    ? "Calling:", __FUNCTION__
+        ? "Calling:", __FUNCTION__
     #EndIf
     
     ''get a lock on the heap
@@ -43,7 +43,7 @@ End Function
 Public Function HeapFreePtrList (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As ULONG32) As LRESULT
     
     #If __FB_DEBUG__
-    ? "Calling:", __FUNCTION__
+        ? "Calling:", __FUNCTION__
     #EndIf
     
     ''make sure a valid list is being passed
