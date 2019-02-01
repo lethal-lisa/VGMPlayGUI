@@ -648,6 +648,7 @@ Function DoOptionsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BO
     
 End Function
 
+
 ''options property sheet page procedures
 Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
@@ -859,6 +860,7 @@ Private Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Pt
     
 End Function
 
+
 Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
     ''declare local variables
@@ -869,12 +871,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
         Case WM_INITDIALOG  ''dialog init
             
             ''create tooltips
-            For i As UINT32 = 0 To 4
-                If (CreateToolTip(hInstance, hWnd, (IDC_CHK_ARCHIVE + i), (IDS_TIP_ARCHIVE + i), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then
-                    SysErrMsgBox(hWnd, GetLastError(), NULL)
-                    Exit For
-                End If
-            Next i
+            If (CreateFileFiltToolTips(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
             
             ''update display to current settings
             SetFileFiltProc(hWnd, dwFileFilt)
@@ -908,7 +905,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                     If (GetFileFiltProc(hWnd, dwFileFilt) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                     ''save to registry
-                    'If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
                     
                 Case PSN_HELP                           ''user has pressed the help button
                     
@@ -932,7 +929,24 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
     
 End Function
 
-Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL
+Private Function CreateFileFiltToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FUNCTION__
+    #EndIf
+    
+    ''create tooltips
+    For i As UINT32 = 0 To 4
+        If (CreateToolTip(hInstance, hDlg, (IDC_CHK_ARCHIVE + i), (IDS_TIP_ARCHIVE + i), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    Next i
+    
+    ''return
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Private Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FUNCTION__
@@ -970,7 +984,7 @@ Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL
     
 End Function
 
-Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
+Private Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FUNCTION__

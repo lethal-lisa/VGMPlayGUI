@@ -34,10 +34,14 @@
     #Error "This file must be compiled for Windows."
 #EndIf
 
+#Define CCH_ERRMSG 512
+
 ''include windows header
 #Include Once "windows.bi"
 
-Declare Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32, ByVal pdwArgs As PDWORD32) As DWORD32
-Declare Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal wTextId As WORD, ByVal wCaptionId As WORD, ByVal dwStyle As DWORD32) As DWORD32
+Declare Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32) As LRESULT
+'Declare Function SysErrMsgBoxEx (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32, ByVal lpszCaption As LPCTSTR, ByVal lidLang As LANGID, ByVal dwStyle As DWORD32) As LRESULT
+Declare Function ProgMsgBox (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal wTextId As WORD, ByVal wCaptionId As WORD, ByVal dwStyle As DWORD32) As LRESULT
+Declare Function PlayMsgSound (ByVal dwStyle As DWORD32) As BOOL
 
 ''EOF

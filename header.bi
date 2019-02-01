@@ -89,9 +89,6 @@ Declare Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
 
 Declare Function CreateMainToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
 
-''creates a tooltip and associates it with a control
-'Declare Function CreateToolTip (ByVal hDlg As HWND, ByVal dwToolID As DWORD32, ByVal wTextID As WORD, ByVal dwStyle As DWORD32, ByVal uFlags As UINT32) As HWND
-
 ''EnumChildWindows procedure for resizing the main dialog's child windows
 Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
 
@@ -108,19 +105,17 @@ Declare Function DoOptionsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWN
 ''WindowProc for the paths page
 Declare Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 
+''functions for PathsProc
 Declare Function CreatePathsToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-
-''begins a browsing window to find VGMPlay.exe
 Declare Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-
-''get/set functions for the paths page, to be called only by PathsProc
 Declare Function SetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
 Declare Function GetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
 
 ''WindowProc for the file filter page
 Declare Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 
-''get/set functions for the file filter page, to be called only by FileFiltProc
+''functions for FileFiltProc
+Declare Function CreateFileFiltToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
 Declare Function SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32) As BOOL
 Declare Function GetFileFiltProc (ByVal hWnd As HWND, ByRef dwValue As DWORD32) As BOOL
 
