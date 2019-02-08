@@ -5,7 +5,8 @@
     VGMPlayGUI v2 - Main module.
     
     Compile with:
-        fbc -s gui "main.bas" "resource.rc" -x "VGMPlayGUI.exe"
+        GoRC /r /nu "resource.rc"
+        fbc -s gui "main.bas" "resource.res" -x "VGMPlayGUI.exe"
     
     Copyright (c) 2018 Kazusoft Co.
     Kazusoft is a TradeMark of Lisa Murray.
@@ -70,17 +71,18 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     RegisterClassEx(@wcxMainClass)
     
     ''create the application heap
-    hHeap = HeapCreate(NULL, NULL, NULL)
-    If (hHeap = INVALID_HANDLE_VALUE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
+    'hHeap = HeapCreate(NULL, NULL, NULL)
+    hHeap = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(GetLastError())
     
     ''initialize memory
-    If (InitMem() = FALSE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
+    If (InitMem() = FALSE) Then Return(GetLastError())
     
     ''load strings
-    If (LoadStringResources(hInst) = FALSE) Then PostQuitMessage(SysErrMsgBox(NULL, GetLastError(), NULL))
+    If (LoadStringResources(hInst) = FALSE) Then Return(GetLastError())
     
     ''load config from registry
-    If (LoadConfig() = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+    If (LoadConfig() = FALSE) Then Return(GetLastError())
     
     ''create, show, and update the main window
     StartMainDialog(hInst, nShowCmd, NULL)
@@ -130,13 +132,13 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             SetCursor(LoadCursor(NULL, IDC_APPSTARTING))
             
             ''create child windows
-            If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+            If (CreateMainChildren(hWnd) = FALSE) Then SysErrMsgBox(NULL, GetLastError())
             
         Case WM_DESTROY             ''destroying window
             
             ''close handles, free allocated memory, and destroy the heap
             If (FreeMem() = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
-            If (HeapDestroy(hHeap) = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
+            'If (HeapDestroy(hHeap) = FALSE) Then PostQuitMessage(Cast(INT32, GetLastError()))
             
             ''post quit message with success code
             PostQuitMessage(ERROR_SUCCESS)
@@ -144,12 +146,12 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
         Case WM_INITDIALOG          ''initializing dialog
             
             ''initialize directory listings to default directory
-            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-            If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+            If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
             
             ''set the default keyboard focus to IDC_LST_MAIN
-            If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError())
             
             ''set the arrow cursor
             SetCursor(LoadCursor(NULL, IDC_ARROW))
@@ -165,7 +167,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
         Case WM_CLOSE               ''window is being closed
             
             ''destroy main window
-            If (DestroyWindow(hWnd) = FALSE) Then SysErrMsgBox(NULL, GetLastError(), NULL)
+            If (DestroyWindow(hWnd) = FALSE) Then SysErrMsgBox(NULL, GetLastError())
             
         Case WM_COMMAND             ''command has been issued
             
@@ -175,7 +177,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                         Case IDM_ROOT                       ''change to drive root
                             
                             ''change directory to the current drive's root
-                            If (PopulateLists(hWnd, "\") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (PopulateLists(hWnd, "\") = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                         Case IDM_EXIT                       ''exit program
                             
@@ -190,9 +192,9 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                             ''setup messageboxparams
                             Dim mbp As MSGBOXPARAMS
-                            ZeroMemory(@mbp, SizeOf(mbp))
+                            ZeroMemory(@mbp, SizeOf(MSGBOXPARAMS))
                             With mbp
-                                .cbSize             = SizeOf(mbp)
+                                .cbSize             = SizeOf(MSGBOXPARAMS)
                                 .hwndOwner          = hWnd
                                 .hInstance          = hInstance
                                 .lpszText           = MAKEINTRESOURCE(IDS_MSGTXT_ABOUT)
@@ -210,25 +212,25 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                         Case IDC_BTN_PLAY                   ''start VGMPlay
                             
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             GetDlgItemText(hWnd, IDC_EDT_FILE, plpszPath[PATH_CURRENT], CCH_PATH)
-                            If (StartVGMPlay(plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (StartVGMPlay(plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                         Case IDC_BTN_GO                     ''change to a specified directory
                             
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             GetDlgItemText(hWnd, IDC_EDT_PATH, plpszPath[PATH_CURRENT], MAX_PATH)
-                            If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                         Case IDC_BTN_UP, IDM_UP             ''move up one directory
                             
-                            If (PopulateLists(hWnd, "..") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (PopulateLists(hWnd, "..") = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                         Case IDC_BTN_REFRESH, IDM_REFRESH   ''refresh the current directory listing
                             
-                            If (PopulateLists(hWnd, ".") = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (PopulateLists(hWnd, ".") = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                     End Select
                     
@@ -237,19 +239,19 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                         Case IDC_LST_MAIN       ''file list
                             
                             ''get selected item, change directories, and refresh the listboxes
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             DlgDirSelectEx(hWnd, plpszPath[PATH_CURRENT], MAX_PATH, IDC_LST_MAIN)
                             If (PathIsDirectory(Cast(LPCTSTR, plpszPath[PATH_CURRENT])) = Cast(BOOL, FILE_ATTRIBUTE_DIRECTORY)) Then
                                 
                                 ''change to selected directory and refresh the listboxes
                                 If (GetLastError() = ERROR_SUCCESS) Then
-                                    If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                                    If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                                 Else
-                                    SysErrMsgBox(hWnd, GetLastError(), NULL)
+                                    SysErrMsgBox(hWnd, GetLastError())
                                 End If
                                 
                             End If
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                     End Select
                     
@@ -258,25 +260,25 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                         Case IDC_LST_MAIN       ''file list
                             
                             ''get the selected item and update the UI
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             DlgDirSelectEx(hWnd, plpszPath[PATH_CURRENT], MAX_PATH, IDC_LST_MAIN)
                             SetDlgItemText(hWnd, IDC_EDT_FILE, plpszPath[PATH_CURRENT])
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                         Case IDC_LST_DRIVES     ''drives list
                             
                             ''get the selected item and change drives
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             DlgDirSelectEx(hWnd, plpszPath[PATH_CURRENT], MAX_PATH, IDC_LST_DRIVES)
-                            If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                     End Select
                     
                 Case Cast(UINT32, LBN_ERRSPACE), EN_ERRSPACE    ''a listbox or edit control is out of memory
                     
                     ''display error message, and terminate program
-                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY, NULL)
+                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY)
                     PostQuitMessage(ERROR_NOT_ENOUGH_MEMORY)
                     
             End Select
@@ -303,11 +305,11 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                 .right  = LoWord(lParam)
                 .bottom = HiWord(lParam)
             End With
-            If (GetClientRect(GetDlgItem(hWnd, IDC_SBR), @rcSbr) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (GetClientRect(GetDlgItem(hWnd, IDC_SBR), @rcSbr) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
             rcParent.bottom -= rcSbr.bottom
             
             ''resize the child windows
-            If (EnumChildWindows(hWnd, @ResizeChildren, Cast(LPARAM, @rcParent)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (EnumChildWindows(hWnd, @ResizeChildren, Cast(LPARAM, @rcParent)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
             
             Return(Cast(LRESULT, TRUE))
             
@@ -316,19 +318,13 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             ''get windowpos structure from lParam
             Dim pwp As WINDOWPOS Ptr = Cast(WINDOWPOS Ptr, lParam)
             
-            #If __FB_DEBUG__
-                ? "Window Pos Changing:"
-                ? "(x, y)", "= ("; Str(pwp->x); ", "; Str(pwp->y); ")"
-                ? "(cx, cy)", "= ("; Str(pwp->cx); ", "; Str(pwp->cy); ")"
-            #EndIf
-            
             ''prevent window from getting too small
             If (pwp->cx < MIN_SIZE_X) Then pwp->cx = MIN_SIZE_X
             If (pwp->cy < MIN_SIZE_Y) Then pwp->cy = MIN_SIZE_Y
             
         Case WM_CONTEXTMENU         ''display the context menu
             
-            If (DisplayContextMenu(hWnd, LoWord(lParam), HiWord(lParam)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (DisplayContextMenu(hWnd, LoWord(lParam), HiWord(lParam)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
             
         Case Else                   ''otherwise
             
@@ -536,7 +532,10 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     If (PathIsDirectory(lpszPath) = FALSE) Then Return(FALSE)
     
     ''store previous path
-    '*plpszPath[PATH_PREVIOUS] = CurDir()
+    /' NYI:
+            At this location, write the previous path (since we haven't
+        changed it yet, this can be gotten with CurDir()) to a buffer.
+    '/
     
     ''change directories
     If (ChDir(*lpszPath)) Then
@@ -547,6 +546,25 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     ''update UI
     SetDlgItemText(hDlg, IDC_EDT_PATH, CurDir())
     SetDlgItemText(hDlg, IDC_EDT_FILE, NULL)
+    
+    ''allocate space for appname & load the string
+    Dim lpszAppName As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, 128 * SizeOf(TCHAR))))
+    If (lpszAppName = NULL) Then Return(FALSE)
+    If (LoadString(hInstance, IDS_APPNAME, lpszAppName, 128) = 0) Then Return(FALSE)
+    
+    ''allocate space for new title bar string and format it
+    Dim lpszTitle As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, ((MAX_PATH + 128) * SizeOf(TCHAR)))))
+    If (lpszTitle = NULL) Then Return(FALSE)
+    *lpszTitle = (*lpszAppName + " - [" + CurDir() + "]")
+    
+    ''free memory used for appname
+    If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszAppName)) = FALSE) Then Return(FALSE)
+    
+    ''update the title bar
+    If (SetWindowText(hDlg, Cast(LPCTSTR, lpszTitle)) = FALSE) Then Return(FALSE)
+    
+    ''free memory used for new title bar string
+    If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszTitle)) = FALSE) Then Return(FALSE)
     
     ''refresh directory listings
     If (DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, dwFileFilt) = 0) Then Return(FALSE)
@@ -660,9 +678,7 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
         Case WM_INITDIALOG  ''dialog init
             
             ''create tooltips
-            'CreateToolTip(hInstance, hWnd, IDC_EDT_VGMPLAYPATH, IDS_TIP_VGMPLAYPATH, TTS_ALWAYSTIP, NULL)
-            'CreateToolTip(hInstance, hWnd, IDC_EDT_DEFAULTPATH, IDS_TIP_DEFAULTPATH, TTS_ALWAYSTIP, NULL)
-            If (CreatePathsToolTips(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (CreatePathsToolTips(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
             
             ''set text in path options
             SetPathsProc(hWnd, plpszPath)
@@ -675,12 +691,12 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                     Select Case LoWord(wParam)      ''button IDs:
                         Case IDC_BTN_VGMPLAYPATH    ''browse for vgmplay
 							
-                            If (BrowseVGMPlay(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                            If (BrowseVGMPlay(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
                         Case IDC_BTN_DEFAULTPATH    ''set default path to current one
 							
 							Dim szCurDir As ZString*MAX_PATH = CurDir()
-							If (SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, @szCurDir) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+							If (SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, @szCurDir) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
 							
                     End Select
                     
@@ -690,7 +706,7 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                     
                 Case EN_ERRSPACE        ''edit control is out of space
                     
-                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY, NULL)
+                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY)
                     
             End Select
             
@@ -701,7 +717,7 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                     
                     ''get page handle
                     hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError())
                     
                 Case PSN_KILLACTIVE                     ''page becoming inactive
                     
@@ -712,10 +728,10 @@ Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WP
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
                     ''get settings from dialog
-                    If (GetPathsProc(hWnd, plpszPath) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (GetPathsProc(hWnd, plpszPath) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                     
                     ''save settings to the registry
-                    If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                     
                 Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
                     
@@ -768,7 +784,7 @@ Private Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As
     ''load file filter
     Dim lpszFilter As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, (MAX_PATH * SizeOf(TCHAR)))))
     If (lpszFilter = NULL) Then Return(FALSE)
-    If (LoadString(hInst, IDS_FILT_VGMPLAY, lpszFilter, 512) = 0) Then Return(FALSE)
+    If (LoadString(hInst, IDS_FILT_VGMPLAY, lpszFilter, MAX_PATH) = 0) Then Return(FALSE)
     
     ''setup ofn
     Dim ofn As OPENFILENAME
@@ -871,7 +887,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
         Case WM_INITDIALOG  ''dialog init
             
             ''create tooltips
-            If (CreateFileFiltToolTips(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+            If (CreateFileFiltToolTips(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
             
             ''update display to current settings
             SetFileFiltProc(hWnd, dwFileFilt)
@@ -892,7 +908,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                     
                     ''get page handle
                     hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError())
                     
                 Case PSN_KILLACTIVE                     ''page becoming inactive
                     
@@ -902,10 +918,10 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                 Case PSN_APPLY                          ''user has pressed the apply button
                     
                     ''get values from sheet
-                    If (GetFileFiltProc(hWnd, dwFileFilt) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (GetFileFiltProc(hWnd, dwFileFilt) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                     
                     ''save to registry
-                    If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                     
                 Case PSN_HELP                           ''user has pressed the help button
                     
@@ -914,7 +930,7 @@ Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As
                 Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
                     
                     Dim dwCurrent As DWORD32
-                    If (GetFileFiltProc(hWnd, dwCurrent) = FALSE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (GetFileFiltProc(hWnd, dwCurrent) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                     If (dwCurrent <> dwFileFilt) Then PrpshCancelPrompt(hWnd)
                     
             End Select
@@ -1042,7 +1058,7 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     
                     ''get page handle
                     hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError(), NULL)
+                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError())
                     
                 Case PSN_KILLACTIVE                     ''page becoming inactive
                     
@@ -1064,6 +1080,7 @@ Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
             End Select
             
         Case Else           ''otherwise
+            
             Return(FALSE)
             
     End Select
