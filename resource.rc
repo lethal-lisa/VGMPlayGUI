@@ -51,6 +51,7 @@
 //strings
 #define IDS_APPNAME                 0x0001 //1
 #define IDS_OPTIONS                 0x0002 //2
+#define IDS_FILT_VGMPLAY            0x0003 //3
 
 //message captions and text
 #define IDS_MSGTXT_ABOUT            0x0011 //17
@@ -70,7 +71,7 @@
 #define IDS_REG_FILEFILTER          0x0023 //35
 
 //VGMPlay path file filter
-#define IDS_FILT_VGMPLAY            0x0031 //49
+//#define IDS_FILT_VGMPLAY            0x0031 //49
 
 //tooltip text
 #define IDS_TIP_DRIVELIST           0x0041 //65
@@ -86,11 +87,6 @@
 #define IDS_TIP_READONLY            0x004B //75
 #define IDS_TIP_EXCLUSIVE           0x004C //76
 #define IDS_TIP_PREFERJAPTAG        0x004D //77
-
-#define IDS_PAR_HELP                0x0051 //81
-#define IDS_PAR_CFG                 0x0052 //82
-#define IDS_PAR_RESET               0x0053 //83
-#define IDS_PAR_ERASE               0x0054 //84
 
 //IDs for icons
 #define IDI_VGMPLAYGUI              0x0064 //100
@@ -108,10 +104,10 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 4, 2, 3
-PRODUCTVERSION  2, 11, 5, 26
+FILEVERSION     1, 4, 2, 7
+PRODUCTVERSION  2, 11, 5, 30
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       VS_FF_PRIVATEBUILD | VS_FF_SPECIALBUILD //VS_FF_DEBUG | VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD
+FILEFLAGS       0 //VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     0
@@ -120,8 +116,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.4.2.3\0"
-            VALUE "ProductVersion",     "2.11.5.26\0"
+            VALUE "FileVersion",        "1.4.2.7\0"
+            VALUE "ProductVersion",     "2.11.5.30\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
@@ -129,8 +125,8 @@ BEGIN
             VALUE "LegalTrademarks",    "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
-            VALUE "PrivateBuild",       "Built by Lisa Murray for private pre-release distribution.\0"
-            VALUE "SpecialBuild",       "Private pre-release version.\0"
+            //VALUE "PrivateBuild",       "\0"
+            //VALUE "SpecialBuild",       "\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -171,10 +167,6 @@ BEGIN
     IDS_TIP_READONLY            "Include read-only files"
     IDS_TIP_EXCLUSIVE           "Show only files with the attributes selected above"
     IDS_TIP_PREFERJAPTAG        "Prefer Japanese GD3 tags\nThis will not work unless you have a unicode-capable console\nUse at your own risk"
-    IDS_PAR_HELP                "/?"
-    IDS_PAR_CFG                 "/cfg"
-    IDS_PAR_RESET               "reset"
-    IDS_PAR_ERASE               "erase"
 END
 
 //icons

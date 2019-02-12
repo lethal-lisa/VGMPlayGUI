@@ -16,11 +16,7 @@ IF EXIST ".\chip-settings.rc" (
 
 REM Compile libchip-settings.dll
 IF EXIST ".\chip-settings.bas" (
-	IF DEFINED FBDEBUG (
-		fbc -g -dll ".\chip-settings.bas" ".\chip-settings.res"
-	) ELSE (
-		fbc -dll ".\chip-settings.bas" ".\chip-settings.res"
-	)
+	fbc -dll ".\chip-settings.bas" ".\chip-settings.res"
 ) ELSE (
 	SET ERRORLEVEL=2
 	GOTO ERR

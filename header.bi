@@ -73,9 +73,6 @@ Dim Shared dwFileFilt As DWORD32                    ''file attribute filter vari
 ''main function
 Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
 
-''processes the command line. called by WinMain only, do not call this function
-'Declare Function CmdLineProc (ByVal lpszCmdLine As LPCTSTR) As LRESULT
-
 /'  Subroutine used to start the main dialog. called by WinMain only, do not
     call this function.
     
