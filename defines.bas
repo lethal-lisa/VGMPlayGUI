@@ -78,6 +78,11 @@
 #Define IDR_MENUCONTEXT             &h4E20 /'20000'/
 #Define IDM_LST_DRIVES              &h4E21 /'20001'/
 #Define IDM_LST_DRIVES_REFRESH      &h4E22 /'20002'/
+#Define IDM_BTN_PLAY                &h4E23
+#Define IDM_BTN_PLAY_PLAY           &h4E24
+#Define IDM_BTN_PLAY_RENDER         &h4E25
+#Define IDM_BTN_PLAY_BOTH           &h4E26
+#Define IDM_BTN_PLAY_CURRENT        &h4E27
 
 ''icons:
 #Define IDI_VGMPLAYGUI              &h0064 /'100'/
@@ -126,16 +131,16 @@
 #Define IDS_TIP_EXCLUSIVE           &h004C /'76'/
 #Define IDS_TIP_PREFERJAPTAG        &h004D /'77'/
 
-''VGMPlay.ini sections and options
-#Define IDS_INI_SEC_GENERAL         &h0100 /'256'/
-#Define IDS_INI_OPT_LOGSOUND        &h0101 /'257'/
-#Define IDS_INI_OPT_PREFERJAPTAG    &h0102 /'258'/
+#Define IDS_PAR_HELP                &h0051
+#Define IDS_PAR_CFG                 &h0052
+#Define IDS_PAR_RESET               &h0053
+#Define IDS_PAR_ERASE               &h0054
 
 ''heap object info:
 ''IDs for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (SizeOf(TCHAR) * CCH_PATH))
-#Define NUM_PATH                    &h00000003 /'3'/
+#Define C_PATH                    &h00000003 /'3'/
 #Define SIZE_PATH                   Cast(SIZE_T, (NUM_PATH * CB_PATH))
 #Define PATH_VGMPLAY                &h00000000 /'0'/
 #Define PATH_DEFAULT                &h00000001 /'1'/
@@ -144,7 +149,7 @@
 ''IDs for plpszKeyName
 #Define CCH_KEY                     &h00000020 /'32'/
 #Define CB_KEY                      Cast(SIZE_T, (SizeOf(TCHAR) * CCH_KEY))
-#Define NUM_KEY                     &h00000003 /'3'/
+#Define C_KEY                     &h00000003 /'3'/
 #Define SIZE_KEY                    Cast(SIZE_T, (NUM_KEY * CB_KEY))
 #Define KEY_VGMPLAYPATH             &h00000000 /'0'/
 #Define KEY_DEFAULTPATH             &h00000001 /'1'/
@@ -153,7 +158,7 @@
 ''IDs for plpszStrRes
 #Define CCH_STRRES                  &h00000200 /'512'/
 #Define CB_STRRES                   Cast(SIZE_T, (SizeOf(TCHAR) * CCH_STRRES))
-#Define NUM_STRRES                  &h00000002 /'2'/
+#Define C_STRRES                  &h00000002 /'2'/
 #Define SIZE_STRRES                 Cast(SIZE_T, (NUM_STRRES * CB_STRRES))
 #Define STR_APPNAME                 &h00000000 /'0'/
 #Define STR_OPTIONS                 &h00000001 /'1'/
@@ -166,6 +171,20 @@
 '/
 #Define CCH_HIST                    MAX_PATH
 #Define CB_HIST                     Cast(SIZE_T, (SizeOf(TCHAR) * CCH_HIST))
-#Define NUM_HIST                    &h00000003 /'3'/
+#Define C_HIST                    &h00000003 /'3'/
+
+''IDs for context menus
+#Define MEN_DRIVES                  &h00000000
+#Define MEN_PLAYBTN                 &h00000001
+
+
+''IDs & sizes for parameters
+#Define CCH_PARAM                   &h00000010
+#Define CB_PARAM                    Cast(SIZE_T, (SizeOf(TCHAR) * CCH_PARAM))
+#Define C_PARAM                     &h00000004
+#Define PAR_HELP                    &h00000000
+#Define PAR_CFG                     &h00000001
+#Define PAR_RESET                   &h00000002
+#Define PAR_ERASE                   &h00000003
 
 ''EOF

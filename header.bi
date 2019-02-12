@@ -35,8 +35,6 @@
     #Print "Compiling in release mode."
 #EndIf
 
-#LibPath "mod"
-
 ''include header files
 #Include Once "windows.bi"
 #Include Once "win/shlwapi.bi"
@@ -61,7 +59,7 @@
 Const MainClass = "MAINCLASS"
 
 ''declare shared variables
-Dim Shared hInstance As HMODULE                     ''handle to the application's instance
+Dim Shared hInstance As HINSTANCE                   ''handle to the application's instance
 Dim Shared lpszCmdLine As LPSTR                     ''pointer to the command line parameters
 Dim Shared hWin As HWND                             ''handle to the application's main window
 Dim Shared hHeap As HANDLE                          ''handle to the application's heap
@@ -78,24 +76,43 @@ Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE
 ''processes the command line. called by WinMain only, do not call this function
 'Declare Function CmdLineProc (ByVal lpszCmdLine As LPCTSTR) As LRESULT
 
-''subroutine used to start the main dialog. called by WinMain only, do not call this function
+/'  Subroutine used to start the main dialog. called by WinMain only, do not
+    call this function.
+    
+    hInst:HINSTANCE -   Handle to the app's instance (passed from WinMain/hInst).
+    nShowCmd:INT32  -   Show command to use (passed from WinMain/nShowCmd).
+    lParam:LPARAM   -   Optional parameter to pass to DialogBoxParam.
+'/
 Declare Sub StartMainDialog (ByVal hInst As HINSTANCE, ByVal nShowCmd As INT32, ByVal lParam As LPARAM)
 
 ''main dialog procedure
 Declare Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 
-''creates child windows for the main dialog, called exclusivly by MainProc, do not call this function
+/'  Creates child windows for the main dialog. This is called exclusivly by
+    MainProc, do not call this function otherwise.
+'/
 Declare Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
 
+/'  Called by CreateMainChildren to create tooltips for the main dialog.
+    This is called exclusively by CreateMainChildren, do not call this
+    function otherwise.
+'/
 Declare Function CreateMainToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
 
 ''EnumChildWindows procedure for resizing the main dialog's child windows
 Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
 
-''displays a context menu in the main dialog
-Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal x As WORD, ByVal y As WORD) As BOOL
+/'  Displays a context menu in the main dialog. dwMouse holds the screen
+    coords of the mouse click in the following form:
+    Low order WORD = x
+    High order WORD = y
+'/
+Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BOOL
 
-''changes directories and refreshes directory listings
+/'  Changes directories, updates the UI, and redraws the list boxes for the
+    main dialog. This function should only be called by MainProc, do not call
+    it otherwise.
+'/
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
 ''options property sheet functions
@@ -108,6 +125,9 @@ Declare Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPar
 ''functions for PathsProc
 Declare Function CreatePathsToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
 Declare Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
+/'  Gets or sets the UI for the Paths Property Sheet. plpszValue is a
+    pointer to two strings of MAX_PATH TCHARs in length.
+'/
 Declare Function SetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
 Declare Function GetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
 
@@ -142,8 +162,5 @@ Declare Function SaveConfig () As BOOL
 
 ''sets the default configuration values
 Declare Function SetDefConfig () As BOOL
-
-''opens a handle to the application's registry key
-'Declare Function OpenProgHKey (ByRef phkProgKey As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As BOOL
 
 ''EOF

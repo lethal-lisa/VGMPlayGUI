@@ -218,4 +218,19 @@ v2.11.4.10:
         PROCESS_INFORMATION and STARTUPINFO.
     *       StartVGMPlay() now creates a definite path to lpszFile.
     
+v2.11.5.x:
+    
+    +       Now shows the current path in the main dialog's title bar. This
+        is handled by PopulateLists()
+    *       Replaced ErrMsgBox with a newer version.
+    *       Updated syntax to reflect new ErrMsgBox version.
+    *       Now uses the default process heap (obtained via GetProcessHeap())
+        instead of creating a new one on startup.
+    +       Added new context menu (IDM_BTN_PLAY) to the play button
+        (IDC_BTN_PLAY).
+    +       Improved debug logging.
+    +       Added comments to source files.
+    +       Added some error checking.
+    *       Updated formatting.
+    
 EOF
