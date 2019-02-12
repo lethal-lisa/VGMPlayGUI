@@ -124,5 +124,8 @@ v2.11.4:
     
 v2.11.5:
     
+    *       Bug fixes.
+    *       Optimization fixes.
+    +       The main window's title bar now displays the current folder.
     
 EOF

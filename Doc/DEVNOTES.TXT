@@ -9,11 +9,12 @@ Registry Structure:
         (Default)       REG_SZ      (value not set)
         VGMPlay Path    REG_SZ      ""
         Default Path    REG_SZ      ""
-        Recent Files    REG_SZ      ""
+        File Filter     REG_DWORD   DDL_DIRECTORY
     
 Keyboard controls used by VGMPlay:
     
     KEY:            FUNCTION:
+    
     Space           Pause
     Left            Seek backwards five seconds.
     Right           Seek forwards five seconds.
@@ -35,8 +36,6 @@ File types supported by VGMPlay:
     DOSBox RAW OPL Logs (*.dro)
     M3U Playlist Files (*.m3u)
     
-Default Window Size in Pixels is (503, 443).
-
-Release build currently requires 1,040KB free to run (v2.8).
+Minimum size in Pixels for main dialog is 504x444.
 
 EOF
