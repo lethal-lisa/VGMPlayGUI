@@ -40,34 +40,26 @@
 #Include Once "win/shlwapi.bi"
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
-#Include Once "win/prsht.bi"
+'#Include Once "win/prsht.bi"
 #Include "mod/chip-settings/chip-settings.bi"
-#Include "mod/errmsgbox/errmsgbox.bi"
+#Include "inc/errorhandler.bi"
+#Include "inc/config.bi"
 #Include "mod/heapptrlist/heapptrlist.bi"
-#Include "mod/openproghkey/openproghkey.bi"
 #Include "mod/createtooltip/createtooltip.bi"
 
 #Include Once "defines.bas"
 
 ''define structures
-'Type OPTIONS
-'    plpszPath As LPTSTR Ptr
-'    dwFiltFilt As DWORD32
-'End Type
 
 ''define constants
 Const MainClass = "MAINCLASS"
 
 ''declare shared variables
-Dim Shared hInstance As HINSTANCE                   ''handle to the application's instance
-Dim Shared lpszCmdLine As LPSTR                     ''pointer to the command line parameters
-Dim Shared hWin As HWND                             ''handle to the application's main window
-Dim Shared hHeap As HANDLE                          ''handle to the application's heap
+Dim Shared hInstance As HINSTANCE       ''handle to the application's instance
+Dim Shared hWin As HWND                 ''handle to the application's main window
+Dim Shared hHeap As HANDLE              ''handle to the application's heap
 
-Dim Shared plpszPath As LPTSTR Ptr                  ''paths
-Dim Shared plpszStrRes As LPTSTR Ptr                ''misc. string resources
-Dim Shared dwFileFilt As DWORD32                    ''file attribute filter variable loaded from the registry
-
+Extern hInstance As HINSTANCE
 
 ''declare functions
 ''main function
@@ -114,6 +106,7 @@ Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD3
 '/
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
+/'
 ''options property sheet functions
 ''starts the options property sheet
 Declare Function DoOptionsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
@@ -124,6 +117,7 @@ Declare Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPar
 ''functions for PathsProc
 Declare Function CreatePathsToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
 Declare Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
+
 /'  Gets or sets the UI for the Paths Property Sheet. plpszValue is a
     pointer to two strings of MAX_PATH TCHARs in length.
 '/
@@ -161,5 +155,6 @@ Declare Function SaveConfig () As BOOL
 
 ''sets the default configuration values
 Declare Function SetDefConfig () As BOOL
+'/
 
 ''EOF

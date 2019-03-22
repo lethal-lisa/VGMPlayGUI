@@ -23,7 +23,7 @@
 
 ''init
 hInstance = GetModuleHandle(NULL)
-lpszCmdLine = GetCommandLine()
+Dim lpszCmdLine As LPSTR = GetCommandLine()
 #If __FB_DEBUG__
     ? !"hInstance\t= 0x"; Hex(hInstance, 8)
     ? !"lpszCmdLine\t= 0x"; Hex(lpszCmdLine, 8)
@@ -671,7 +671,7 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     Return(TRUE)
     
 End Function
-
+/'
 ''starts the options property sheet
 Function DoOptionsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
     
@@ -858,9 +858,9 @@ Private Function CreatePathsToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HW
     Return(TRUE)
     
 End Function
-
+'/
 ''called by PathsProc to start the browse for VGMPlay dialog
-Private Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
+/'Private Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "/"; __FUNCTION__
@@ -955,8 +955,8 @@ Private Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
-End Function
-
+End Function'/
+/'
 ''called by PathsProc to update its UI to the current values
 Private Function SetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
     
@@ -1002,9 +1002,9 @@ Private Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Pt
 	Return(TRUE)
     
 End Function
+'/
 
-
-Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+/'Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
     ''declare local variables
     Static hwndPrsht As HWND	''handle to property sheet.
@@ -1258,7 +1258,7 @@ Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
     Return(dwReturn)
     
 End Function
-
+'/
 ''starts VGMPlay with the specified file
 Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     
@@ -1386,7 +1386,7 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     
 End Function
 
-''config functions:
+/'''config functions:
 ''loads the config from the registry
 Function LoadConfig () As BOOL
     
@@ -1531,7 +1531,7 @@ Function SetDefConfig () As BOOL
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
-End Function
+End Function'/
 
 ''EOF
 

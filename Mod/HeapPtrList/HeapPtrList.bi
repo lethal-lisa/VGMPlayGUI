@@ -27,8 +27,6 @@
         #Else
             #Print "Compiling in release mode."
         #EndIf
-    #Else
-        #Error "This file must be compiled as a static library."
     #EndIf
 #Else
     #Error "This file must be compiled for Windows."
