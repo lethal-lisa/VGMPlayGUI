@@ -45,7 +45,7 @@ End(uExitCode)
 Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hInst\t\t= 0x"; Hex(hInst, 8)
         ? !"hInstPrev\t= 0x"; Hex(hInstPrev, 8)
         ? !"lpszCmdLine\t= 0x"; Hex(lpszCmdLine, 8)
@@ -77,16 +77,16 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     RegisterClassEx(@wcxMainClass)
     
     ''initialize memory
-    If (InitMem() = FALSE) Then Return(GetLastError())
+    If Not(InitMem()) Then Return(GetLastError())
     
     ''load strings
-    If (LoadStringResources(hInst) = FALSE) Then Return(GetLastError())
+    If Not(LoadStringResources(hInst)) Then Return(GetLastError())
     
     ''load config from registry
-    If (LoadConfig() = FALSE) Then Return(GetLastError())
+    If Not(LoadConfig()) Then Return(GetLastError())
     
     ''create, show, and update the main window
-    StartMainDialog(hInst, nShowCmd, NULL)
+    If Not(StartMainDialog(hInst, hWin, nShowCmd, NULL)) Then Return(GetLastError())
     
     ''start message loop
     Dim msg As MSG
@@ -111,25 +111,34 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     
 End Function
 
-''subroutine used to start the main dialog. called by WinMain
-Private Sub StartMainDialog (ByVal hInst As HINSTANCE, ByVal nShowCmd As INT32, ByVal lParam As LPARAM)
+''used to start the main dialog. called by WinMain
+Private Function StartMainDialog (ByVal hInst As HINSTANCE, ByVal hWnd As HWND, ByVal nShowCmd As INT32, ByVal lParam As LPARAM) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hInst\t\t= 0x"; Hex(hInst, 8)
         ? !"nShowCmd\t= 0x"; Hex(nShowCmd, 8)
         ? !"lParam\t\t= 0x"; Hex(lParam, 8)
     #EndIf
     
-    ''create, show, and update the main dialog
+    ''create the window
     DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_MAIN), NULL, @MainProc, lParam)
-    hWin = FindWindow(@MainClass, NULL)
-    ShowWindow(hWin, nShowCmd)
-    SetForegroundWindow(hWin)
-    SetActiveWindow(hWin)
-    UpdateWindow(hWin)
     
-End Sub
+    ''find the window
+    hWnd = FindWindow(@MainClass, NULL)
+    If (hWnd = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''show the window
+    If Not(ShowWindow(hWnd, nShowCmd)) Then Return(FALSE)
+    If Not(SetForegroundWindow(hWnd)) Then Return(FALSE)
+    SetActiveWindow(hWnd)
+    If Not(UpdateWindow(hWnd)) Then Return(FALSE)
+    
+    ''return
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
 
 ''dialog procedures
 Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
@@ -350,7 +359,7 @@ End Function
 Private Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hDlg\t= 0x"; Hex(hDlg, 8)
     #EndIf
     
@@ -381,7 +390,7 @@ End Function
 Private Function CreateMainToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hInst\t= 0x"; Hex(hInst, 8)
         ? !"hDlg\t= 0x"; Hex(hDlg, 8)
     #EndIf
@@ -479,7 +488,7 @@ End Function
 Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
         ? !"dwMouse\t\t= 0x"; Hex(dwMouse, 8)
     #EndIf
@@ -596,7 +605,7 @@ End Function
 Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
         ? !"lpszPath\t= 0x"; Hex(lpszPath, 8)
         ? !"*lpszPath\t= "; *lpszPath
@@ -667,7 +676,7 @@ End Function
 Function DoOptionsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hInst\t= 0x"; Hex(hInst, 8)
         ? !"hDlg\t= 0x"; Hex(hDlg, 8)
     #EndIf
@@ -835,7 +844,7 @@ End Function
 Private Function CreatePathsToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hInst\t= 0x"; Hex(hInst, 8)
         ? !"hDlg\t= 0x"; Hex(hDlg, 8)
     #EndIf
@@ -854,7 +863,7 @@ End Function
 Private Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hInst\t= 0x"; Hex(hInst, 8)
         ? !"hDlg\t= 0x"; Hex(hDlg, 8)
     #EndIf
@@ -952,7 +961,7 @@ End Function
 Private Function SetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
         ? !"plpszValue\t= 0x"; Hex(plpszValue, 8)
     #EndIf
@@ -977,7 +986,7 @@ End Function
 Private Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
         ? !"plpszValue\t= 0x"; Hex(plpszValue, 8)
     #EndIf
@@ -1067,7 +1076,7 @@ End Function
 Private Function CreateFileFiltToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hInst\t= 0x"; Hex(hInst, 8)
         ? !"hDlg\t= 0x"; Hex(hDlg, 8)
     #EndIf
@@ -1087,7 +1096,7 @@ End Function
 Private Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
         ? !"dwValue\t= 0x"; Hex(dwValue, 8)
     #EndIf
@@ -1128,7 +1137,7 @@ End Function
 Private Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
         ? !"dwValue\t= 0x"; Hex(dwValue, 8)
     #EndIf
@@ -1220,7 +1229,7 @@ End Function
 Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hDlg\t= 0x"; Hex(hDlg, 8)
     #EndIf
     
@@ -1254,7 +1263,7 @@ End Function
 Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? "lpszFile", "= 0x"; Hex(lpszFile, 8)
         ? "*lpszFile", "= "; *lpszFile
     #EndIf
@@ -1303,7 +1312,7 @@ End Function
 Function InitMem () As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
     #EndIf
     
 	''get a lock on the heap
@@ -1331,7 +1340,7 @@ End Function
 Function FreeMem () As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
     #EndIf
     
 	''get a lock on the heap
@@ -1356,7 +1365,7 @@ End Function
 Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
         ? !"hInst\t= 0x"; Hex(hInst, 8)
     #EndIf
     
@@ -1382,7 +1391,7 @@ End Function
 Function LoadConfig () As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
     #EndIf
     
 	''get a lock on the heap
@@ -1449,7 +1458,7 @@ End Function
 Function SaveConfig () As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
     #EndIf
     
 	''get a lock on the heap
@@ -1501,7 +1510,7 @@ End Function
 Function SetDefConfig () As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "/"; __FUNCTION__
     #EndIf
     
 	''get a lock on the heap
@@ -1525,3 +1534,4 @@ Function SetDefConfig () As BOOL
 End Function
 
 ''EOF
+

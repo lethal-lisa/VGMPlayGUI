@@ -73,14 +73,16 @@ Dim Shared dwFileFilt As DWORD32                    ''file attribute filter vari
 ''main function
 Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
 
-/'  Subroutine used to start the main dialog. called by WinMain only, do not
-    call this function.
+/'  Used to start the main dialog. called by WinMain only, do not call this
+    function.
     
-    hInst:HINSTANCE -   Handle to the app's instance (passed from WinMain/hInst).
+    hInst:HINSTANCE -   Handle to the app's instance (passed from
+                        WinMain/hInst).
+    hWnd:HWND       -   Returns the handle to the main window.
     nShowCmd:INT32  -   Show command to use (passed from WinMain/nShowCmd).
     lParam:LPARAM   -   Optional parameter to pass to DialogBoxParam.
 '/
-Declare Sub StartMainDialog (ByVal hInst As HINSTANCE, ByVal nShowCmd As INT32, ByVal lParam As LPARAM)
+Declare Function StartMainDialog (ByVal hInst As HINSTANCE, ByVal hWnd As HWND, ByVal nShowCmd As INT32, ByVal lParam As LPARAM) As BOOL
 
 ''main dialog procedure
 Declare Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
@@ -90,8 +92,8 @@ Declare Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
 '/
 Declare Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
 
-/'  Called by CreateMainChildren to create tooltips for the main dialog.
-    This is called exclusively by CreateMainChildren, do not call this
+/'  Called by CreateMainChildren to create tooltips for the main dialog. This
+    is called exclusively by CreateMainChildren, do not call this
     function otherwise.
 '/
 Declare Function CreateMainToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
