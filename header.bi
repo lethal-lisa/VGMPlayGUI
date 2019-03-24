@@ -61,6 +61,11 @@ Dim Shared hHeap As HANDLE              ''handle to the application's heap
 
 Extern hInstance As HINSTANCE
 
+Extern hConfig As HANDLE
+Extern plpszPath As LPTSTR Ptr
+Extern plpszStrRes As LPTSTR Ptr
+Extern dwFileFilt As DWORD32
+
 ''declare functions
 ''main function
 Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32

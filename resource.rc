@@ -104,10 +104,10 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 4, 2, 7
+FILEVERSION     1, 5, 0, 0
 PRODUCTVERSION  2, 11, 5, 30
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       0 //VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
+FILEFLAGS       VS_FF_SPECIALBUILD //| VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     0
@@ -116,7 +116,7 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.4.2.7\0"
+            VALUE "FileVersion",        "1.5.0.0\0"
             VALUE "ProductVersion",     "2.11.5.30\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
@@ -126,7 +126,7 @@ BEGIN
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
             //VALUE "PrivateBuild",       "\0"
-            //VALUE "SpecialBuild",       "\0"
+            VALUE "SpecialBuild",       "Test build.\0"
         END
     END
     BLOCK "VarFileInfo"
