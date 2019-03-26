@@ -6,7 +6,7 @@
     
     Compile with:
         GoRC /r /nu "resource.rc"
-        fbc -s gui "main.bas" "resource.res" -x "VGMPlayGUI.exe"
+        fbc -s gui "main.bas" "resource.res" "errorhandler.o" "config.o" -x "VGMPlayGUI.exe"
     
     Copyright (c) 2018 Kazusoft Co.
     Kazusoft is a TradeMark of Lisa Murray.
@@ -22,11 +22,14 @@
 #Include "header.bi"
 
 ''init
+Dim Shared hWin As HWND                 ''handle to the application's main window
+'Dim Shared hHeap As HANDLE              ''handle to the application's heap
+Dim Shared hInstance As HINSTANCE
 hInstance = GetModuleHandle(NULL)
 Dim lpszCmdLine As LPSTR = GetCommandLine()
 #If __FB_DEBUG__
-    ? !"hInstance\t= 0x"; Hex(hInstance, 8)
-    ? !"lpszCmdLine\t= 0x"; Hex(lpszCmdLine, 8)
+    ? !"hInstance\t= 0x"; Hex(hInstance)
+    ? !"lpszCmdLine\t= 0x"; Hex(lpszCmdLine)
     ? !"*lpszCmdLine\t= "; *lpszCmdLine
 #EndIf
 InitCommonControls()
@@ -36,7 +39,7 @@ Dim uExitCode As UINT32 = WinMain(hInstance, NULL, lpszCmdLine, SW_SHOWNORMAL)
 
 ''exit
 #If __FB_DEBUG__
-    ? !"uExitCode\t= 0x"; Hex(uExitCode, 8)
+    ? !"uExitCode\t= 0x"; Hex(uExitCode)
 #EndIf
 ExitProcess(uExitCode)
 End(uExitCode)
@@ -45,17 +48,16 @@ End(uExitCode)
 Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hInst\t\t= 0x"; Hex(hInst, 8)
-        ? !"hInstPrev\t= 0x"; Hex(hInstPrev, 8)
-        ? !"lpszCmdLine\t= 0x"; Hex(lpszCmdLine, 8)
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hInst\t= 0x"; Hex(hInst)
+        ? !"hInstPrev\t= 0x"; Hex(hInstPrev)
+        ? !"lpszCmdLine\t= 0x"; Hex(lpszCmdLine)
         ? !"*lpszCmdLine\t= "; *lpszCmdLine
-        ? !"nShowCmd\t= 0x"; Hex(nShowCmd, 8)
+        ? !"nShowCmd\t= 0x"; Hex(nShowCmd)
     #EndIf
     
-    ''create the application heap
-    hHeap = HeapCreate(NULL, NULL, NULL)
-    If (hHeap = INVALID_HANDLE_VALUE) Then Return(GetLastError())
+    hConfig = HeapCreate(NULL, NULL, NULL)
+    If (hConfig = INVALID_HANDLE_VALUE) Then Return(GetLastError())
     
     ''setup and register classes
     Dim wcxMainClass As WNDCLASSEX
@@ -77,16 +79,13 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     RegisterClassEx(@wcxMainClass)
     
     ''initialize memory
-    If Not(InitMem()) Then Return(GetLastError())
-    
-    ''load strings
-    If Not(LoadStringResources(hInst)) Then Return(GetLastError())
+    If (InitConfig() = FALSE) Then Return(GetLastError())
     
     ''load config from registry
-    If Not(LoadConfig()) Then Return(GetLastError())
+    If (LoadConfig() = FALSE) Then Return(GetLastError())
     
     ''create, show, and update the main window
-    If Not(StartMainDialog(hInst, hWin, nShowCmd, NULL)) Then Return(GetLastError())
+    If (StartMainDialog(hWin, nShowCmd, NULL) = FALSE) Then Return(GetLastError())
     
     ''start message loop
     Dim msg As MSG
@@ -98,10 +97,10 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     Wend
     
     ''free memory
-    If (FreeMem() = FALSE) Then Return(GetLastError())
+    If (FreeConfig() = FALSE) Then Return(GetLastError())
     
     ''destroy the heap
-    If (HeapDestroy(hHeap) = FALSE) Then Return(GetLastError())
+    If (HeapDestroy(hConfig) = FALSE) Then Return(GetLastError())
     
     ''unregister the window classes
     If (UnregisterClass(@MainClass, hInst) = FALSE) Then Return(GetLastError())
@@ -112,27 +111,27 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
 End Function
 
 ''used to start the main dialog. called by WinMain
-Private Function StartMainDialog (ByVal hInst As HINSTANCE, ByVal hWnd As HWND, ByVal nShowCmd As INT32, ByVal lParam As LPARAM) As BOOL
+Private Function StartMainDialog (ByVal hWnd As HWND, ByVal nShowCmd As INT32, ByVal lParam As LPARAM) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hInst\t\t= 0x"; Hex(hInst, 8)
-        ? !"nShowCmd\t= 0x"; Hex(nShowCmd, 8)
-        ? !"lParam\t\t= 0x"; Hex(lParam, 8)
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hWnd\t= 0x"; Hex(hWnd)
+        ? !"nShowCmd\t= 0x"; Hex(nShowCmd)
+        ? !"lParam\t= 0x"; Hex(lParam)
     #EndIf
     
     ''create the window
-    DialogBoxParam(hInst, MAKEINTRESOURCE(IDD_MAIN), NULL, @MainProc, lParam)
+    DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_MAIN), NULL, @MainProc, lParam)
     
     ''find the window
     hWnd = FindWindow(@MainClass, NULL)
     If (hWnd = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''show the window
-    If Not(ShowWindow(hWnd, nShowCmd)) Then Return(FALSE)
-    If Not(SetForegroundWindow(hWnd)) Then Return(FALSE)
+    If (ShowWindow(hWnd, nShowCmd) = FALSE) Then Return(FALSE)
+    If (SetForegroundWindow(hWnd) = FALSE) Then Return(FALSE)
     SetActiveWindow(hWnd)
-    If Not(UpdateWindow(hWnd)) Then Return(FALSE)
+    If (UpdateWindow(hWnd) = FALSE) Then Return(FALSE)
     
     ''return
     SetLastError(ERROR_SUCCESS)
@@ -161,9 +160,9 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
         Case WM_INITDIALOG          ''initializing dialog
             
             ''initialize directory listings to default directory
-            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+            If (HeapLock(hConfig) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
             If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+            If (HeapUnlock(hConfig) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
             
             ''set the default keyboard focus to IDC_LST_MAIN
             If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then SysErrMsgBox(hWnd, GetLastError())
@@ -172,7 +171,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             If (PathFileExists(plpszPath[PATH_VGMPLAY]) = FALSE) Then
                 If (ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_VGMPMISS, IDS_MSGCAP_VGMPMISS, MB_YESNO Or MB_ICONWARNING) = IDYES) Then
                     ''TODO: fix error checking here
-                    DoOptionsPropSheet(hInstance, hWnd)
+                    DoOptionsPropSheet(hWnd)
                 End If
             End If
             
@@ -198,7 +197,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                         Case IDM_OPTIONS                            ''start the options property sheet
                             
-                            DoOptionsPropSheet(hInstance, hWnd)
+                            DoOptionsPropSheet(hWnd)
                             
                         Case IDM_ABOUT                              ''display the about message
                             
@@ -213,8 +212,8 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                                 .lpszCaption        = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
                                 .dwStyle            = (MB_OK Or MB_DEFBUTTON1 Or MB_USERICON)
                                 .lpszIcon           = MAKEINTRESOURCE(IDI_KAZUSOFT)
-                                .dwContextHelpId    = NULL
-                                .lpfnMsgBoxCallback = NULL
+                                '.dwContextHelpId    = NULL
+                                '.lpfnMsgBoxCallback = NULL
                                 .dwLanguageId       = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
                             End With
                             
@@ -224,25 +223,25 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             
                         Case IDC_BTN_PLAY, IDM_BTN_PLAY_CURRENT     ''start VGMPlay
                             
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             GetDlgItemText(hWnd, IDC_EDT_FILE, plpszPath[PATH_CURRENT], CCH_PATH)
-                            If (StartVGMPlay(plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (StartVGMPlay(plpszPath[PATH_CURRENT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                            If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                         Case IDC_BTN_GO                             ''change to a specified directory
                             
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             GetDlgItemText(hWnd, IDC_EDT_PATH, plpszPath[PATH_CURRENT], MAX_PATH)
-                            If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                            If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                         Case IDC_BTN_UP, IDM_UP                     ''move up one directory
                             
-                            If (PopulateLists(hWnd, "..") = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (PopulateLists(hWnd, "..") = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                         Case IDC_BTN_REFRESH, IDM_REFRESH           ''refresh the current directory listing
                             
-                            If (PopulateLists(hWnd, ".") = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (PopulateLists(hWnd, ".") = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                     End Select
                     
@@ -251,19 +250,19 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                         Case IDC_LST_MAIN       ''file list
                             
                             ''get selected item, change directories, and refresh the listboxes
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             DlgDirSelectEx(hWnd, plpszPath[PATH_CURRENT], MAX_PATH, IDC_LST_MAIN)
                             If (PathIsDirectory(Cast(LPCTSTR, plpszPath[PATH_CURRENT])) = Cast(BOOL, FILE_ATTRIBUTE_DIRECTORY)) Then
                                 
                                 ''change to selected directory and refresh the listboxes
                                 If (GetLastError() = ERROR_SUCCESS) Then
-                                    If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                                    If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                                 Else
-                                    SysErrMsgBox(hWnd, GetLastError())
+                                    Return(SysErrMsgBox(hWnd, GetLastError()))
                                 End If
                                 
                             End If
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                     End Select
                     
@@ -272,26 +271,27 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                         Case IDC_LST_MAIN       ''file list
                             
                             ''get the selected item and update the UI
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             DlgDirSelectEx(hWnd, plpszPath[PATH_CURRENT], MAX_PATH, IDC_LST_MAIN)
                             SetDlgItemText(hWnd, IDC_EDT_FILE, plpszPath[PATH_CURRENT])
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                         Case IDC_LST_DRIVES     ''drives list
                             
                             ''get the selected item and change drives
-                            If (HeapLock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             DlgDirSelectEx(hWnd, plpszPath[PATH_CURRENT], MAX_PATH, IDC_LST_DRIVES)
-                            If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                            If (HeapUnlock(hHeap) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+                            If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                            If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                     End Select
                     
                 Case Cast(UINT32, LBN_ERRSPACE), EN_ERRSPACE    ''a listbox or edit control is out of memory
                     
                     ''display error message, and terminate program
-                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY)
-                    PostQuitMessage(ERROR_NOT_ENOUGH_MEMORY)
+                    'SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY)
+                    'PostQuitMessage(ERROR_NOT_ENOUGH_MEMORY)
+                    Return(FatalSysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY))
                     
             End Select
             
@@ -299,7 +299,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             
             #If __FB_DEBUG__
                 ? "WM_SIZE:"
-                ? "Resize type:", "0x"; Hex(wParam, 8)
+                ? "Resize type:", "0x"; Hex(wParam)
                 'If (wParam And SIZE_MAXHIDE) Then ? "SIZE_MAXHIDE"
                 'If (wParam And SIZE_MAXIMIZED) Then ? "SIZE_MAXIMIZED"
                 'If (wParam And SIZE_MAXSHOW) Then ? "SIZE_MAXSHOW"
@@ -317,11 +317,11 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                 .right  = LoWord(lParam)
                 .bottom = HiWord(lParam)
             End With
-            If (GetClientRect(GetDlgItem(hWnd, IDC_SBR), @rcSbr) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+            If (GetClientRect(GetDlgItem(hWnd, IDC_SBR), @rcSbr) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             rcParent.bottom -= rcSbr.bottom
             
             ''resize the child windows
-            If (EnumChildWindows(hWnd, @ResizeChildren, Cast(LPARAM, @rcParent)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+            If (EnumChildWindows(hWnd, @ResizeChildren, Cast(LPARAM, @rcParent)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             Return(Cast(LRESULT, TRUE))
             
@@ -341,7 +341,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                 HiWord(lParam) = y
             '/
             
-            If (DisplayContextMenu(hWnd, Cast(DWORD32, lParam)) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+            If (DisplayContextMenu(hWnd, Cast(DWORD32, lParam)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
         Case Else                   ''otherwise
             
@@ -359,8 +359,8 @@ End Function
 Private Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hDlg\t= 0x"; Hex(hDlg, 8)
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
     #EndIf
     
     ''create child windows
@@ -378,7 +378,7 @@ Private Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
     SendMessage(GetDlgItem(hDlg, IDC_BTN_PLAY), BM_SETIMAGE, IMAGE_ICON, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PLAY))))
     
     ''create tooltips
-    If (CreateMainToolTips(hInstance, hDlg) = FALSE) Then Return(FALSE)
+    If (CreateMainToolTips(hDlg) = FALSE) Then Return(FALSE)
     
     ''return
     SetLastError(ERROR_SUCCESS)
@@ -387,20 +387,19 @@ Private Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
 End Function
 
 ''called by CreateMainChildren to create tooltips
-Private Function CreateMainToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
+Private Function CreateMainToolTips (ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hInst\t= 0x"; Hex(hInst, 8)
-        ? !"hDlg\t= 0x"; Hex(hDlg, 8)
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
     #EndIf
     
     ''create tooltips
-    If (CreateToolTip(hInst, hDlg, IDC_LST_DRIVES, IDS_TIP_DRIVELIST, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    If (CreateToolTip(hInst, hDlg, IDC_BTN_PLAY, IDS_TIP_PLAYBTN, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    If (CreateToolTip(hInst, hDlg, IDC_BTN_GO, IDS_TIP_GOBTN, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    If (CreateToolTip(hInst, hDlg, IDC_BTN_UP, IDS_TIP_UPBTN, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    If (CreateToolTip(hInst, hDlg, IDC_BTN_REFRESH, IDS_TIP_REFRESHBTN, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateToolTip(hInstance, hDlg, IDC_LST_DRIVES, IDS_TIP_DRIVELIST, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateToolTip(hInstance, hDlg, IDC_BTN_PLAY, IDS_TIP_PLAYBTN, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateToolTip(hInstance, hDlg, IDC_BTN_GO, IDS_TIP_GOBTN, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateToolTip(hInstance, hDlg, IDC_BTN_UP, IDS_TIP_UPBTN, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateToolTip(hInstance, hDlg, IDC_BTN_REFRESH, IDS_TIP_REFRESHBTN, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''return
     SetLastError(ERROR_SUCCESS)
@@ -488,9 +487,9 @@ End Function
 Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
-        ? !"dwMouse\t\t= 0x"; Hex(dwMouse, 8)
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
+        ? !"dwMouse\t= 0x"; Hex(dwMouse)
     #EndIf
     
     ''set waiting cursor
@@ -499,12 +498,9 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BO
     ''create a local heap
     Dim hDcm As HANDLE = HeapCreate(NULL, Cast(SIZE_T, SizeOf(Point)), Cast(SIZE_T, (SizeOf(Point) + (2 * SizeOf(HMENU)))))
     If (hDcm = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    #If __FB_DEBUG__
-        ? !"hDcm\t\t= 0x"; Hex(hDcm, 8)
-    #EndIf
     
-    ''lock the local heap
-    If (HeapLock(hDcm) = FALSE) Then Return(FALSE)
+    '''lock the local heap
+    'If (HeapLock(hDcm) = FALSE) Then Return(FALSE)
     
     ''allocate space for a POINT structure to hold the mouse coords
     Dim lpptMouse As LPPOINT = Cast(LPPOINT, HeapAlloc(hDcm, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(Point))))
@@ -589,7 +585,7 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BO
     If (HeapFree(hDcm, NULL, Cast(LPVOID, phMenu)) = FALSE) Then Return(FALSE)
     
     ''unlock & destroy the local heap
-    If (HeapUnlock(hDcm) = FALSE) Then Return(FALSE)
+    'If (HeapUnlock(hDcm) = FALSE) Then Return(FALSE)
     If (HeapDestroy(hDcm) = FALSE) Then Return(FALSE)
     
     ''restore the previous cursor
@@ -605,17 +601,20 @@ End Function
 Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
-        ? !"lpszPath\t= 0x"; Hex(lpszPath, 8)
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t\t= 0x"; Hex(hDlg)
+        ? !"lpszPath\t= 0x"; Hex(lpszPath)
         ? !"*lpszPath\t= "; *lpszPath
     #EndIf
     
     ''load and set a waiting cursor
     Dim hPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
     
-	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+	'''get a lock on the heap
+    'If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     
     ''make sure path exists and is a directory
     If (PathFileExists(lpszPath) = FALSE) Then Return(FALSE)
@@ -660,8 +659,8 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     If (DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, dwFileFilt) = 0) Then Return(FALSE)
     If (DlgDirList(hDlg, NULL, IDC_LST_DRIVES, NULL, (DDL_DRIVES Or DDL_EXCLUSIVE)) = 0) Then Return(FALSE)
     
-    ''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    '''release the lock on the heap
+    'If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
     ''restore the previous cursor
     SetCursor(hPrev)
@@ -671,608 +670,24 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     Return(TRUE)
     
 End Function
-/'
-''starts the options property sheet
-Function DoOptionsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hInst\t= 0x"; Hex(hInst, 8)
-        ? !"hDlg\t= 0x"; Hex(hDlg, 8)
-    #EndIf
-    
-	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''declare local variables
-    Dim lpPsp As LPPROPSHEETPAGE    ''property sheet pages
-    Dim psh As PROPSHEETHEADER      ''property sheet header
-    
-    ''allocate space for pages
-    lpPsp = Cast(LPPROPSHEETPAGE, LocalAlloc(LPTR, Cast(SIZE_T, (3 * SizeOf(PROPSHEETPAGE)))))
-    If (lpPsp = NULL) Then Return(FALSE)
-    
-    ''setup "paths" page
-    With lpPsp[0]
-        .dwSize         = SizeOf(PROPSHEETPAGE)
-        .dwFlags        = PSP_USEICONID
-        .hInstance      = hInst
-        .pszTemplate    = MAKEINTRESOURCE(IDD_PATHS)
-        .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        .pszTitle       = NULL
-        .pfnDlgProc     = @PathsProc
-        .lParam         = NULL
-        .pfnCallback    = NULL
-    End With
-    
-    ''setup "file filter" page
-    With lpPsp[1]
-        .dwSize         = SizeOf(PROPSHEETPAGE)
-        .dwFlags        = (PSP_USEICONID Or PSP_HASHELP)
-        .hInstance      = hInst
-        .pszTemplate    = MAKEINTRESOURCE(IDD_FILEFILTER)
-        .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        .pszTitle       = NULL
-        .pfnDlgProc     = @FileFiltProc
-        .lParam         = NULL
-        .pfnCallback    = NULL
-    End With
-    
-    ''setup "vgmplay settings" page
-    With lpPsp[2]
-        .dwSize         = SizeOf(PROPSHEETPAGE)
-        .dwFlags        = (PSP_USEICONID Or PSP_HASHELP)
-        .hInstance      = hInst
-        .pszTemplate    = MAKEINTRESOURCE(IDD_VGMPLAYSETTINGS)
-        .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        .pszTitle       = NULL
-        .pfnDlgProc     = @VGMPlaySettingsProc
-        .lParam         = NULL
-        .pfnCallback    = NULL
-    End With
-    
-    ''setup property sheet header
-    ZeroMemory(@psh, SizeOf(PROPSHEETHEADER))
-    With psh
-        .dwSize         = SizeOf(PROPSHEETHEADER)
-        .dwFlags        = (PSH_USEICONID Or PSH_PROPSHEETPAGE Or PSH_NOCONTEXTHELP Or PSH_HASHELP)
-        .hwndParent     = hDlg
-        .hInstance      = hInst
-        .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        .pszCaption     = plpszStrRes[STR_OPTIONS]
-        .nPages         = 3
-        .nStartPage     = 0
-        .ppsp           = Cast(LPCPROPSHEETPAGE, lpPsp)
-        .pfnCallback    = NULL
-    End With
-    
-    ''start property sheet
-    PropertySheet(@psh)
-    
-    ''return
-    LocalFree(Cast(HLOCAL, lpPsp))
-    If (GetLastError()) Then Return(FALSE)
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
 
-''options property sheet page procedures
-Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-    
-    ''declare local variables
-    Static hwndPrsht As HWND    ''handle to property sheet.
-    
-    ''process messages
-    Select Case uMsg        ''messages
-        Case WM_INITDIALOG  ''dialog init
-            
-            ''create tooltips
-            If (CreatePathsToolTips(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-            
-            ''set text in path options
-            SetPathsProc(hWnd, plpszPath)
-            
-        Case WM_COMMAND     ''commands
-            
-            Select Case HiWord(wParam)  ''event code
-                Case BN_CLICKED         ''button clicked
-                    
-                    Select Case LoWord(wParam)      ''button IDs:
-                        Case IDC_BTN_VGMPLAYPATH    ''browse for vgmplay
-							
-                            If (BrowseVGMPlay(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                            
-                        Case IDC_BTN_DEFAULTPATH    ''set default path to current one
-							
-							Dim szCurDir As ZString*MAX_PATH = CurDir()
-							If (SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, @szCurDir) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-							
-                    End Select
-                    
-                Case EN_CHANGE          ''edit control changing
-                    
-                    SendMessage(hwndPrsht, PSM_CHANGED, Cast(WPARAM, hWnd), 0)
-                    
-                Case EN_ERRSPACE        ''edit control is out of space
-                    
-                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY)
-                    
-            End Select
-            
-        Case WM_NOTIFY      ''notifications
-            
-            Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
-                Case PSN_SETACTIVE                      ''page becoming active
-                    
-                    ''get page handle
-                    hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError())
-                    
-                Case PSN_KILLACTIVE                     ''page becoming inactive
-                    
-                    ''let page become inactive
-                    SetWindowLong(hWnd, DWL_MSGRESULT, Cast(LONG32, FALSE))
-                    Return(FALSE)
-                    
-                Case PSN_APPLY                          ''user has pressed the apply button
-                    
-                    ''get settings from dialog
-                    If (GetPathsProc(hWnd, plpszPath) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                    
-                    ''save settings to the registry
-                    If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                    
-                Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
-                    
-                    PrpshCancelPrompt(hWnd)
-                    
-            End Select
-            
-        Case Else           ''otherwise
-            
-            Return(FALSE)
-            
-    End Select
-    
-    Return(TRUE)
-    
-End Function
-
-''called by PathsProc to create tooltips in response to WM_INITDIALOG
-Private Function CreatePathsToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hInst\t= 0x"; Hex(hInst, 8)
-        ? !"hDlg\t= 0x"; Hex(hDlg, 8)
-    #EndIf
-    
-    ''create tooltips
-    If (CreateToolTip(hInstance, hDlg, IDC_EDT_VGMPLAYPATH, IDS_TIP_VGMPLAYPATH, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    If (CreateToolTip(hInstance, hDlg, IDC_EDT_DEFAULTPATH, IDS_TIP_DEFAULTPATH, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-'/
-''called by PathsProc to start the browse for VGMPlay dialog
-/'Private Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hInst\t= 0x"; Hex(hInst, 8)
-        ? !"hDlg\t= 0x"; Hex(hDlg, 8)
-    #EndIf
-    
-    ''create local heap
-    Dim hOfn As HANDLE = HeapCreate(NULL, Cast(SIZE_T, (SizeOf(OPENFILENAME) + (CB_BVGMP * C_BVGMP))), NULL)
-    If (hOfn = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    #If __FB_DEBUG__
-        ? !"hOfn\t= 0x"; Hex(hOfn, 8)
-    #EndIf
-    
-    ''get a lock on the newly created heap
-    If (HeapLock(hOfn) = FALSE) Then Return(FALSE)
-    
-    ''allocate strings
-    Dim plpszString As LPTSTR Ptr
-    SetLastError(Cast(DWORD32, HeapAllocPtrList(hOfn, Cast(LPVOID Ptr, plpszString), CB_BVGMP, C_BVGMP)))
-    If (GetLastError()) Then Return(FALSE)
-    /' plpszString index definitions:
-        plpszString[0] = path to return to
-        plpszString[1] = file filter
-        plpszString[2] = ofn.lpstrFile
-        plpszString[3] = ofn.lpstrFileTitle
-    '/
-    *plpszString[BVGMP_RETURN] = CurDir()
-    If (LoadString(hInst, IDS_FILT_VGMPLAY, plpszString[BVGMP_FILT], MAX_PATH) = 0) Then Return(FALSE)
-    
-    ''setup ofn
-    Dim lpOfn As LPOPENFILENAME = Cast(LPOPENFILENAME, HeapAlloc(hOfn, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(OPENFILENAME))))
-    If (lpOfn = NULL) Then Return(FALSE)
-    #If __FB_DEBUG__
-        ? !"lpOfn\t= 0x"; Hex(lpOfn, 8)
-    #EndIf
-    With *lpOfn
-        .lStructSize        = SizeOf(OPENFILENAME)
-        .hwndOwner          = hDlg
-        .hInstance          = NULL
-        .lpstrFilter        = Cast(LPCTSTR, plpszString[BVGMP_FILT])
-        .lpstrCustomFilter  = NULL
-        .nMaxCustFilter     = NULL
-        .nFilterIndex       = 1
-        .lpstrFile          = plpszString[BVGMP_FILE]
-        .nMaxFile           = MAX_PATH
-        .lpstrFileTitle     = plpszString[BVGMP_FILETITLE]
-        .nMaxFileTitle      = MAX_PATH
-        .lpstrInitialDir    = NULL
-        .lpstrTitle         = NULL
-        .Flags              = (OFN_DONTADDTORECENT Or OFN_FILEMUSTEXIST Or OFN_HIDEREADONLY Or OFN_PATHMUSTEXIST)
-        .nFileOffset        = NULL
-        .nFileExtension     = NULL
-        .lpstrDefExt        = NULL
-    End With
-    
-    ''browse for VGMPlay.exe
-    If (GetOpenFileName(lpOfn)) Then
-        
-        ''update UI
-        If (SetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszString[BVGMP_FILE]) = FALSE) Then Return(FALSE)
-        
-    Else
-        
-        #If __FB_DEBUG__
-            ? !"CommDlgExError\t= 0x"; Hex(CommDlgExtendedError(), 8)
-        #EndIf
-        
-    End If
-    
-    ''return to current directory because GetOpenFileName has changed it
-    ''FB's ChDir function returns non-zero on error.
-    If (ChDir(*plpszString[BVGMP_RETURN])) Then
-        SetLastError(ERROR_PATH_NOT_FOUND)
-        Return(FALSE)
-    End If
-    
-    ''free memory used for ofn
-    If (HeapFree(hOfn, NULL, Cast(LPVOID, lpOfn)) = FALSE) Then Return(FALSE)
-    
-    ''free string list
-    SetLastError(Cast(DWORD32, HeapFreePtrList(hOfn, Cast(LPVOID Ptr, plpszString), CB_BVGMP, C_BVGMP)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''destroy the heap
-    If (HeapDestroy(hOfn) = FALSE) Then Return(FALSE)
-    
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function'/
-/'
-''called by PathsProc to update its UI to the current values
-Private Function SetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
-        ? !"plpszValue\t= 0x"; Hex(plpszValue, 8)
-    #EndIf
-    
-    ''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''set the values
-    If (SetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY]) = FALSE) Then Return(FALSE)
-    If (SetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT]) = FALSE) Then Return(FALSE)
-    
-    ''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-	
-	''return
-	SetLastError(ERROR_SUCCESS)
-	Return(TRUE)
-    
-End Function
-
-''called by PathsProc to save its UI values to the current config
-Private Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
-        ? !"plpszValue\t= 0x"; Hex(plpszValue, 8)
-    #EndIf
-    
-    ''get values
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    GetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY], MAX_PATH)
-    GetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT], MAX_PATH)
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-	
-	''return
-	SetLastError(ERROR_SUCCESS)
-	Return(TRUE)
-    
-End Function
-'/
-
-/'Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-    
-    ''declare local variables
-    Static hwndPrsht As HWND	''handle to property sheet.
-    
-    ''process messages
-    Select Case uMsg        ''messages
-        Case WM_INITDIALOG  ''dialog init
-            
-            ''create tooltips
-            If (CreateFileFiltToolTips(hInstance, hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-            
-            ''update display to current settings
-            SetFileFiltProc(hWnd, dwFileFilt)
-            
-        Case WM_COMMAND     ''commands
-            Select Case HiWord(wParam)  ''event code
-                Case BN_CLICKED         ''button clicked
-                    
-					''we don't need to poll individual buttons since GetFileFiltProc just checks each button's state
-                    SendMessage(hwndPrsht, PSM_CHANGED, Cast(WPARAM, hWnd), 0)
-                    
-            End Select
-            
-        Case WM_NOTIFY      ''notifications
-            
-            Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
-                Case PSN_SETACTIVE                      ''page becoming active
-                    
-                    ''get page handle
-                    hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError())
-                    
-                Case PSN_KILLACTIVE                     ''page becoming inactive
-                    
-                    SetWindowLong(hWnd, DWL_MSGRESULT, Cast(LONG32, FALSE))
-                    Return(FALSE)
-                    
-                Case PSN_APPLY                          ''user has pressed the apply button
-                    
-                    ''get values from sheet
-                    If (GetFileFiltProc(hWnd, dwFileFilt) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                    
-                    ''save to registry
-                    If (SaveConfig() = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                    
-                Case PSN_HELP                           ''user has pressed the help button
-                    
-                    ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_FILTHELP, IDS_MSGCAP_FILTHELP, MB_ICONINFORMATION)
-                    
-                Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
-                    
-                    Dim dwCurrent As DWORD32
-                    If (GetFileFiltProc(hWnd, dwCurrent) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
-                    If (dwCurrent <> dwFileFilt) Then PrpshCancelPrompt(hWnd)
-                    
-            End Select
-            
-        Case Else           ''otherwise
-            
-            Return(FALSE)
-            
-    End Select
-    
-    Return(TRUE)
-    
-End Function
-
-''called by FileFiltProc to create tooltips in response to WM_INITDIALOG
-Private Function CreateFileFiltToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hInst\t= 0x"; Hex(hInst, 8)
-        ? !"hDlg\t= 0x"; Hex(hDlg, 8)
-    #EndIf
-    
-    ''create tooltips
-    For i As UINT32 = 0 To 4
-        If (CreateToolTip(hInstance, hDlg, (IDC_CHK_ARCHIVE + i), (IDS_TIP_ARCHIVE + i), TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    Next i
-    
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-
-''called by FileFiltProc to update its UI to the current values
-Private Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
-        ? !"dwValue\t= 0x"; Hex(dwValue, 8)
-    #EndIf
-    
-    If (dwValue And DDL_ARCHIVE) Then 
-        CheckDlgButton(hDlg, IDC_CHK_ARCHIVE, BST_CHECKED)
-    Else
-        CheckDlgButton(hDlg, IDC_CHK_ARCHIVE, BST_UNCHECKED)
-    End If
-    If (dwValue And DDL_HIDDEN) Then
-        CheckDlgButton(hDlg, IDC_CHK_HIDDEN, BST_CHECKED)
-    Else
-        CheckDlgButton(hDlg, IDC_CHK_HIDDEN, BST_UNCHECKED)
-    End If
-    If (dwValue And DDL_SYSTEM) Then
-        CheckDlgButton(hDlg, IDC_CHK_SYSTEM, BST_CHECKED)
-    Else
-        CheckDlgButton(hDlg, IDC_CHK_SYSTEM, BST_UNCHECKED)
-    End If
-    If (dwValue And DDL_READONLY) Then
-        CheckDlgButton(hDlg, IDC_CHK_READONLY, BST_CHECKED)
-    Else
-        CheckDlgButton(hDlg, IDC_CHK_READONLY, BST_UNCHECKED)
-    End If
-    If (dwValue And DDL_EXCLUSIVE) Then
-        CheckDlgButton(hDlg, IDC_CHK_EXCLUSIVE, BST_CHECKED)
-    Else
-        CheckDlgButton(hDlg, IDC_CHK_EXCLUSIVE, BST_UNCHECKED)
-    End If
-    
-	''return
-	SetLastError(ERROR_SUCCESS)
-	Return(TRUE)
-    
-End Function
-
-''called by FileFiltProc to save its UI values to the current config
-Private Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg, 8)
-        ? !"dwValue\t= 0x"; Hex(dwValue, 8)
-    #EndIf
-    
-    dwValue = DDL_DIRECTORY
-    
-    If (IsDlgButtonChecked(hDlg, IDC_CHK_ARCHIVE) = BST_CHECKED) Then dwValue = (dwValue Or DDL_ARCHIVE)
-    If (IsDlgButtonChecked(hDlg, IDC_CHK_HIDDEN) = BST_CHECKED) Then dwValue = (dwValue Or DDL_HIDDEN)
-    If (IsDlgButtonChecked(hDlg, IDC_CHK_SYSTEM) = BST_CHECKED) Then dwValue = (dwValue Or DDL_SYSTEM)
-    If (IsDlgButtonChecked(hDlg, IDC_CHK_READONLY) = BST_CHECKED) Then dwValue = (dwValue Or DDL_READONLY)
-    If (IsDlgButtonChecked(hDlg, IDC_CHK_EXCLUSIVE) = BST_CHECKED) Then dwValue = (dwValue Or DDL_EXCLUSIVE)
-	
-	''return
-	SetLastError(ERROR_SUCCESS)
-	Return(TRUE)
-    
-End Function
-
-
-Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-    
-    ''declare local variables
-    Static hwndPrsht As HWND    ''handle to property sheet.
-    
-    ''process messages
-    Select Case uMsg        ''messages
-        Case WM_INITDIALOG  ''initialize dialog
-            
-            CreateToolTip(hInstance, hWnd, IDC_CHK_PREFERJAPTAG, IDS_TIP_PREFERJAPTAG, TTS_ALWAYSTIP, NULL)
-			
-			''disable windows until chip-settings.dll is done
-			EnableWindow(GetDlgItem(hWnd, IDC_CHK_LOGSOUND), FALSE)
-			EnableWindow(GetDlgItem(hWnd, IDC_CHK_PREFERJAPTAG), FALSE)
-			EnableWindow(GetDlgItem(hWnd, IDC_BTN_CHIPSETTINGS), FALSE)
-			
-        Case WM_COMMAND     ''commands
-            Select Case HiWord(wParam)  ''event code
-                Case BN_CLICKED         ''button clicked
-                    Select Case LoWord(wParam)
-                        Case IDC_BTN_CHIPSETTINGS
-                            
-                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
-                            
-                    End Select
-                    
-                    SendMessage(hwndPrsht, PSM_CHANGED, Cast(WPARAM, hWnd), NULL)
-                    
-            End Select
-            
-        Case WM_NOTIFY      ''notifications
-            
-            Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
-                Case PSN_SETACTIVE                      ''page becoming active
-                    
-                    ''get page handle
-                    hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError())
-                    
-                Case PSN_KILLACTIVE                     ''page becoming inactive
-                    
-                    SetWindowLong(hWnd, DWL_MSGRESULT, Cast(LONG32, FALSE))
-                    Return(FALSE)
-                    
-                Case PSN_APPLY                          ''user has pressed the apply button
-                    
-                    'ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
-                    
-                Case PSN_HELP                           ''user has pressed the help button
-                    
-                    ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
-                    
-                Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
-                    
-                    PrpshCancelPrompt(hWnd)
-                    
-            End Select
-            
-        Case Else           ''otherwise
-            
-            Return(FALSE)
-            
-    End Select
-    
-    Return(TRUE)
-    
-End Function
-
-''displays a cancel prompt for the options property sheet
-Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hDlg\t= 0x"; Hex(hDlg, 8)
-    #EndIf
-    
-    Dim dwReturn As DWORD32 = ProgMsgBox(hInstance, hDlg, IDS_MSGTXT_CHANGES, IDS_MSGCAP_CHANGES, MB_ICONWARNING Or MB_YESNOCANCEL)
-    Select Case dwReturn    ''button pressed
-        Case IDYES          ''"Yes" button, save settings and close
-            
-            ''send a PSN_APPLY notification to the property sheet and let it close
-            Dim nmh As NMHDR
-            nmh.code = PSN_APPLY
-            SendMessage(hDlg, WM_NOTIFY, NULL, Cast(LPARAM, @nmh))
-            SetWindowLong(hDlg, DWL_MSGRESULT, Cast(LONG32, FALSE))
-            
-        Case IDNO           ''"No" button, close
-            
-            ''allow the property sheet to close
-            SetWindowLong(hDlg, DWL_MSGRESULT, Cast(LONG32, FALSE))
-            
-        Case IDCANCEL       ''"Cancel" button, do not close
-            
-            ''stop the property sheet from closing
-            SetWindowLong(hDlg, DWL_MSGRESULT, Cast(LONG32, TRUE))
-            
-    End Select
-    
-    Return(dwReturn)
-    
-End Function
-'/
 ''starts VGMPlay with the specified file
 Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? "lpszFile", "= 0x"; Hex(lpszFile, 8)
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? "lpszFile", "= 0x"; Hex(lpszFile)
         ? "*lpszFile", "= "; *lpszFile
     #EndIf
     
 	''set loading cursor
     Dim hPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
 	
-	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+	'''get a lock on the heap
+    'If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''allocate buffer for command line parameters
     Dim lpszParam As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, (MAX_PATH * SizeOf(TCHAR)))))
@@ -1295,8 +710,8 @@ Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     ''free the buffer used for the command line parameters
     If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszParam)) = FALSE) Then Return(FALSE)
     
-	''release the heap lock
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+	'''release the heap lock
+    'If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
 	
 	''restore the cursor
     SetCursor(hPrev)
@@ -1307,28 +722,24 @@ Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     
 End Function
 
-''memory macro functions:
+/'''memory macro functions:
 ''initializes memory
 Function InitMem () As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
     #EndIf
     
 	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     
     ''allocate memory
-    SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszPath), CB_PATH, C_PATH)))
+    SetLastError(HeapAllocPtrList(hConfig, Cast(LPVOID Ptr, plpszPath), CB_PATH, C_PATH))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszStrRes), CB_STRRES, C_STRRES)))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    
-    ''check allocation
-    If ((plpszPath = NULL) Or (plpszStrRes = NULL)) Then Return(FALSE)
+    If (plpszPath = NULL) Then Return(FALSE)
     
     ''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
     SetLastError(ERROR_SUCCESS)
@@ -1340,28 +751,26 @@ End Function
 Function FreeMem () As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
     #EndIf
     
 	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     
     ''free memory
-    SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszPath), CB_PATH, C_PATH)))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszStrRes), CB_STRRES, C_STRRES)))
+    SetLastError(HeapFreePtrList(hConfig, Cast(LPVOID Ptr, plpszPath), CB_PATH, C_PATH))
     If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
     
     ''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
-End Function
+End Function'/
 
-''loads the needed string resources
+/'''loads the needed string resources
 Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     
     #If __FB_DEBUG__
@@ -1384,154 +793,6 @@ Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
-End Function
-
-/'''config functions:
-''loads the config from the registry
-Function LoadConfig () As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-    #EndIf
-    
-	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''open the program's registry key
-    Dim dwKeyDisp As DWORD32    ''disposition value for OpenProgHKey
-    Dim hkProgKey As HKEY       ''handle to the program's registry key 
-    SetLastError(Cast(DWORD32, OpenProgHKey(@hkProgKey, "VGMPlayGUI"/'plpszStrRes[STR_APPNAME]'/, NULL, KEY_ALL_ACCESS, @dwKeyDisp)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''load the config
-    Dim cbValue As DWORD32          ''size of items to write to the registry
-    Dim plpszKeyName As LPTSTR Ptr  ''pointer to a buffer for the key names
-    
-    If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
-        
-        ''allocate a buffer for a list of strings to hold the key names
-        SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, C_KEY)))
-        If (GetLastError()) Then Return(FALSE)
-        
-        ''load the key names
-        For iKey As UINT32 = 0 To (C_KEY - 1)
-            If (LoadString(hInstance, Cast(UINT32, (IDS_REG_VGMPLAYPATH + iKey)), plpszKeyName[iKey], CCH_KEY) = 0) Then Return(FALSE)
-        Next iKey
-        
-        ''load the config
-        cbValue = CB_PATH
-        SetLastError(Cast(DWORD32, RegQueryValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), @cbValue)))
-        If (GetLastError()) Then Return(FALSE)
-        
-        cbValue = CB_PATH
-        SetLastError(Cast(DWORD32, RegQueryValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), @cbValue)))
-        If (GetLastError()) Then Return(FALSE)
-        
-        cbValue = SizeOf(DWORD32)
-        SetLastError(Cast(DWORD32, RegQueryValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue)))
-        If (GetLastError()) Then Return(FALSE)
-        
-        ''free the allocated buffer for the key names
-        SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, C_KEY)))
-        If (GetLastError()) Then Return(FALSE)
-        
-    Else
-        
-        If (SetDefConfig() = FALSE) Then Return(FALSE)
-        
-    End If
-    
-    ''close the key
-    SetLastError(Cast(DWORD32, RegCloseKey(hkProgKey)))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    
-	''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-
-''saves the paths to the registry
-Function SaveConfig () As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-    #EndIf
-    
-	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''open the program's registry key
-    Dim hkProgKey As HKEY   ''handle to the program's registry key
-    SetLastError(Cast(DWORD32, OpenProgHKey(@hkProgKey, "VGMPlayGUI"/'plpszStrRes[STR_APPNAME]'/, NULL, KEY_WRITE, NULL)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''allocate a buffer for a list of strings to hold the key names
-    Dim plpszKeyName As LPTSTR Ptr
-    SetLastError(Cast(DWORD32, HeapAllocPtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, C_KEY)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''load the key names
-    For iKey As UINT32 = 0 To (C_KEY - 1)
-        If (LoadString(hInstance, Cast(UINT32, (IDS_REG_VGMPLAYPATH + iKey)), plpszKeyName[iKey], CCH_KEY) = 0) Then Return(FALSE)
-    Next iKey
-    
-    ''save the configuration to the registry
-    SetLastError(Cast(DWORD32, RegSetValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    SetLastError(Cast(DWORD32, RegSetValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), CB_PATH)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    SetLastError(Cast(DWORD32, RegSetValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32))))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''free the allocated buffer for the key names
-    SetLastError(Cast(DWORD32, HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, C_KEY)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''close the key
-    SetLastError(Cast(DWORD32, RegCloseKey(hkProgKey)))
-    If (GetLastError()) Then Return(FALSE)
-    
-	''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-	
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-
-''sets the default config values
-Function SetDefConfig () As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-    #EndIf
-    
-	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''set defaults
-    *plpszPath[PATH_VGMPLAY]    = ""
-    *plpszPath[PATH_DEFAULT]    = ""
-    dwFileFilt                  = DDL_DIRECTORY
-    
-	''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''save the default configuration
-    If (SaveConfig() = FALSE) Then Return(FALSE)
-	
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
 End Function'/
 
 ''EOF
-

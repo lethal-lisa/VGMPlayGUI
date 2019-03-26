@@ -4,7 +4,7 @@
     
     VGMPlayGUI v2 - Header file.
     
-    Copyright (c) 2018 Kazusoft Co.
+    Copyright (c) 2018-2019 Kazusoft Co.
     Kazusoft is a TradeMark of Lisa Murray.
     
 '/
@@ -41,13 +41,13 @@
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
 '#Include Once "win/prsht.bi"
-#Include "mod/chip-settings/chip-settings.bi"
+'#Include "mod/chip-settings/chip-settings.bi"
 #Include "inc/errorhandler.bi"
 #Include "inc/config.bi"
 #Include "mod/heapptrlist/heapptrlist.bi"
 #Include "mod/createtooltip/createtooltip.bi"
 
-#Include Once "defines.bas"
+#Include "defines.bi"
 
 ''define structures
 
@@ -55,15 +55,11 @@
 Const MainClass = "MAINCLASS"
 
 ''declare shared variables
-Dim Shared hInstance As HINSTANCE       ''handle to the application's instance
-Dim Shared hWin As HWND                 ''handle to the application's main window
-Dim Shared hHeap As HANDLE              ''handle to the application's heap
 
 Extern hInstance As HINSTANCE
 
 Extern hConfig As HANDLE
 Extern plpszPath As LPTSTR Ptr
-Extern plpszStrRes As LPTSTR Ptr
 Extern dwFileFilt As DWORD32
 
 ''declare functions
@@ -79,7 +75,7 @@ Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE
     nShowCmd:INT32  -   Show command to use (passed from WinMain/nShowCmd).
     lParam:LPARAM   -   Optional parameter to pass to DialogBoxParam.
 '/
-Declare Function StartMainDialog (ByVal hInst As HINSTANCE, ByVal hWnd As HWND, ByVal nShowCmd As INT32, ByVal lParam As LPARAM) As BOOL
+Declare Function StartMainDialog (ByVal hWnd As HWND, ByVal nShowCmd As INT32, ByVal lParam As LPARAM) As BOOL
 
 ''main dialog procedure
 Declare Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
@@ -93,7 +89,7 @@ Declare Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
     is called exclusively by CreateMainChildren, do not call this
     function otherwise.
 '/
-Declare Function CreateMainToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
+Declare Function CreateMainToolTips (ByVal hDlg As HWND) As BOOL
 
 ''EnumChildWindows procedure for resizing the main dialog's child windows
 Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
@@ -111,55 +107,9 @@ Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD3
 '/
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
-/'
-''options property sheet functions
-''starts the options property sheet
-Declare Function DoOptionsPropSheet (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-
-''WindowProc for the paths page
-Declare Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-
-''functions for PathsProc
-Declare Function CreatePathsToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-Declare Function BrowseVGMPlay (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-
-/'  Gets or sets the UI for the Paths Property Sheet. plpszValue is a
-    pointer to two strings of MAX_PATH TCHARs in length.
-'/
-Declare Function SetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
-Declare Function GetPathsProc (ByVal hWnd As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
-
-''WindowProc for the file filter page
-Declare Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-
-''functions for FileFiltProc
-Declare Function CreateFileFiltToolTips (ByVal hInst As HINSTANCE, ByVal hDlg As HWND) As BOOL
-Declare Function SetFileFiltProc (ByVal hWnd As HWND, ByVal dwValue As DWORD32) As BOOL
-Declare Function GetFileFiltProc (ByVal hWnd As HWND, ByRef dwValue As DWORD32) As BOOL
-
-''WindowProc for the VGMPlay settings page
-Declare Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-
-''cancel prompt for the property sheet
-Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
-
-''function to start up VGMPlay with a file
 Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
 
-''memory macro functions
-Declare Function InitMem () As BOOL
-Declare Function FreeMem () As BOOL
-
-''loads string resources
-Declare Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
-
-''config functions
-''loads/saves the configuration to the registry
-Declare Function LoadConfig () As BOOL
-Declare Function SaveConfig () As BOOL
-
-''sets the default configuration values
-Declare Function SetDefConfig () As BOOL
-'/
+'Declare Function InitMem () As BOOL
+'Declare Function FreeMem () As BOOL
 
 ''EOF

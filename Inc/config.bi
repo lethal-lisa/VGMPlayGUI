@@ -13,8 +13,8 @@
 #Include "mod/heapptrlist/heapptrlist.bi"
 #Include "inc/errorhandler.bi"
 #Include "defines.bi"
-#Include "inc/config/pathsproc.bi"
-#Include "inc/config/filefiltproc.bi"
+'#Include "inc/config/pathsproc.bi"
+'#Include "inc/config/filefiltproc.bi"
 
 #Define CCH_BVGMP           MAX_PATH
 #Define CB_BVGMP            Cast(SIZE_T, (SizeOf(TCHAR) * CCH_BVGMP))
@@ -24,18 +24,14 @@
 #Define BVGMP_FILE          2
 #Define BVGMP_FILETITLE     3
 
-Dim Shared hConfig As HANDLE            ''handle to the config heap
-Dim Shared plpszPath As LPTSTR Ptr      ''paths
-Dim Shared plpszStrRes As LPTSTR Ptr    ''misc. string resources
-Dim Shared dwFileFilt As DWORD32        ''file attribute filter variable loaded from the registry
-
-Extern hInstance As HINSTANCE
-'Extern hConfig As HANDLE
-'Extern plpszPath As LPTSTR Ptr
-'Extern plpszStrRes As LPTSTR Ptr
-'Extern dwFileFilt As DWORD32
+#Define C_PAGES             3
+#Define PG_PATHS            0
+#Define PG_FILEFILT         1
+#Define PG_VGMPLAY          2
 
 Declare Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
+Declare Function InitConfig () As BOOL
+Declare Function FreeConfig () As BOOL
 Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
 Declare Function LoadConfig () As BOOL
 Declare Function SaveConfig () As BOOL
