@@ -3,7 +3,7 @@
 
 ## Summary
   
-  This program is a Windows GUI for Valley Bell's VGMPlay program, as such it is not stand-alone and requires VGMPlay to be installed. It's designed to make using VGMPlay easier by providing a GUI based interface for the otherwise console-mode only application. It's distributed under the GNU GPL3 license, and it'a built using FreeBASIC v1.05.0.
+  This program is a Windows GUI for Valley Bell's VGMPlay program, as such it is not stand-alone and requires VGMPlay to be installed. It's designed to make using VGMPlay easier by providing a GUI frontend/launcher for the otherwise console-mode only application. It's distributed under the GNU GPL3 license, and it'a built using FreeBASIC and the Windows API.
 
 ## Minimum Requirements
   
