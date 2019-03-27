@@ -41,7 +41,6 @@
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
 '#Include Once "win/prsht.bi"
-'#Include "mod/chip-settings/chip-settings.bi"
 #Include "inc/errorhandler.bi"
 #Include "inc/config.bi"
 #Include "mod/heapptrlist/heapptrlist.bi"
@@ -58,13 +57,15 @@ Const MainClass = "MAINCLASS"
 
 Extern hInstance As HINSTANCE
 
-Extern hConfig As HANDLE
-Extern plpszPath As LPTSTR Ptr
-Extern dwFileFilt As DWORD32
+'Extern hConfig As HANDLE
+'Extern plpszPath As LPTSTR Ptr
+'Extern dwFileFilt As DWORD32
 
 ''declare functions
 ''main function
 Declare Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
+
+Declare Function InitClasses () As BOOL
 
 /'  Used to start the main dialog. called by WinMain only, do not call this
     function.
@@ -108,8 +109,5 @@ Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD3
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
 Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
-
-'Declare Function InitMem () As BOOL
-'Declare Function FreeMem () As BOOL
 
 ''EOF

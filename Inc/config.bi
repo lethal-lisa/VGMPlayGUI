@@ -29,6 +29,10 @@
 #Define PG_FILEFILT         1
 #Define PG_VGMPLAY          2
 
+Extern hConfig As HANDLE
+Extern plpszPath As LPTSTR Ptr
+Extern dwFileFilt As DWORD32
+
 Declare Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
 Declare Function InitConfig () As BOOL
 Declare Function FreeConfig () As BOOL

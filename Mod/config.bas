@@ -10,9 +10,10 @@
 #Include "inc/config.bi"
 
 Extern hInstance As HINSTANCE
-Extern hConfig As HANDLE
-Extern plpszPath As LPTSTR Ptr
-Extern dwFileFilt As DWORD32
+
+'Extern hConfig As HANDLE
+'Extern plpszPath As LPTSTR Ptr
+'Extern dwFileFilt As DWORD32
 
 Dim Shared hConfig As HANDLE            ''handle to the config heap
 Dim Shared plpszPath As LPTSTR Ptr      ''paths
@@ -131,8 +132,8 @@ Public Function InitConfig () As BOOL
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     
     ''allocate memory
-    SetLastError(HeapAllocPtrList(hConfig, Cast(LPVOID Ptr, plpszPath), CB_PATH, C_PATH))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+    SetLastError(HeapAllocPtrList(hConfig, plpszPath, CB_PATH, C_PATH))
+    If (GetLastError()) Then Return(FALSE)
     If (plpszPath = NULL) Then Return(FALSE)
     
     ''release the lock on the heap
@@ -154,8 +155,8 @@ Public Function FreeConfig () As BOOL
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     
     ''free memory
-    SetLastError(HeapFreePtrList(hConfig, Cast(LPVOID Ptr, plpszPath), CB_PATH, C_PATH))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
+    SetLastError(HeapFreePtrList(hConfig, plpszPath, CB_PATH, C_PATH))
+    If (GetLastError()) Then Return(FALSE)
     
     ''release the lock on the heap
     If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
@@ -165,6 +166,8 @@ Public Function FreeConfig () As BOOL
     Return(TRUE)
     
 End Function
+
+
 
 Private Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     

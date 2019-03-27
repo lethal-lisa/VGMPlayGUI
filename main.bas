@@ -22,8 +22,7 @@
 #Include "header.bi"
 
 ''init
-Dim Shared hWin As HWND                 ''handle to the application's main window
-'Dim Shared hHeap As HANDLE              ''handle to the application's heap
+Dim Shared hWin As HWND ''handle to the application's main window
 Dim Shared hInstance As HINSTANCE
 hInstance = GetModuleHandle(NULL)
 Dim lpszCmdLine As LPSTR = GetCommandLine()
@@ -59,7 +58,7 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     hConfig = HeapCreate(NULL, NULL, NULL)
     If (hConfig = INVALID_HANDLE_VALUE) Then Return(GetLastError())
     
-    ''setup and register classes
+    /'''setup and register classes
     Dim wcxMainClass As WNDCLASSEX
     ZeroMemory(@wcxMainClass, SizeOf(WNDCLASSEX))
     With wcxMainClass
@@ -76,7 +75,9 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
         .lpszClassName  = @MainClass
         .hIconSm        = .hIcon
     End With
-    RegisterClassEx(@wcxMainClass)
+    RegisterClassEx(@wcxMainClass)'/
+    
+    If (InitClasses() = FALSE) Then Return(GetLastError())
     
     ''initialize memory
     If (InitConfig() = FALSE) Then Return(GetLastError())
@@ -107,6 +108,37 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     
     ''return exit code
     Return(msg.wParam)
+    
+End Function
+
+Private Function InitClasses () As BOOL
+    
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''setup main class
+    Dim lpwcxMain As LPWNDCLASSEX = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, SizeOf(WNDCLASSEX))
+    If (lpwcxMain = NULL) Then Return(FALSE)
+    With *lpwcxMain
+        .cbSize         = SizeOf(WNDCLASSEX)
+        .style          = (CS_HREDRAW Or CS_VREDRAW)
+        .lpfnWndProc    = @MainProc
+        .cbClsExtra     = 0
+        .cbWndExtra     = DLGWINDOWEXTRA
+        .hInstance      = hInstance
+        .hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_VGMPLAYGUI))
+        .hCursor        = LoadCursor(NULL, IDC_ARROW)
+        .hbrBackground  = Cast(HBRUSH, (COLOR_BTNFACE + 1))
+        .lpszMenuName   = MAKEINTRESOURCE(IDR_MENUMAIN)
+        .lpszClassName  = @MainClass
+        .hIconSm        = .hIcon
+    End With
+    RegisterClassEx(lpwcxMain)
+    
+    ''return
+    If (HeapFree(hHeap, NULL, lpwcxMain) = FALSE) Then Return(FALSE)
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
     
 End Function
 
@@ -495,18 +527,16 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BO
     ''set waiting cursor
     Dim hCurPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
     
-    ''create a local heap
-    Dim hDcm As HANDLE = HeapCreate(NULL, Cast(SIZE_T, SizeOf(Point)), Cast(SIZE_T, (SizeOf(Point) + (2 * SizeOf(HMENU)))))
-    If (hDcm = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    '''create a local heap
+    'Dim hDcm As HANDLE = HeapCreate(NULL, Cast(SIZE_T, SizeOf(Point)), Cast(SIZE_T, (SizeOf(Point) + (2 * SizeOf(HMENU)))))
+    'If (hDcm = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
-    '''lock the local heap
-    'If (HeapLock(hDcm) = FALSE) Then Return(FALSE)
-    
-    ''allocate space for a POINT structure to hold the mouse coords
-    Dim lpptMouse As LPPOINT = Cast(LPPOINT, HeapAlloc(hDcm, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(Point))))
-    If (lpptMouse = NULL) Then Return(FALSE)
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''get the mouse coords & convert them to client coords
+    Dim lpptMouse As LPPOINT = Cast(LPPOINT, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, SizeOf(Point)))
+    If (lpptMouse = NULL) Then Return(FALSE)
     lpptMouse->x = LoWord(dwMouse)
     lpptMouse->y = HiWord(dwMouse)
     If (ScreenToClient(hDlg, lpptMouse) = FALSE) Then Return(FALSE)
@@ -516,10 +546,10 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BO
     If (hwndChild = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''free memory allocated for lpptMouse
-    If (HeapFree(hDcm, NULL, Cast(LPVOID, lpptMouse)) = FALSE) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, lpptMouse) = FALSE) Then Return(FALSE)
     
     ''allocate memory for menu handles
-    Dim phMenu As HMENU Ptr = Cast(HMENU Ptr, HeapAlloc(hDcm, HEAP_ZERO_MEMORY, Cast(SIZE_T, (2 * SizeOf(HMENU)))))
+    Dim phMenu As HMENU Ptr = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (2 * SizeOf(HMENU)))
     If (phMenu = NULL) Then Return(FALSE)
     /'  phMenu[x] key:
         phMenu[0] = top level menu
@@ -560,14 +590,8 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BO
             
         Case Else
             
-            ''free memory allocated for menu handles
-            If (HeapFree(hDcm, NULL, Cast(LPVOID, phMenu)) = FALSE) Then Return(FALSE)
-            
-            ''unlock & destroy the local heap
-            If (HeapUnlock(hDcm) = FALSE) Then Return(FALSE)
-            If (HeapDestroy(hDcm) = FALSE) Then Return(FALSE)
-            
             ''return
+            If (HeapFree(hHeap, NULL, Cast(LPVOID, phMenu)) = FALSE) Then Return(FALSE)
             SetLastError(ERROR_SUCCESS)
             Return(TRUE)
             
@@ -582,11 +606,7 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BO
     Next iMenu
     
     ''free memory allocated for menu handles
-    If (HeapFree(hDcm, NULL, Cast(LPVOID, phMenu)) = FALSE) Then Return(FALSE)
-    
-    ''unlock & destroy the local heap
-    'If (HeapUnlock(hDcm) = FALSE) Then Return(FALSE)
-    If (HeapDestroy(hDcm) = FALSE) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, phMenu) = FALSE) Then Return(FALSE)
     
     ''restore the previous cursor
     SetCursor(hCurPrev)
@@ -676,16 +696,13 @@ Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
-        ? "lpszFile", "= 0x"; Hex(lpszFile)
-        ? "*lpszFile", "= "; *lpszFile
+        ? !"lpszFile\t= 0x"; Hex(lpszFile)
+        ? !"*lpszFile\t= "; *lpszFile
     #EndIf
     
 	''set loading cursor
     Dim hPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
 	
-	'''get a lock on the heap
-    'If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
@@ -710,9 +727,6 @@ Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     ''free the buffer used for the command line parameters
     If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszParam)) = FALSE) Then Return(FALSE)
     
-	'''release the heap lock
-    'If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-	
 	''restore the cursor
     SetCursor(hPrev)
 	
@@ -721,78 +735,5 @@ Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     Return(TRUE)
     
 End Function
-
-/'''memory macro functions:
-''initializes memory
-Function InitMem () As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "\"; __FUNCTION__
-    #EndIf
-    
-	''get a lock on the heap
-    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
-    
-    ''allocate memory
-    SetLastError(HeapAllocPtrList(hConfig, Cast(LPVOID Ptr, plpszPath), CB_PATH, C_PATH))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    If (plpszPath = NULL) Then Return(FALSE)
-    
-    ''release the lock on the heap
-    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
-	
-	''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-
-''frees memory
-Function FreeMem () As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "\"; __FUNCTION__
-    #EndIf
-    
-	''get a lock on the heap
-    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
-    
-    ''free memory
-    SetLastError(HeapFreePtrList(hConfig, Cast(LPVOID Ptr, plpszPath), CB_PATH, C_PATH))
-    If (GetLastError() <> ERROR_SUCCESS) Then Return(FALSE)
-    
-    ''release the lock on the heap
-    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
-	
-	''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function'/
-
-/'''loads the needed string resources
-Function LoadStringResources (ByVal hInst As HINSTANCE) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
-        ? !"hInst\t= 0x"; Hex(hInst, 8)
-    #EndIf
-    
-	''get a lock on the heap
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''load misc strings
-    For iMisc As UINT32 = 0 To 1
-        If (LoadString(hInst, (IDS_APPNAME + iMisc), plpszStrRes[STR_APPNAME + iMisc], CCH_STRRES) = 0) Then Return(FALSE)
-    Next iMisc
-    
-    ''release the lock on the heap
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-	
-    ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function'/
 
 ''EOF
