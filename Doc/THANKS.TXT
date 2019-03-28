@@ -1,8 +1,10 @@
 VGMPlayGUI - Special Thanks:
     
-    Valley Bell         - for creating VGMPlay.
-    Persephone Vine     - for beta-testing and morale support.
-    Kiernan             - for morale support.
-    Daniel              - for morale support.
+    Valley Bell         - For creating VGMPlay.
+    Persephone Vine     - For beta-testing and morale support.
+    Ceres               - For beta-testing and morale support.
+    Kiernan             - For morale support.
+    Daniel              - For morale support.
+    Filo97              - For testing.
     
 EOF

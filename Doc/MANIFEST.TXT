@@ -3,7 +3,6 @@ VGMPlayGUI - File List:
     Files in Binary Packages:
     \
         VGMPlayGUI.exe          -   Main executable.
-        chip-settings.dll       -   Required to run VGMPlayGUI.exe.
     
     \Doc\
         AUTHORS.TXT             -   Credits.

@@ -1,7 +1,5 @@
 VGMPlayGUI - List of Planned Functions:
     
-    -Remove LoadStringResources.
-    
     -Add functionality allowing the user to view/edit VGM file headers.
         
             To perform this on VGZ files, an external library for GZip

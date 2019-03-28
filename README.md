@@ -13,18 +13,17 @@
 ## Compilation Requirements
   
   - 32- or 64-Bit Microsoft Windows Vista or Higher.
-  - FreeBASIC compiler v1.05.0 or newer for Windows.
+  - FreeBASIC v1.05.0 or newer for Windows.
   
 ## Compilation Instructions
   
   1. Install the latest version of FreeBASIC for Windows.
-  2. compile .\Mod\*.bas with the -lib command-line switch.
-  3. compile .\main.bas with these parameters:
-    fbc.exe -s gui ".\main.bas" ".\resource.rc" -x "VGMPlayGUI.exe"
+  2. `fbc -c .\Mod\*.bas`
+  3. `fbc -s gui .\main.bas .\resource.rc .\Mod\*.o -x "VGMPlayGUI.exe"`
 
 ## External Links
   Get VGMPlay: http://www.smspower.org/Music/InVgm
   
 ### Get More Music At:
-  VGMRips: https://vgmrips.net/
-  SMS Power! Music Section: http://www.smspower.org/Music/Index
+  - VGMRips: https://vgmrips.net/
+  - SMS Power! Music Section: http://www.smspower.org/Music/Index

@@ -233,4 +233,14 @@ v2.11.5.x:
     *       Updated BrowseVGMPlay.
     *       Updated DisplayContextMenu.
     
+v2.11.6.x:
+    
+    -       Removed extraneous functions.
+    -       Removed global heap.
+    *       Improved modularization.
+    
+v2.11.7.x:
+    
+    *       Improved modularization.
+    
 EOF

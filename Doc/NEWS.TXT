@@ -128,4 +128,10 @@ v2.11.5:
     *       Optimization fixes.
     +       The main window's title bar now displays the current folder.
     
+v2.11.6:
+    
+    *       Optimization fixes.
+    *       Bug fixes.
+    *       Improved modularization.
+    
 EOF

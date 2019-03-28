@@ -14,19 +14,17 @@ Minimum Requirements:
     RAM: Depends on VGM file size.
     OS: 32- or 64-Bit Microsoft Windows Vista or higher (64-Bit Windows 7 or higher recommended).
     Software: Valley Bell's VGMPlay for Windows.
-
-:Compilation Requirements:
+    
+Compilation Requirements:
     
     -32- or 64-Bit Microsoft Windows Vista or Higher.
     -FreeBASIC compiler v1.05.0 or newer for Windows.
-  
+    
 Compilation Instructions:
     
     1. Install the latest version of FreeBASIC for Windows.
-    2. compile .\Mod\*.bas with the -lib command-line switch.
+    2. compile .\Mod\*.bas with the -c command-line switch.
     3. compile .\main.bas with these parameters:
-    fbc.exe -s gui ".\main.bas" ".\resource.rc" -x "VGMPlayGUI.exe"
-
-Contact:
-    Community Discord Server: https://discord.gg/mdN3sqp
-  
+    fbc.exe -s gui ".\main.bas" ".\resource.rc" ".\Mod\*.o" -x "VGMPlayGUI.exe"
+    
+EOF
