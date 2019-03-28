@@ -6,7 +6,7 @@
     
     Compile with:
         GoRC /r /nu "resource.rc"
-        fbc -s gui "main.bas" "resource.res" "errorhandler.o" "config.o" -x "VGMPlayGUI.exe"
+        fbc -s gui "main.bas" "resource.res" "Mod\*.o" -x "VGMPlayGUI.exe"
     
     Copyright (c) 2018 Kazusoft Co.
     Kazusoft is a TradeMark of Lisa Murray.
@@ -58,25 +58,6 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     hConfig = HeapCreate(NULL, NULL, NULL)
     If (hConfig = INVALID_HANDLE_VALUE) Then Return(GetLastError())
     
-    /'''setup and register classes
-    Dim wcxMainClass As WNDCLASSEX
-    ZeroMemory(@wcxMainClass, SizeOf(WNDCLASSEX))
-    With wcxMainClass
-        .cbSize         = SizeOf(WNDCLASSEX)
-        .style          = (CS_HREDRAW Or CS_VREDRAW)
-        .lpfnWndProc    = @MainProc
-        .cbClsExtra     = 0
-        .cbWndExtra     = DLGWINDOWEXTRA
-        .hInstance      = hInst
-        .hIcon          = LoadIcon(hInst, MAKEINTRESOURCE(IDI_VGMPLAYGUI))
-        .hCursor        = LoadCursor(NULL, IDC_ARROW)
-        .hbrBackground  = Cast(HBRUSH, (COLOR_BTNFACE + 1))
-        .lpszMenuName   = MAKEINTRESOURCE(IDR_MENUMAIN)
-        .lpszClassName  = @MainClass
-        .hIconSm        = .hIcon
-    End With
-    RegisterClassEx(@wcxMainClass)'/
-    
     If (InitClasses() = FALSE) Then Return(GetLastError())
     
     ''initialize memory
@@ -112,6 +93,10 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
 End Function
 
 Private Function InitClasses () As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+    #EndIf
     
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
@@ -527,10 +512,6 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BO
     ''set waiting cursor
     Dim hCurPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
     
-    '''create a local heap
-    'Dim hDcm As HANDLE = HeapCreate(NULL, Cast(SIZE_T, SizeOf(Point)), Cast(SIZE_T, (SizeOf(Point) + (2 * SizeOf(HMENU)))))
-    'If (hDcm = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
@@ -622,7 +603,7 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg)
+        ? !"hDlg\t= 0x"; Hex(hDlg)
         ? !"lpszPath\t= 0x"; Hex(lpszPath)
         ? !"*lpszPath\t= "; *lpszPath
     #EndIf
@@ -632,9 +613,6 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    
-	'''get a lock on the heap
-    'If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     
     ''make sure path exists and is a directory
     If (PathFileExists(lpszPath) = FALSE) Then Return(FALSE)
@@ -657,30 +635,27 @@ Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     If (SetDlgItemText(hDlg, IDC_EDT_FILE, NULL) = FALSE) Then Return(FALSE)
     
     ''allocate space for appname & load the string
-    Dim lpszAppName As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, 128 * SizeOf(TCHAR))))
+    Dim lpszAppName As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (128 * SizeOf(TCHAR)))
     If (lpszAppName = NULL) Then Return(FALSE)
     If (LoadString(hInstance, IDS_APPNAME, lpszAppName, 128) = 0) Then Return(FALSE)
     
     ''allocate space for new title bar string and format it
-    Dim lpszTitle As LPTSTR = Cast(LPTSTR, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, ((MAX_PATH + 128) * SizeOf(TCHAR)))))
+    Dim lpszTitle As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, ((MAX_PATH + 128) * SizeOf(TCHAR)))
     If (lpszTitle = NULL) Then Return(FALSE)
     *lpszTitle = (*lpszAppName + " - [" + CurDir() + "]")
     
     ''free memory used for appname
-    If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszAppName)) = FALSE) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, lpszAppName) = FALSE) Then Return(FALSE)
     
     ''update the title bar
     If (SetWindowText(hDlg, Cast(LPCTSTR, lpszTitle)) = FALSE) Then Return(FALSE)
     
     ''free memory used for new title bar string
-    If (HeapFree(hHeap, NULL, Cast(LPVOID, lpszTitle)) = FALSE) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, lpszTitle) = FALSE) Then Return(FALSE)
     
     ''refresh directory listings
     If (DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, dwFileFilt) = 0) Then Return(FALSE)
     If (DlgDirList(hDlg, NULL, IDC_LST_DRIVES, NULL, (DDL_DRIVES Or DDL_EXCLUSIVE)) = 0) Then Return(FALSE)
-    
-    '''release the lock on the heap
-    'If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
     ''restore the previous cursor
     SetCursor(hPrev)

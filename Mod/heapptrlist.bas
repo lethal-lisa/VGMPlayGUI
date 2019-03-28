@@ -1,35 +1,33 @@
 /'
     
-    Heap Pointer List Management Library v1.1
+    heapptrlist.bas
     
-    HeapPtrList.bas
-    
-    Copyright (c) 2018 Kazusoft Co.
+    Copyright (c) 2018-2019 Kazusoft Co.
     
     Compile with:
-        fbc -lib "HeapPtrList.bas"
+        fbc -c "heapptrlist.bas"
     
 '/
 
 ''include header
-#Include "heapptrlist.bi"
+#Include "inc/heapptrlist.bi"
 
 Public Function HeapAllocPtrList (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As ULONG32) As LRESULT
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
-        ? !"hHeap\t= 0x"; Hex(hHeap, 8)
-        ? !"plpList\t= 0x"; Hex(plpList, 8)
-        ? !"cbItem\t= 0x"; Hex(cbItem, 8)
-        ? !"cItems\t= 0x"; Hex(cItems, 8)
-        ? !"Total size: "; (cbItem * cItems); "Bytes"
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hHeap\t= 0x"; Hex(hHeap)
+        ? !"plpList\t= 0x"; Hex(plpList)
+        ? !"cbItem\t= 0x"; Hex(cbItem)
+        ? !"cItems\t= 0x"; Hex(cItems)
+        ? !"Total size\t= "; (cbItem * cItems); "Bytes"
     #EndIf
     
     ''get a lock on the heap
     If (HeapLock(hHeap) = FALSE) Then Return(GetLastError())
     
     ''allocate the list of pointers
-    plpList = Cast(LPVOID Ptr, HeapAlloc(hHeap, HEAP_ZERO_MEMORY, Cast(SIZE_T, (cbItem * cItems))))
+    plpList = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (cbItem * cItems))
     If (plpList = NULL) Then Return(GetLastError())
     
     ''allocate each individual item
@@ -38,7 +36,7 @@ Public Function HeapAllocPtrList (ByVal hHeap As HANDLE, ByRef plpList As LPVOID
         If (plpList[iItem] = NULL) Then Return(GetLastError())
         #If __FB_DEBUG__
             ? "Allocated Item #"; iItem
-            ? !"Item Address\t= 0x"; Hex(plpList[iItem], 8)
+            ? !"Item Address\t= 0x"; Hex(plpList[iItem])
         #EndIf
     Next iItem
     
@@ -52,12 +50,12 @@ End Function
 Public Function HeapFreePtrList (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As ULONG32) As LRESULT
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
-        ? !"hHeap\t= 0x"; Hex(hHeap, 8)
-        ? !"plpList\t= 0x"; Hex(plpList, 8)
-        ? !"cbItem\t= 0x"; Hex(cbItem, 8)
-        ? !"cItems\t= 0x"; Hex(cItems, 8)
-        ? !"Total size: "; (cbItem * cItems); "Bytes"
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hHeap\t= 0x"; Hex(hHeap)
+        ? !"plpList\t= 0x"; Hex(plpList)
+        ? !"cbItem\t= 0x"; Hex(cbItem)
+        ? !"cItems\t= 0x"; Hex(cItems)
+        ? !"Total size\t= "; (cbItem * cItems); "Bytes"
     #EndIf
     
     ''make sure a valid list is being passed
@@ -75,7 +73,7 @@ Public Function HeapFreePtrList (ByVal hHeap As HANDLE, ByRef plpList As LPVOID 
     Next iItem
     
     ''free the list of pointers
-    If (HeapFree(hHeap, NULL, Cast(LPVOID, plpList)) = FALSE) Then Return(GetLastError())
+    If (HeapFree(hHeap, NULL, plpList) = FALSE) Then Return(GetLastError())
     
     ''release the lock on the heap
     If (HeapUnlock(hHeap) = FALSE) Then Return(GetLastError())
@@ -87,10 +85,10 @@ End Function
 Public Function LoadStringRange (ByVal hInst As HINSTANCE, ByVal plpszBuff As LPTSTR Ptr, ByVal wIdFirst As WORD, ByVal cchString As ULONG32, ByVal cStrings As ULONG32) As LRESULT
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
-        ? !"hInst\t= 0x"; Hex(hInst, 8)
-        ? !"plpszBuff\t= 0x"; Hex(plpszBuff, 8)
-        ? !"wIdFirst\t= 0x"; Hex(wIdFirst, 4)
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hInst\t= 0x"; Hex(hInst)
+        ? !"plpszBuff\t= 0x"; Hex(plpszBuff)
+        ? !"wIdFirst\t= 0x"; Hex(wIdFirst)
         ? !"cchString\t= "; cchString
         ? !"cStrings\t= "; cStrings
     #EndIf
@@ -100,8 +98,8 @@ Public Function LoadStringRange (ByVal hInst As HINSTANCE, ByVal plpszBuff As LP
         If (LoadString(hInst, Cast(UINT32, (wIdFirst + iStr)), plpszBuff[iStr], cchString) = 0) Then Return(GetLastError())
         #If __FB_DEBUG__
             ? "Loaded string #"; iStr
-            ? !"String ID\t= 0x"; Hex((wIdFirst + iStr), 4)
-            ? !"String Address\t= 0x"; Hex(plpszBuff[iStr], 8)
+            ? !"String ID\t= 0x"; Hex((wIdFirst + iStr))
+            ? !"String Address\t= 0x"; Hex(plpszBuff[iStr])
             ? !"String Content\t= "; *plpszBuff[iStr]
         #EndIf
     Next iStr

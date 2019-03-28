@@ -11,10 +11,6 @@
 
 Extern hInstance As HINSTANCE
 
-'Extern hConfig As HANDLE
-'Extern plpszPath As LPTSTR Ptr
-'Extern dwFileFilt As DWORD32
-
 Dim Shared hConfig As HANDLE            ''handle to the config heap
 Dim Shared plpszPath As LPTSTR Ptr      ''paths
 Dim Shared dwFileFilt As DWORD32        ''file attribute filter variable loaded from the registry

@@ -40,15 +40,11 @@
 #Include Once "win/shlwapi.bi"
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
-'#Include Once "win/prsht.bi"
-#Include "inc/errorhandler.bi"
 #Include "inc/config.bi"
-#Include "mod/heapptrlist/heapptrlist.bi"
-#Include "mod/createtooltip/createtooltip.bi"
-
+#Include "inc/createtooltip.bi"
+#Include "inc/errorhandler.bi"
+#Include "inc/heapptrlist.bi"
 #Include "defines.bi"
-
-''define structures
 
 ''define constants
 Const MainClass = "MAINCLASS"
@@ -56,10 +52,6 @@ Const MainClass = "MAINCLASS"
 ''declare shared variables
 
 Extern hInstance As HINSTANCE
-
-'Extern hConfig As HANDLE
-'Extern plpszPath As LPTSTR Ptr
-'Extern dwFileFilt As DWORD32
 
 ''declare functions
 ''main function

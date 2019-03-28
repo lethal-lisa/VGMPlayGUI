@@ -9,12 +9,12 @@
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
 #Include Once "win/prsht.bi"
-#Include "mod/createtooltip/createtooltip.bi"
-#Include "mod/heapptrlist/heapptrlist.bi"
+'#Include "mod/createtooltip/createtooltip.bi"
+'#Include "mod/heapptrlist/heapptrlist.bi"
+#Include "inc/createtooltip.bi"
+#Include "inc/heapptrlist.bi"
 #Include "inc/errorhandler.bi"
 #Include "defines.bi"
-'#Include "inc/config/pathsproc.bi"
-'#Include "inc/config/filefiltproc.bi"
 
 #Define CCH_BVGMP           MAX_PATH
 #Define CB_BVGMP            Cast(SIZE_T, (SizeOf(TCHAR) * CCH_BVGMP))

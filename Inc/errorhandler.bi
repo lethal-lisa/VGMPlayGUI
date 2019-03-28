@@ -9,6 +9,7 @@
 '/
 
 #Pragma Once
+#Include Once "windows.bi"
 
 #Define CCH_ERRMSG  &h00000200 /'512'/
 #Define CB_ERRMSG   Cast(SIZE_T, (CCH_ERRMSG * SizeOf(TCHAR)))

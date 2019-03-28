@@ -2,10 +2,12 @@
     
     errorhandler.bas
     
+    Compile with:
+        fbc -c "errorhandler.bas"
+    
 '/
 
 ''include headers
-#Include "windows.bi"
 #Include "inc/errorhandler.bi"
 
 Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32) As LRESULT

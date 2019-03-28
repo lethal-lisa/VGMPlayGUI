@@ -33,6 +33,8 @@
 #define IDS_APPNAME                 0x0001 //1
 #define IDS_OPTIONS                 0x0002 //2
 #define IDS_FILT_VGMPLAY            0x0003 //3
+#define IDS_READY                   0x0004 //4
+#define IDS_WORKING                 0x0005 //5
 
 //message captions and text
 #define IDS_MSGTXT_ABOUT            0x0011 //17
@@ -74,8 +76,8 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 6, 0, 1
-PRODUCTVERSION  2, 11, 6, 4
+FILEVERSION     1, 7, 0, 7
+PRODUCTVERSION  2, 11, 7, 7
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       0 //VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
@@ -86,8 +88,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.6.0.1\0"
-            VALUE "ProductVersion",     "2.11.6.4\0"
+            VALUE "FileVersion",        "1.7.0.7\0"
+            VALUE "ProductVersion",     "2.11.7.7\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
@@ -110,6 +112,9 @@ LANGUAGE 9, 1
 BEGIN
     IDS_APPNAME                 "VGMPlayGUI"
     IDS_OPTIONS                 "Options Menu"
+    IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
+    IDS_READY                   "Ready"
+    IDS_WORKING                 "Working"
     IDS_MSGTXT_ABOUT            "VGMPlayGUI - GUI for Valley Bell's VGMPlay.\nCopyright (c) 2018 Kazusoft Co.\nKazusoft and the Kazusoft logo are trademarks of Lisa Murray."
     IDS_MSGCAP_ABOUT            "About VGMPlayGUI"
     IDS_MSGTXT_NYI              "This feature is not implemented yet.\nSorry."
@@ -123,7 +128,6 @@ BEGIN
     IDS_REG_VGMPLAYPATH         "VGMPlay Path"
     IDS_REG_DEFAULTPATH         "Default Path"
     IDS_REG_FILEFILTER          "File Filter"
-    IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
     IDS_TIP_DRIVELIST           "List of available drives"
     IDS_TIP_UPBTN               "Go up one directory level"
     IDS_TIP_GOBTN               "Go to entered directory"

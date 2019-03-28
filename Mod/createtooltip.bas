@@ -1,14 +1,14 @@
 /'
     
-    CreateToolTip.bas
+    createtooltip.bas
     
     Compile with:
-        fbc -lib "CreateToolTip.bas"
+        fbc -c "createtooltip.bas"
     
 '/
 
 ''include header
-#Include "createtooltip.bi"
+#Include "inc/createtooltip.bi"
 
 ''creates a tooltip and associates it with a control
 Public Function CreateToolTip (ByVal hInst As HINSTANCE, ByVal hDlg As HWND, ByVal dwToolID As DWORD32, ByVal wTextID As WORD, ByVal dwStyle As DWORD32, ByVal uFlags As UINT32) As HWND

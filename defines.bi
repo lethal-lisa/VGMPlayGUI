@@ -94,6 +94,8 @@
 #Define IDS_APPNAME                 &h0001 /'1'/
 #Define IDS_OPTIONS                 &h0002 /'2'/
 #Define IDS_FILT_VGMPLAY            &h0003 /'3'/
+#Define IDS_READY                   &h0004 /'4'/
+#Define IDS_WORKING                 &h0005 /'5'/
 
 ''message captions and text
 #Define IDS_MSGTXT_ABOUT            &h0011 /'17'/
