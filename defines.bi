@@ -55,12 +55,6 @@
 #Define IDC_CHK_READONLY            &h04B5 /'1205'/
 #Define IDC_CHK_EXCLUSIVE           &h04B6 /'1206'/
 
-''vgmplay settings property sheet
-#Define IDD_VGMPLAYSETTINGS         &h0514 /'1300'/
-#Define IDC_CHK_LOGSOUND            &h0515 /'1301'/
-#Define IDC_CHK_PREFERJAPTAG        &h0516 /'1302'/
-#Define IDC_BTN_CHIPSETTINGS        &h0517 /'1303'/
-
 ''menus:
 ''main dialog's menu
 #Define IDR_MENUMAIN                &h2710 /'10000'/
@@ -83,6 +77,10 @@
 #Define IDM_BTN_PLAY_RENDER         &h4E25 /'20005'/
 #Define IDM_BTN_PLAY_BOTH           &h4E26 /'20006'/
 #Define IDM_BTN_PLAY_CURRENT        &h4E27 /'20007'/
+#Define IDM_LST_MAIN                &h4E28 /'20008'/
+#Define IDM_PROPERTIES              &h4E29 /'20009'/
+#Define IDM_ADDTOLIST               &h4E2A /'20010'/
+#Define IDM_DELETE                  &h4E2B /'20011'/
 
 ''icons:
 #Define IDI_VGMPLAYGUI              &h0064 /'100'/
@@ -108,8 +106,8 @@
 #Define IDS_MSGCAP_CHANGES          &h0018 /'24'/
 #Define IDS_MSGTXT_FILTHELP         &h0019 /'25'/
 #Define IDS_MSGCAP_FILTHELP         &h001A /'26'/
-#Define IDS_MSGTXT_DELFILE          &h001B /'27'/
-#Define IDS_MSGCAP_DELFILE          &h001C /'28'/
+#Define IDS_MSGTXT_DELCONFIRM       &h001B /'27'/
+#Define IDS_MSGCAP_DELCONFIRM       &h001C /'28'/
 
 ''registry key names
 #Define IDS_REG_VGMPLAYPATH         &h0021 /'33'/
@@ -171,5 +169,6 @@
 ''IDs for context menus
 #Define MEN_DRIVES                  &h00000000
 #Define MEN_PLAYBTN                 &h00000001
+#Define MEN_MAINLIST                &h00000002
 
 ''EOF

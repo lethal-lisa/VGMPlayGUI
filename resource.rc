@@ -28,6 +28,10 @@
 #define IDM_BTN_PLAY_RENDER         0x4E25 //20005
 #define IDM_BTN_PLAY_BOTH           0x4E26 //20006
 #define IDM_BTN_PLAY_CURRENT        0x4E27 //20007
+#define IDM_LST_MAIN                0x4E28 //20008
+#define IDM_PROPERTIES              0x4E29 //20009
+#define IDM_ADDTOLIST               0x4E2A //20010
+#define IDM_DELETE                  0x4E2B //20011
 
 //strings
 #define IDS_APPNAME                 0x0001 //1
@@ -47,6 +51,8 @@
 #define IDS_MSGCAP_CHANGES          0x0018 //24
 #define IDS_MSGTXT_FILTHELP         0x0019 //25
 #define IDS_MSGCAP_FILTHELP         0x001A //26
+#define IDS_MSGTXT_DELCONFIRM       0x001B //27
+#define IDS_MSGCAP_DELCONFIRM       0x001C //28
 
 //registry key names
 #define IDS_REG_VGMPLAYPATH         0x0021 //33
@@ -76,10 +82,10 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 7, 0, 7
-PRODUCTVERSION  2, 11, 7, 7
+FILEVERSION     1, 8, 0, 2
+PRODUCTVERSION  2, 12, 0, 2
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       0 //VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
+FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     0
@@ -88,8 +94,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.7.0.7\0"
-            VALUE "ProductVersion",     "2.11.7.7\0"
+            VALUE "FileVersion",        "1.8.0.2\0"
+            VALUE "ProductVersion",     "2.12.0.2\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
@@ -97,8 +103,8 @@ BEGIN
             VALUE "LegalTrademarks",    "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
-            //VALUE "PrivateBuild",       "\0"
-            //VALUE "SpecialBuild",       "\0"
+            VALUE "PrivateBuild",       "Testing build\0"
+            VALUE "SpecialBuild",       "Test build\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -125,6 +131,8 @@ BEGIN
     IDS_MSGCAP_CHANGES          "Cancel?"
     IDS_MSGTXT_FILTHELP         "You can change the filter used by the file browser by selecting different options from here."
     IDS_MSGCAP_FILTHELP         "File Filter Help"
+    IDS_MSGTXT_DELCONFIRM       "Are you sure you want to delete this file?"
+    IDS_MSGCAP_DELCONFIRM       "Delete?"
     IDS_REG_VGMPLAYPATH         "VGMPlay Path"
     IDS_REG_DEFAULTPATH         "Default Path"
     IDS_REG_FILEFILTER          "File Filter"
@@ -195,6 +203,14 @@ BEGIN
         MENUITEM "Play and Render to WAV File", IDM_BTN_PLAY_BOTH, MFT_STRING, MFS_DISABLED
         MENUITEM SEPARATOR
         MENUITEM "Play With &Current Settings", IDM_BTN_PLAY_CURRENT, MFT_STRING, MFS_ENABLED
+    END
+    POPUP "IDC_LST_MAIN", IDM_LST_MAIN, MFT_STRING, MFS_ENABLED
+    BEGIN
+        MENUITEM "&Properties", IDM_PROPERTIES, MFT_STRING, MFS_ENABLED
+        MENUITEM SEPARATOR
+        MENUITEM "&Add to Playlist", IDM_ADDTOLIST, MFT_STRING, MFS_DISABLED
+        MENUITEM SEPARATOR
+        MENUITEM "&Delete", IDM_DELETE, MFT_STRING, MFS_ENABLED
     END
 END
 

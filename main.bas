@@ -229,8 +229,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                                 .lpszCaption        = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
                                 .dwStyle            = (MB_OK Or MB_DEFBUTTON1 Or MB_USERICON)
                                 .lpszIcon           = MAKEINTRESOURCE(IDI_KAZUSOFT)
-                                '.dwContextHelpId    = NULL
-                                '.lpfnMsgBoxCallback = NULL
                                 .dwLanguageId       = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
                             End With
                             
@@ -238,17 +236,33 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                             MessageBeep(MB_ICONINFORMATION)
                             MessageBoxIndirect(@mbp)
                             
+                        Case IDM_PROPERTIES
+                            
+                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_OK)
+                            
+                        Case IDM_ADDTOLIST
+                            
+                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_OK)
+                            
+                        Case IDM_DELETE
+                            
+                            If (ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_DELCONFIRM, IDS_MSGCAP_DELCONFIRM, (MB_ICONWARNING Or MB_YESNO)) = IDYES) Then
+                                If (GetDlgItemText(hWnd, IDC_EDT_FILE, plpszPath[PATH_CURRENT], CCH_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                                If (DeleteFile(Cast(LPCTSTR, plpszPath[PATH_CURRENT])) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                                If (PopulateLists(hWnd, ".") = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError())
+                            End If
+                            
                         Case IDC_BTN_PLAY, IDM_BTN_PLAY_CURRENT     ''start VGMPlay
                             
                             If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
-                            GetDlgItemText(hWnd, IDC_EDT_FILE, plpszPath[PATH_CURRENT], CCH_PATH)
+                            If (GetDlgItemText(hWnd, IDC_EDT_FILE, plpszPath[PATH_CURRENT], CCH_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (StartVGMPlay(plpszPath[PATH_CURRENT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                         Case IDC_BTN_GO                             ''change to a specified directory
                             
                             If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
-                            GetDlgItemText(hWnd, IDC_EDT_PATH, plpszPath[PATH_CURRENT], MAX_PATH)
+                            If (GetDlgItemText(hWnd, IDC_EDT_PATH, plpszPath[PATH_CURRENT], MAX_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (PopulateLists(hWnd, plpszPath[PATH_CURRENT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
@@ -306,8 +320,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                 Case Cast(UINT32, LBN_ERRSPACE), EN_ERRSPACE    ''a listbox or edit control is out of memory
                     
                     ''display error message, and terminate program
-                    'SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY)
-                    'PostQuitMessage(ERROR_NOT_ENOUGH_MEMORY)
                     Return(FatalSysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY))
                     
             End Select
@@ -317,11 +329,6 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             #If __FB_DEBUG__
                 ? "WM_SIZE:"
                 ? "Resize type:", "0x"; Hex(wParam)
-                'If (wParam And SIZE_MAXHIDE) Then ? "SIZE_MAXHIDE"
-                'If (wParam And SIZE_MAXIMIZED) Then ? "SIZE_MAXIMIZED"
-                'If (wParam And SIZE_MAXSHOW) Then ? "SIZE_MAXSHOW"
-                'If (wParam And SIZE_MINIMIZED) Then ? "SIZE_MINIMIZED"
-                'If (wParam And SIZE_RESTORED) Then ? "SIZE_RESTORED"
                 ? "(cx, cy)", "= ("; LoWord(lParam); ", "; HiWord(lParam); ")"
             #EndIf
             
@@ -542,11 +549,11 @@ Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BO
         Case IDC_LST_MAIN
             
             ''load top-level menu
-			phMenu[0] = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENUMAIN))
+			phMenu[0] = LoadMenu(hInstance, MAKEINTRESOURCE(IDR_MENUCONTEXT))
 			If (phMenu[0] = INVALID_HANDLE_VALUE) Then Return(FALSE)
 			
 			''load sub menu
-			phMenu[1] = GetSubMenu(phMenu[0], 1)
+			phMenu[1] = GetSubMenu(phMenu[0], MEN_MAINLIST)
 			If (phMenu[1] = INVALID_HANDLE_VALUE) Then Return(FALSE)
 			
         Case IDC_LST_DRIVES

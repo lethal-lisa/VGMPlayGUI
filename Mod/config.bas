@@ -27,8 +27,6 @@ Declare Function CreateFileFiltToolTips (ByVal hDlg As HWND) As BOOL
 Declare Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL 
 Declare Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
 
-Declare Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-
 Declare Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal lpszClass As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As LRESULT
 Declare Function SetDefConfig () As BOOL
 
@@ -39,11 +37,11 @@ Public Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         ? !"hDlg\t= 0x"; Hex(hDlg)
     #EndIf
     
-    Dim hHeap As HANDLE = HeapCreate(NULL, ((3 * SizeOf(PROPSHEETPAGE)) + SizeOf(PROPSHEETHEADER) + (64 * SizeOf(TCHAR))), ((3 * SizeOf(PROPSHEETPAGE)) + SizeOf(PROPSHEETHEADER) + (64 * SizeOf(TCHAR))))
+    Dim hHeap As HANDLE = HeapCreate(NULL, ((C_PAGES * SizeOf(PROPSHEETPAGE)) + SizeOf(PROPSHEETHEADER) + (64 * SizeOf(TCHAR))), ((3 * SizeOf(PROPSHEETPAGE)) + SizeOf(PROPSHEETHEADER) + (64 * SizeOf(TCHAR))))
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''allocate space for pages
-    Dim lpPsp As LPPROPSHEETPAGE = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (3 * SizeOf(PROPSHEETPAGE)))
+    Dim lpPsp As LPPROPSHEETPAGE = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (C_PAGES * SizeOf(PROPSHEETPAGE)))
     If (lpPsp = NULL) Then Return(FALSE)
     
     ''setup "paths" page
@@ -53,10 +51,7 @@ Public Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .hInstance      = hInstance
         .pszTemplate    = MAKEINTRESOURCE(IDD_PATHS)
         .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        '.pszTitle       = NULL
         .pfnDlgProc     = @PathsProc
-        '.lParam         = NULL
-        '.pfnCallback    = NULL
     End With
     
     ''setup "file filter" page
@@ -66,23 +61,7 @@ Public Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .hInstance      = hInstance
         .pszTemplate    = MAKEINTRESOURCE(IDD_FILEFILTER)
         .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        '.pszTitle       = NULL
         .pfnDlgProc     = @FileFiltProc
-        '.lParam         = NULL
-        '.pfnCallback    = NULL
-    End With
-    
-    ''setup "vgmplay settings" page
-    With lpPsp[PG_VGMPLAY]
-        .dwSize         = SizeOf(PROPSHEETPAGE)
-        .dwFlags        = (PSP_USEICONID Or PSP_HASHELP)
-        .hInstance      = hInstance
-        .pszTemplate    = MAKEINTRESOURCE(IDD_VGMPLAYSETTINGS)
-        .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        '.pszTitle       = NULL
-        .pfnDlgProc     = @VGMPlaySettingsProc
-        '.lParam         = NULL
-        '.pfnCallback    = NULL
     End With
     
     ''setup property sheet header
@@ -97,11 +76,10 @@ Public Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .hwndParent     = hDlg
         .hInstance      = hInstance
         .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        .pszCaption     = Cast(LPCTSTR, lpszOptions)'plpszStrRes[STR_OPTIONS]
+        .pszCaption     = Cast(LPCTSTR, lpszOptions)
         .nPages         = C_PAGES
         .nStartPage     = 0
         .ppsp           = Cast(LPCPROPSHEETPAGE, lpPsp)
-        '.pfnCallback    = NULL
     End With
     
     ''start property sheet
@@ -249,7 +227,7 @@ End Function
 Private Function CreatePathsToolTips (ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
         ? !"hDlg\t= 0x"; Hex(hDlg)
     #EndIf
     
@@ -266,7 +244,7 @@ End Function
 Private Function SetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
         ? !"hDlg\t\t= 0x"; Hex(hDlg)
         ? !"plpszValue\t= 0x"; Hex(plpszValue)
     #EndIf
@@ -290,7 +268,7 @@ End Function
 Private Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Ptr) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
         ? !"hDlg\t\t= 0x"; Hex(hDlg)
         ? !"plpszValue\t= 0x"; Hex(plpszValue)
     #EndIf
@@ -310,7 +288,7 @@ End Function
 Private Function BrowseVGMPlay (ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "/"; __FUNCTION__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
         ? !"hDlg\t= 0x"; Hex(hDlg)
     #EndIf
     
@@ -554,76 +532,6 @@ End Function
 
 
 
-Private Function VGMPlaySettingsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-    
-    ''declare local variables
-    Static hwndPrsht As HWND    ''handle to property sheet.
-    
-    ''process messages
-    Select Case uMsg        ''messages
-        Case WM_INITDIALOG  ''initialize dialog
-            
-            CreateToolTip(hInstance, hWnd, IDC_CHK_PREFERJAPTAG, IDS_TIP_PREFERJAPTAG, TTS_ALWAYSTIP, NULL)
-			
-			''disable windows until chip-settings.dll is done
-			EnableWindow(GetDlgItem(hWnd, IDC_CHK_LOGSOUND), FALSE)
-			EnableWindow(GetDlgItem(hWnd, IDC_CHK_PREFERJAPTAG), FALSE)
-			EnableWindow(GetDlgItem(hWnd, IDC_BTN_CHIPSETTINGS), FALSE)
-			
-        Case WM_COMMAND     ''commands
-            Select Case HiWord(wParam)  ''event code
-                Case BN_CLICKED         ''button clicked
-                    Select Case LoWord(wParam)
-                        Case IDC_BTN_CHIPSETTINGS
-                            
-                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
-                            
-                    End Select
-                    
-                    SendMessage(hwndPrsht, PSM_CHANGED, Cast(WPARAM, hWnd), NULL)
-                    
-            End Select
-            
-        Case WM_NOTIFY      ''notifications
-            
-            Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
-                Case PSN_SETACTIVE                      ''page becoming active
-                    
-                    ''get page handle
-                    hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then SysErrMsgBox(hWnd, GetLastError())
-                    
-                Case PSN_KILLACTIVE                     ''page becoming inactive
-                    
-                    SetWindowLong(hWnd, DWL_MSGRESULT, Cast(LONG32, FALSE))
-                    Return(FALSE)
-                    
-                Case PSN_APPLY                          ''user has pressed the apply button
-                    
-                    'ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
-                    
-                Case PSN_HELP                           ''user has pressed the help button
-                    
-                    ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
-                    
-                Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
-                    
-                    PrpshCancelPrompt(hWnd)
-                    
-            End Select
-            
-        Case Else           ''otherwise
-            
-            Return(FALSE)
-            
-    End Select
-    
-    Return(TRUE)
-    
-End Function
-
-
-
 Public Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
     
     #If __FB_DEBUG__
@@ -795,7 +703,7 @@ End Function
 Private Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal lpszClass As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As LRESULT
     
     #If __FB_DEBUG__
-        ? "Calling:", __FUNCTION__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
     #EndIf
     
     ''declare local variables

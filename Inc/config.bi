@@ -9,8 +9,6 @@
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
 #Include Once "win/prsht.bi"
-'#Include "mod/createtooltip/createtooltip.bi"
-'#Include "mod/heapptrlist/heapptrlist.bi"
 #Include "inc/createtooltip.bi"
 #Include "inc/heapptrlist.bi"
 #Include "inc/errorhandler.bi"
@@ -24,10 +22,9 @@
 #Define BVGMP_FILE          2
 #Define BVGMP_FILETITLE     3
 
-#Define C_PAGES             3
+#Define C_PAGES             2
 #Define PG_PATHS            0
 #Define PG_FILEFILT         1
-#Define PG_VGMPLAY          2
 
 Extern hConfig As HANDLE
 Extern plpszPath As LPTSTR Ptr
