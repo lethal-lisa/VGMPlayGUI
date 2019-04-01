@@ -1,3 +1,5 @@
+//propertysheets.rc
+
 #define IDD_PATHS                   0x044C //1100
 #define IDC_STC_VGMPLAYPATH         0x044D //1101
 #define IDC_EDT_VGMPLAYPATH         0x044E //1102

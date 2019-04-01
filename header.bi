@@ -62,8 +62,6 @@ Declare Function InitClasses () As BOOL
 /'  Used to start the main dialog. called by WinMain only, do not call this
     function.
     
-    hInst:HINSTANCE -   Handle to the app's instance (passed from
-                        WinMain/hInst).
     hWnd:HWND       -   Returns the handle to the main window.
     nShowCmd:INT32  -   Show command to use (passed from WinMain/nShowCmd).
     lParam:LPARAM   -   Optional parameter to pass to DialogBoxParam.
@@ -99,6 +97,8 @@ Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD3
     it otherwise.
 '/
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
+
+Declare Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
 Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
 

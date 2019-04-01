@@ -571,13 +571,13 @@ Public Function LoadConfig () As BOOL
         ? "Calling:", __FILE__; "\"; __FUNCTION__
     #EndIf
     
-    Dim hHeap As HANDLE = HeapCreate(NULL, (CB_KEY * C_KEY), (CB_KEY * C_KEY))
+    Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''open the program's registry key
     Dim dwKeyDisp As DWORD32    ''disposition value for OpenProgHKey
     Dim hkProgKey As HKEY       ''handle to the program's registry key 
-    SetLastError(OpenProgHKey(@hkProgKey, "VGMPlayGUI", NULL, KEY_ALL_ACCESS, @dwKeyDisp))
+    SetLastError(OpenProgHKey(@hkProgKey, "VGMPlayGUI", NULL, KEY_READ, @dwKeyDisp))
     If (GetLastError()) Then Return(FALSE)
     
     ''load the config
@@ -622,7 +622,6 @@ Public Function LoadConfig () As BOOL
     ''return
     SetLastError(RegCloseKey(hkProgKey))
     If (GetLastError()) Then Return(FALSE)
-    If (HeapDestroy(hHeap) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
@@ -634,7 +633,7 @@ Public Function SaveConfig () As BOOL
         ? "Calling:", __FILE__; "\"; __FUNCTION__
     #EndIf
     
-    Dim hHeap As HANDLE = HeapCreate(NULL, (CB_KEY * C_KEY), (CB_KEY * C_KEY))
+    Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''open the program's registry key
@@ -664,11 +663,10 @@ Public Function SaveConfig () As BOOL
     If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
     
     ''return
-    SetLastError(HeapFreePtrList(hHeap, Cast(LPVOID Ptr, plpszKeyName), CB_KEY, C_KEY))
+    SetLastError(HeapFreePtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
     If (GetLastError()) Then Return(FALSE)
     SetLastError(RegCloseKey(hkProgKey))
     If (GetLastError()) Then Return(FALSE)
-	If (HeapDestroy(hHeap) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
@@ -710,15 +708,15 @@ Private Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTS
     Dim hkSoftware As HKEY  ''hkey to HKEY_CURRENT_USER\"Software"
     
     ''open HKEY_CURRENT_USER\Software
-    SetLastError(Cast(DWORD32, RegOpenKeyEx(HKEY_CURRENT_USER, "Software", NULL, samDesired, @hkSoftware)))
+    SetLastError(RegOpenKeyEx(HKEY_CURRENT_USER, "Software", NULL, samDesired, @hkSoftware))
     If (GetLastError()) Then Return(GetLastError())
     
     ''open/create HKEY_CURRENT_USER\"Software"\*lpszAppName
-    SetLastError(Cast(DWORD32, RegCreateKeyEx(hkSoftware, lpszAppName, NULL, NULL, NULL, samDesired, NULL, phkOut, pdwDisp)))
+    SetLastError(RegCreateKeyEx(hkSoftware, lpszAppName, NULL, NULL, NULL, samDesired, NULL, phkOut, pdwDisp))
     If (GetLastError()) Then Return(GetLastError())
     
     ''close hkSoftware
-    SetLastError(Cast(DWORD32, RegCloseKey(hkSoftware)))
+    SetLastError(RegCloseKey(hkSoftware))
     If (GetLastError()) Then Return(GetLastError())
     
     ''return

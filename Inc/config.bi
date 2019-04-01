@@ -26,6 +26,15 @@
 #Define PG_PATHS            0
 #Define PG_FILEFILT         1
 
+''IDs for plpszKeyName
+#Define CCH_KEY                     &h00000020 ''32
+#Define CB_KEY                      Cast(SIZE_T, (CCH_KEY * SizeOf(TCHAR)))
+#Define C_KEY                       &h00000003 ''3
+'#Define SIZE_KEY                    Cast(SIZE_T, (NUM_KEY * CB_KEY))
+#Define KEY_VGMPLAYPATH             &h00000000 ''0
+#Define KEY_DEFAULTPATH             &h00000001 ''1
+#Define KEY_FILEFILTER              &h00000002 ''2
+
 Extern hConfig As HANDLE
 Extern plpszPath As LPTSTR Ptr
 Extern dwFileFilt As DWORD32
