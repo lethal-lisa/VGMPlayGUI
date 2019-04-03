@@ -2,6 +2,8 @@
     
     createtooltip.bi
     
+    Copyright (c) 2019 Kazusoft Co.
+    
 '/
 
 #Pragma Once

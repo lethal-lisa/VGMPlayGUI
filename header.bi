@@ -90,7 +90,7 @@ Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As 
     Low order WORD = x
     High order WORD = y
 '/
-Declare Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BOOL
+Declare Function DisplayMainContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BOOL
 
 /'  Changes directories, updates the UI, and redraws the list boxes for the
     main dialog. This function should only be called by MainProc, do not call
@@ -101,5 +101,7 @@ Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) A
 Declare Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
 Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
+
+Declare Function AboutMsgBox (ByVal hDlg As HWND) As BOOL
 
 ''EOF

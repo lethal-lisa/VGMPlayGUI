@@ -8,7 +8,7 @@
         GoRC /r /nu "resource.rc"
         fbc -s gui "main.bas" "resource.res" "Mod\*.o" -x "VGMPlayGUI.exe"
     
-    Copyright (c) 2018 Kazusoft Co.
+    Copyright (c) 2018-2019 Kazusoft Co.
     Kazusoft is a TradeMark of Lisa Murray.
     
 '/
@@ -157,7 +157,7 @@ Private Function StartMainDialog (ByVal hWnd As HWND, ByVal nShowCmd As INT32, B
 End Function
 
 ''dialog procedures
-Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
     Static lpszCurPath As LPTSTR
     
@@ -167,6 +167,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             
             Dim hHeap As HANDLE = GetProcessHeap()
             If (hHeap = INVALID_HANDLE_VALUE) Then Return(FatalSysErrMsgBox(hWnd, GetLastError()))
+            
             lpszCurPath = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
             If (lpszCurPath = NULL) Then Return(FatalSysErrMsgBox(hWnd, GetLastError()))
             
@@ -208,50 +209,34 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
             
             Select Case HiWord(wParam)                          ''event:
                 Case BN_CLICKED                                 ''a button has been pressed
-                    Select Case LoWord(wParam)                      ''button IDs:
-                        Case IDM_ROOT                               ''change to drive root
+                    Select Case LoWord(wParam)                  ''button IDs:
+                        Case IDM_ROOT                           ''change to drive root
                             
                             ''change directory to the current drive's root
                             If (PopulateLists(hWnd, "\") = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
                             
-                        Case IDM_EXIT                               ''exit program
+                        Case IDM_EXIT                           ''exit program
                             
                             ''send a WM_CLOSE message to the main window
                             SendMessage(hWnd, WM_CLOSE, NULL, NULL)
                             
-                        Case IDM_OPTIONS                            ''start the options property sheet
+                        Case IDM_OPTIONS                        ''start the options property sheet
                             
                             DoOptionsPropSheet(hWnd)
                             
-                        Case IDM_ABOUT                              ''display the about message
+                        Case IDM_ABOUT                          ''display the about message
                             
-                            /'''setup messageboxparams
-                            Dim mbp As MSGBOXPARAMS
-                            ZeroMemory(@mbp, SizeOf(MSGBOXPARAMS))
-                            With mbp
-                                .cbSize             = SizeOf(MSGBOXPARAMS)
-                                .hwndOwner          = hWnd
-                                .hInstance          = hInstance
-                                .lpszText           = MAKEINTRESOURCE(IDS_MSGTXT_ABOUT)
-                                .lpszCaption        = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
-                                .dwStyle            = (MB_OK Or MB_DEFBUTTON1 Or MB_USERICON)
-                                .lpszIcon           = MAKEINTRESOURCE(IDI_KAZUSOFT)
-                                .dwLanguageId       = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
-                            End With
+                            If (AboutMsgBox(hWnd) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
-                            ''display message box
-                            MessageBeep(MB_ICONINFORMATION)
-                            MessageBoxIndirect(@mbp)'/
+                        Case IDM_PROPERTIES                     ''item properties
                             
-                        Case IDM_PROPERTIES
+                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
                             
-                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_OK)
+                        Case IDM_ADDTOLIST                      ''add item to a playlist
                             
-                        Case IDM_ADDTOLIST
+                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
                             
-                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_OK)
-                            
-                        Case IDM_DELETE
+                        Case IDM_DELETE                         ''delete file
                             
                             If (ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_DELCONFIRM, IDS_MSGCAP_DELCONFIRM, (MB_ICONWARNING Or MB_YESNO)) = IDYES) Then
                                 If (GetDlgItemText(hWnd, IDC_EDT_FILE, lpszCurPath, CCH_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
@@ -259,21 +244,21 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                                 If (PopulateLists(hWnd, ".") = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             End If
                             
-                        Case IDC_BTN_PLAY ''start VGMPlay
+                        Case IDC_BTN_PLAY                       ''start VGMPlay
                             
                             If (GetDlgItemText(hWnd, IDC_EDT_FILE, lpszCurPath, CCH_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (StartVGMPlay(Cast(LPCTSTR, lpszCurPath)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
-                        Case IDC_BTN_GO                             ''change to a specified directory
+                        Case IDC_BTN_GO                         ''change to a specified directory
                             
                             If (GetDlgItemText(hWnd, IDC_EDT_PATH, lpszCurPath, MAX_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (PopulateLists(hWnd, lpszCurPath) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
-                        Case IDC_BTN_UP, IDM_UP                     ''move up one directory
+                        Case IDC_BTN_UP, IDM_UP                 ''move up one directory
                             
                             If (PopulateLists(hWnd, "..") = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
-                        Case IDC_BTN_REFRESH, IDM_REFRESH           ''refresh the current directory listing
+                        Case IDC_BTN_REFRESH, IDM_REFRESH       ''refresh the current directory listing
                             
                             If (PopulateLists(hWnd, ".") = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
@@ -359,7 +344,7 @@ Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPA
                 HiWord(lParam) = y
             '/
             
-            If (DisplayContextMenu(hWnd, Cast(DWORD32, lParam)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            If (DisplayMainContextMenu(hWnd, Cast(DWORD32, lParam)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
         Case Else                   ''otherwise
             
@@ -496,13 +481,7 @@ Private Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As 
     
 End Function
 
-/' displays a context menu in the main dialog
-    hDlg:HWND       -   Handle to the parent dialog
-    dwMouse:DWORD32 -   Mouse position in screen co-ords. The low-order
-                        WORD is the x co-ord, and the high-order WORD is
-                        the y co-ord.
-'/
-Function DisplayContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BOOL
+Private Function DisplayMainContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -731,6 +710,55 @@ Private Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
 	''return
 	If (HeapFree(hHeap, NULL, lpszParam) = FALSE) Then Return(FALSE)
 	SetCursor(hCurPrev)
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Private Function AboutMsgBox (ByVal hDlg As HWND) As BOOL
+    
+    Dim hCurPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
+    
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''load unformatted strings
+    Dim plpszAbout As LPTSTR Ptr
+    SetLastError(HeapAllocPtrList(hHeap, plpszAbout, CB_ABT, C_ABT))
+    If (GetLastError()) Then Return(FALSE)
+    SetLastError(LoadStringRange(hInstance, plpszAbout, IDS_ABT_DESCRIPTION, CCH_ABT, C_ABT))
+    If (GetLastError()) Then Return(FALSE)
+    
+    ''format the strings
+    Dim lpszMessage As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (C_ABT * CB_ABT))
+    If (lpszMessage = NULL) Then Return(FALSE)
+    *lpszMessage = (*plpszAbout[ABT_DESCRIPTION] + *plpszAbout[ABT_LEGAL])
+    
+    ''setup message box params
+    Dim lpMbp As LPMSGBOXPARAMS = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, SizeOf(MSGBOXPARAMS))
+    If (lpMbp = NULL) Then Return(FALSE)
+    With *lpMbp
+        .hInstance = hInstance
+        .cbSize = SizeOf(MSGBOXPARAMS)
+        .hwndOwner = hDlg
+        .lpszText = lpszMessage
+        .lpszCaption = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
+        .dwStyle = (MB_OK Or MB_USERICON)
+        .lpszIcon = MAKEINTRESOURCE(IDI_KAZUSOFT)
+        .dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
+    End With
+    
+    ''show message box
+    SetCursor(hCurPrev)
+    MessageBoxIndirect(lpMbp)
+    hCurPrev = SetCursor(LoadCursor(NULL, IDC_WAIT))
+    
+    ''return
+    SetLastError(HeapFreePtrList(hHeap, plpszAbout, CB_ABT, C_ABT))
+    If (GetLastError()) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, lpszMessage) = FALSE) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, lpMbp) = FALSE) Then Return(FALSE)
+    SetCursor(hCurPrev)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     

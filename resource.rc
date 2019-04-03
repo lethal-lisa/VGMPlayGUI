@@ -25,42 +25,43 @@
 #define IDS_APPNAME                 0x0001 //1
 #define IDS_OPTIONS                 0x0002 //2
 #define IDS_FILT_VGMPLAY            0x0003 //3
-#define IDS_ABT_DESCRIPTION         0x0004
-#define IDS_ABT_LEGAL               0x0005
+#define IDS_ABT_DESCRIPTION         0x0004 //4
+#define IDS_ABT_LEGAL               0x0005 //5
 
 //message captions
-#define IDS_MSGCAP_ABOUT            0x0100
-#define IDS_MSGCAP_NYI              0x0101
-#define IDS_MSGCAP_VGMPMISS         0x0102
-#define IDS_MSGCAP_CHANGES          0x0103
-#define IDS_MSGCAP_FILTHELP         0x0104
-#define IDS_MSGCAP_DELCONFIRM       0x0105
+#define IDS_MSGCAP_ABOUT            0x0100 //256
+#define IDS_MSGCAP_NYI              0x0101 //257
+#define IDS_MSGCAP_VGMPMISS         0x0102 //258
+#define IDS_MSGCAP_CHANGES          0x0103 //259
+#define IDS_MSGCAP_FILTHELP         0x0104 //260
+#define IDS_MSGCAP_DELCONFIRM       0x0105 //270
 
 //message text
-#define IDS_MSGTXT_NYI              0x0200
-#define IDS_MSGTXT_VGMPMISS         0x0201
-#define IDS_MSGTXT_CHANGES          0x0202
-#define IDS_MSGTXT_FILTHELP         0x0203
-#define IDS_MSGTXT_DELCONFIRM       0x0204
+#define IDS_MSGTXT_NYI              0x0200 //512
+#define IDS_MSGTXT_VGMPMISS         0x0201 //513
+#define IDS_MSGTXT_CHANGES          0x0202 //514
+#define IDS_MSGTXT_FILTHELP         0x0203 //515
+#define IDS_MSGTXT_DELCONFIRM       0x0204 //516
 
 //registry key names
-#define IDS_REG_VGMPLAYPATH         0x0300
-#define IDS_REG_DEFAULTPATH         0x0301
-#define IDS_REG_FILEFILTER          0x0302
+#define IDS_REG_VGMPLAYPATH         0x0300 //768
+#define IDS_REG_DEFAULTPATH         0x0301 //769
+#define IDS_REG_DEFAULTLIST         0x0302 //770
+#define IDS_REG_FILEFILTER          0x0303 //771
 
 //tooltip text
-#define IDS_TIP_DRIVELIST           0x0400
-#define IDS_TIP_UPBTN               0x0401
-#define IDS_TIP_GOBTN               0x0402
-#define IDS_TIP_REFRESHBTN          0x0403
-#define IDS_TIP_PLAYBTN             0x0404
-#define IDS_TIP_VGMPLAYPATH         0x0405
-#define IDS_TIP_DEFAULTPATH         0x0406
-#define IDS_TIP_ARCHIVE             0x0407
-#define IDS_TIP_HIDDEN              0x0408
-#define IDS_TIP_SYSTEM              0x0409
-#define IDS_TIP_READONLY            0x040A
-#define IDS_TIP_EXCLUSIVE           0x040B
+#define IDS_TIP_DRIVELIST           0x0400 //1024
+#define IDS_TIP_UPBTN               0x0401 //1025
+#define IDS_TIP_GOBTN               0x0402 //1026
+#define IDS_TIP_REFRESHBTN          0x0403 //1027
+#define IDS_TIP_PLAYBTN             0x0404 //1028
+#define IDS_TIP_VGMPLAYPATH         0x0405 //1029
+#define IDS_TIP_DEFAULTPATH         0x0406 //1030
+#define IDS_TIP_ARCHIVE             0x0407 //1031
+#define IDS_TIP_HIDDEN              0x0408 //1032
+#define IDS_TIP_SYSTEM              0x0409 //1033
+#define IDS_TIP_READONLY            0x040A //1034
+#define IDS_TIP_EXCLUSIVE           0x040B //1035
 
 //IDs for icons
 #define IDI_VGMPLAYGUI              0x0064 //100
@@ -71,10 +72,10 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 9, 1, 3
-PRODUCTVERSION  2, 12, 0, 12
+FILEVERSION     1, 10, 0, 5
+PRODUCTVERSION  2, 12, 0, 19
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       0 //VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
+FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     0
@@ -83,8 +84,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.9.1.3\0"
-            VALUE "ProductVersion",     "2.12.0.12\0"
+            VALUE "FileVersion",        "1.10.0.5\0"
+            VALUE "ProductVersion",     "2.12.0.19\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
@@ -92,8 +93,8 @@ BEGIN
             VALUE "LegalTrademarks",    "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
-            //VALUE "PrivateBuild",       "\0"
-            //VALUE "SpecialBuild",       "\0"
+            VALUE "PrivateBuild",       "Built by Lisa for testing out new about message routine.\0"
+            VALUE "SpecialBuild",       "Debug/test build\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -108,7 +109,7 @@ BEGIN
     IDS_APPNAME                 "VGMPlayGUI"
     IDS_OPTIONS                 "VGMPlayGUI Options"
     IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
-    IDS_ABT_DESCRIPTION         "VGMPlayGUI - Windows GUI for Valley Bell's VGMPlay."
+    IDS_ABT_DESCRIPTION         "VGMPlayGUI - Windows GUI for Valley Bell's VGMPlay.\n"
     IDS_ABT_LEGAL               "Copyright (c) 2018-2019 Kazusoft Co.\nKazusoft Co., and the Kazusoft logo are trademarks of Lisa Murray.\nVGMPlay is a Trademark of Valley Bell.\n"
     IDS_MSGCAP_ABOUT            "About VGMPlayGUI"
     IDS_MSGCAP_NYI              "NYI"
@@ -123,6 +124,7 @@ BEGIN
     IDS_MSGTXT_DELCONFIRM       "Are you sure you want to delete this file?"
     IDS_REG_VGMPLAYPATH         "VGMPlay Path"
     IDS_REG_DEFAULTPATH         "Default Path"
+    IDS_REG_DEFAULTLIST         "Default Playlist"
     IDS_REG_FILEFILTER          "File Filter"
     IDS_TIP_DRIVELIST           "List of available drives"
     IDS_TIP_UPBTN               "Go up one directory level"

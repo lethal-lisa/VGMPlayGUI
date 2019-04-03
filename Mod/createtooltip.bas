@@ -5,6 +5,8 @@
     Compile with:
         fbc -c "createtooltip.bas"
     
+    Copyright (c) 2019 Kazusoft Co.
+    
 '/
 
 ''include header

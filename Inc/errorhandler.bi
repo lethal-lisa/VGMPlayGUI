@@ -4,7 +4,7 @@
     
     Error Message Box Module Header
     
-    Copyright (c) 2018 Kazusoft Co.
+    Copyright (c) 2018-2019 Kazusoft Co.
     
 '/
 

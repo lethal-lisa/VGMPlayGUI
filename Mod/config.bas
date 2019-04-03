@@ -5,6 +5,8 @@
     Compile with:
         fbc -c "config.bas"
     
+    Copyright (c) 2019 Kazusoft Co.
+    
 '/
 
 #Include "inc/config.bi"
@@ -27,8 +29,9 @@ Declare Function CreateFileFiltToolTips (ByVal hDlg As HWND) As BOOL
 Declare Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL 
 Declare Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
 
-Declare Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal lpszClass As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As LRESULT
+Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
 Declare Function SetDefConfig () As BOOL
+Declare Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal lpszClass As LPTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As LRESULT
 
 Public Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
     
@@ -142,6 +145,130 @@ Public Function FreeConfig () As BOOL
 End Function
 
 
+Public Function LoadConfig () As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+    #EndIf
+    
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''open the program's registry key
+    Dim lpszAppName As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_APPNAME)
+    If (lpszAppName = NULL) Then Return(FALSE)
+    If (LoadString(hInstance, IDS_APPNAME, lpszAppName, CCH_APPNAME) = 0) Then Return(FALSE)
+    
+    Dim dwKeyDisp As DWORD32    ''disposition value for OpenProgHKey
+    Dim hkProgKey As HKEY       ''handle to the program's registry key
+    SetLastError(OpenProgHKey(@hkProgKey, lpszAppName, NULL, KEY_READ, @dwKeyDisp))
+    If (GetLastError()) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, lpszAppName) = FALSE) Then Return(FALSE)
+    
+    ''load the config
+    Dim cbValue As DWORD32          ''size of items to write to the registry
+    Dim plpszKeyName As LPTSTR Ptr  ''pointer to a buffer for the key names
+    
+    If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
+        
+        ''setup key names
+        SetLastError(HeapAllocPtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
+        If (GetLastError()) Then Return(FALSE)
+        SetLastError(LoadStringRange(hInstance, plpszKeyName, IDS_REG_VGMPLAYPATH, CCH_KEY, C_KEY))
+        If (GetLastError()) Then Return(FALSE)
+        
+        ''load the config
+        If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
+        
+        cbValue = CB_PATH
+        SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), @cbValue))
+        If (GetLastError()) Then Return(FALSE)
+        
+        cbValue = CB_PATH
+        SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), @cbValue))
+        If (GetLastError()) Then Return(FALSE)
+        
+        cbValue = CB_PATH
+        SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTLIST], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_DEFLIST]), @cbValue))
+        If (GetLastError()) Then Return(FALSE)
+        
+        cbValue = SizeOf(DWORD32)
+        SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue))
+        If (GetLastError()) Then Return(FALSE)
+        
+        If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
+        
+        ''free the allocated buffer for the key names
+        SetLastError(HeapFreePtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
+        If (GetLastError()) Then Return(FALSE)
+        
+    Else
+        
+        If (SetDefConfig() = FALSE) Then Return(FALSE)
+        
+    End If
+    
+    ''return
+    SetLastError(RegCloseKey(hkProgKey))
+    If (GetLastError()) Then Return(FALSE)
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Public Function SaveConfig () As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+    #EndIf
+    
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''open the program's registry key
+    Dim lpszAppName As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_APPNAME)
+    If (lpszAppName = NULL) Then Return(FALSE)
+    If (LoadString(hInstance, IDS_APPNAME, lpszAppName, CCH_APPNAME) = 0) Then Return(FALSE)
+    
+    Dim hkProgKey As HKEY   ''handle to the program's registry key
+    SetLastError(OpenProgHKey(@hkProgKey, lpszAppName, NULL, KEY_WRITE, NULL))
+    If (GetLastError()) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, lpszAppName) = FALSE) Then Return(FALSE)
+    
+    ''setup key names
+    Dim plpszKeyName As LPTSTR Ptr
+    SetLastError(HeapAllocPtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
+    If (GetLastError()) Then Return(FALSE)
+    SetLastError(LoadStringRange(hInstance, plpszKeyName, IDS_REG_VGMPLAYPATH, CCH_KEY, C_KEY))
+    If (GetLastError()) Then Return(FALSE)
+    
+    ''save the configuration to the registry
+    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
+    
+    SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH))
+    If (GetLastError()) Then Return(FALSE)
+    
+    SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), CB_PATH))
+    If (GetLastError()) Then Return(FALSE)
+    
+    SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTLIST], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFLIST]), CB_PATH))
+    If (GetLastError()) Then Return(FALSE)
+    
+    SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32)))
+    If (GetLastError()) Then Return(FALSE)
+    
+    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
+    
+    ''return
+    SetLastError(HeapFreePtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
+    If (GetLastError()) Then Return(FALSE)
+    SetLastError(RegCloseKey(hkProgKey))
+    If (GetLastError()) Then Return(FALSE)
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
 
 Private Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
@@ -153,10 +280,10 @@ Private Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPar
         Case WM_INITDIALOG  ''dialog init
             
             ''create tooltips
-            If (CreatePathsToolTips(hWnd) = FALSE) Then SysErrMsgBox(hWnd, GetLastError())
+            If (CreatePathsToolTips(hWnd) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             ''set text in path options
-            SetPathsProc(hWnd, plpszPath)
+            If (SetPathsProc(hWnd, plpszPath) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
         Case WM_COMMAND     ''commands
             
@@ -172,6 +299,10 @@ Private Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPar
 							
 							Dim szCurDir As ZString*MAX_PATH = CurDir()
 							If (SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, @szCurDir) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+							
+                        Case IDC_BTN_DEFAULTLIST    ''browse for a default M3U list
+                            
+                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
 							
                     End Select
                     
@@ -245,18 +376,15 @@ Private Function SetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Pt
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg)
+        ? !"hDlg\t= 0x"; Hex(hDlg)
         ? !"plpszValue\t= 0x"; Hex(plpszValue)
     #EndIf
     
-    ''get a lock on the heap
-    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
-    
     ''set the values
+    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     If (SetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY]) = FALSE) Then Return(FALSE)
     If (SetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT]) = FALSE) Then Return(FALSE)
-    
-    ''release the lock on the heap
+    If (SetDlgItemText(hDlg, IDC_EDT_DEFAULTLIST, plpszValue[PATH_DEFLIST]) = FALSE) Then Return(FALSE)
     If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
@@ -269,14 +397,15 @@ Private Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Pt
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
-        ? !"hDlg\t\t= 0x"; Hex(hDlg)
+        ? !"hDlg\t= 0x"; Hex(hDlg)
         ? !"plpszValue\t= 0x"; Hex(plpszValue)
     #EndIf
     
     ''get values
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
-    GetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY], MAX_PATH)
-    GetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT], MAX_PATH)
+    If (GetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY], MAX_PATH) = FALSE) Then Return(FALSE)
+    If (GetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT], MAX_PATH) = FALSE) Then Return(FALSE)
+    If (GetDlgItemText(hDlg, IDC_EDT_DEFAULTLIST, plpszValue[PATH_DEFLIST], MAX_PATH) = FALSE) Then Return(FALSE)
     If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
@@ -295,9 +424,6 @@ Private Function BrowseVGMPlay (ByVal hDlg As HWND) As BOOL
     ''create local heap
     Dim hOfn As HANDLE = HeapCreate(NULL, Cast(SIZE_T, (SizeOf(OPENFILENAME) + (CB_BVGMP * C_BVGMP))), NULL)
     If (hOfn = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    #If __FB_DEBUG__
-        ? !"hOfn\t= 0x"; Hex(hOfn, 8)
-    #EndIf
     
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     
@@ -317,27 +443,16 @@ Private Function BrowseVGMPlay (ByVal hDlg As HWND) As BOOL
     ''setup ofn
     Dim lpOfn As LPOPENFILENAME = Cast(LPOPENFILENAME, HeapAlloc(hOfn, HEAP_ZERO_MEMORY, Cast(SIZE_T, SizeOf(OPENFILENAME))))
     If (lpOfn = NULL) Then Return(FALSE)
-    #If __FB_DEBUG__
-        ? !"lpOfn\t= 0x"; Hex(lpOfn)
-    #EndIf
     With *lpOfn
         .lStructSize        = SizeOf(OPENFILENAME)
         .hwndOwner          = hDlg
-        '.hInstance          = NULL
         .lpstrFilter        = Cast(LPCTSTR, plpszString[BVGMP_FILT])
-        '.lpstrCustomFilter  = NULL
-        '.nMaxCustFilter     = NULL
         .nFilterIndex       = 1
         .lpstrFile          = plpszString[BVGMP_FILE]
         .nMaxFile           = MAX_PATH
         .lpstrFileTitle     = plpszString[BVGMP_FILETITLE]
         .nMaxFileTitle      = MAX_PATH
-        '.lpstrInitialDir    = NULL
-        '.lpstrTitle         = NULL
         .Flags              = (OFN_DONTADDTORECENT Or OFN_FILEMUSTEXIST Or OFN_HIDEREADONLY Or OFN_PATHMUSTEXIST)
-        '.nFileOffset        = NULL
-        '.nFileExtension     = NULL
-        '.lpstrDefExt        = NULL
     End With
     
     ''browse for VGMPlay.exe
@@ -349,7 +464,7 @@ Private Function BrowseVGMPlay (ByVal hDlg As HWND) As BOOL
     Else
         
         #If __FB_DEBUG__
-            ? !"CommDlgExError\t= 0x"; Hex(CommDlgExtendedError(), 8)
+            ? !"CommDlgExError\t= 0x"; Hex(CommDlgExtendedError())
         #EndIf
         
     End If
@@ -361,20 +476,12 @@ Private Function BrowseVGMPlay (ByVal hDlg As HWND) As BOOL
         Return(FALSE)
     End If
     
-    ''free memory used for ofn
-    If (HeapFree(hOfn, NULL, Cast(LPVOID, lpOfn)) = FALSE) Then Return(FALSE)
-    
-    ''free string list
-    SetLastError(Cast(DWORD32, HeapFreePtrList(hOfn, Cast(LPVOID Ptr, plpszString), CB_BVGMP, C_BVGMP)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''release the lock on the heap
-    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
-    
-    ''destroy the heap
-    If (HeapDestroy(hOfn) = FALSE) Then Return(FALSE)
-    
     ''return
+    If (HeapFree(hOfn, NULL, Cast(LPVOID, lpOfn)) = FALSE) Then Return(FALSE)
+    SetLastError(HeapFreePtrList(hOfn, Cast(LPVOID Ptr, plpszString), CB_BVGMP, C_BVGMP))
+    If (GetLastError()) Then Return(FALSE)
+    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
+    If (HeapDestroy(hOfn) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
@@ -395,14 +502,14 @@ Private Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal w
             If (CreateFileFiltToolTips(hWnd) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             ''update display to current settings
-            SetFileFiltProc(hWnd, dwFileFilt)
+            If (SetFileFiltProc(hWnd, dwFileFilt) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
         Case WM_COMMAND     ''commands
             Select Case HiWord(wParam)  ''event code
                 Case BN_CLICKED         ''button clicked
                     
 					''we don't need to poll individual buttons since GetFileFiltProc just checks each button's state
-                    SendMessage(hwndPrsht, PSM_CHANGED, Cast(WPARAM, hWnd), 0)
+                    SendMessage(hwndPrsht, PSM_CHANGED, Cast(WPARAM, hWnd), NULL)
                     
             End Select
             
@@ -532,7 +639,7 @@ End Function
 
 
 
-Public Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
+Private Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -565,113 +672,6 @@ Public Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
     
 End Function
 
-Public Function LoadConfig () As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "\"; __FUNCTION__
-    #EndIf
-    
-    Dim hHeap As HANDLE = GetProcessHeap()
-    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    
-    ''open the program's registry key
-    Dim dwKeyDisp As DWORD32    ''disposition value for OpenProgHKey
-    Dim hkProgKey As HKEY       ''handle to the program's registry key 
-    SetLastError(OpenProgHKey(@hkProgKey, "VGMPlayGUI", NULL, KEY_READ, @dwKeyDisp))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''load the config
-    Dim cbValue As DWORD32          ''size of items to write to the registry
-    Dim plpszKeyName As LPTSTR Ptr  ''pointer to a buffer for the key names
-    
-    If (dwKeyDisp = REG_OPENED_EXISTING_KEY) Then
-        
-        ''setup key names
-        SetLastError(HeapAllocPtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
-        If (GetLastError()) Then Return(FALSE)
-        SetLastError(LoadStringRange(hInstance, plpszKeyName, IDS_REG_VGMPLAYPATH, CCH_KEY, C_KEY))
-        If (GetLastError()) Then Return(FALSE)
-        
-        ''load the config
-        If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
-        
-        cbValue = CB_PATH
-        SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), @cbValue))
-        If (GetLastError()) Then Return(FALSE)
-        
-        cbValue = CB_PATH
-        SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), @cbValue))
-        If (GetLastError()) Then Return(FALSE)
-        
-        cbValue = SizeOf(DWORD32)
-        SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue))
-        If (GetLastError()) Then Return(FALSE)
-        
-        If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
-        
-        ''free the allocated buffer for the key names
-        SetLastError(HeapFreePtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
-        If (GetLastError()) Then Return(FALSE)
-        
-    Else
-        
-        If (SetDefConfig() = FALSE) Then Return(FALSE)
-        
-    End If
-    
-    ''return
-    SetLastError(RegCloseKey(hkProgKey))
-    If (GetLastError()) Then Return(FALSE)
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-
-Public Function SaveConfig () As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "\"; __FUNCTION__
-    #EndIf
-    
-    Dim hHeap As HANDLE = GetProcessHeap()
-    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    
-    ''open the program's registry key
-    Dim hkProgKey As HKEY   ''handle to the program's registry key
-    SetLastError(OpenProgHKey(@hkProgKey, "VGMPlayGUI", NULL, KEY_WRITE, NULL))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''setup key names
-    Dim plpszKeyName As LPTSTR Ptr
-    SetLastError(HeapAllocPtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
-    If (GetLastError()) Then Return(FALSE)
-    SetLastError(LoadStringRange(hInstance, plpszKeyName, IDS_REG_VGMPLAYPATH, CCH_KEY, C_KEY))
-    If (GetLastError()) Then Return(FALSE)
-    
-    ''save the configuration to the registry
-    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
-    
-    SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH))
-    If (GetLastError()) Then Return(FALSE)
-    
-    SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), CB_PATH))
-    If (GetLastError()) Then Return(FALSE)
-    
-    SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32)))
-    If (GetLastError()) Then Return(FALSE)
-    
-    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
-    
-    ''return
-    SetLastError(HeapFreePtrList(hHeap, plpszKeyName, CB_KEY, C_KEY))
-    If (GetLastError()) Then Return(FALSE)
-    SetLastError(RegCloseKey(hkProgKey))
-    If (GetLastError()) Then Return(FALSE)
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-
 Private Function SetDefConfig () As BOOL
     
     #If __FB_DEBUG__
@@ -684,6 +684,7 @@ Private Function SetDefConfig () As BOOL
     ''set defaults
     *plpszPath[PATH_VGMPLAY]    = ""
     *plpszPath[PATH_DEFAULT]    = ""
+    *plpszPath[PATH_DEFLIST]    = ""
     dwFileFilt                  = DDL_DIRECTORY
     
 	''release the lock on the heap
@@ -698,7 +699,7 @@ Private Function SetDefConfig () As BOOL
     
 End Function
 
-Private Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal lpszClass As LPCTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As LRESULT
+Private Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal lpszClass As LPTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As LRESULT
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -712,14 +713,12 @@ Private Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTS
     If (GetLastError()) Then Return(GetLastError())
     
     ''open/create HKEY_CURRENT_USER\"Software"\*lpszAppName
-    SetLastError(RegCreateKeyEx(hkSoftware, lpszAppName, NULL, NULL, NULL, samDesired, NULL, phkOut, pdwDisp))
-    If (GetLastError()) Then Return(GetLastError())
-    
-    ''close hkSoftware
-    SetLastError(RegCloseKey(hkSoftware))
+    SetLastError(RegCreateKeyEx(hkSoftware, lpszAppName, NULL, lpszClass, NULL, samDesired, NULL, phkOut, pdwDisp))
     If (GetLastError()) Then Return(GetLastError())
     
     ''return
+    SetLastError(RegCloseKey(hkSoftware))
+    If (GetLastError()) Then Return(GetLastError())
     Return(ERROR_SUCCESS)
     
 End Function

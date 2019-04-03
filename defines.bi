@@ -4,6 +4,8 @@
     
     Defines for VGMPlayGUI
     
+    Copyright (c) 2018-2019 Kazusoft Co.
+    
 '/
 
 #Pragma Once
@@ -46,6 +48,9 @@
 #Define IDC_STC_DEFAULTPATH         &h0450 ''1104
 #Define IDC_EDT_DEFAULTPATH         &h0451 ''1105
 #Define IDC_BTN_DEFAULTPATH         &h0452 ''1106
+#Define IDC_STC_DEFAULTLIST         &h0453 ''1107
+#Define IDC_EDT_DEFAULTLIST         &h0454 ''1108
+#Define IDC_BTN_DEFAULTLIST         &h0455 ''1109
 
 ''file filter property sheet
 #Define IDD_FILEFILTER              &h04B0 ''1200
@@ -88,9 +93,10 @@
 ''IDs for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (CCH_PATH * SizeOf(TCHAR)))
-#Define C_PATH                      &h00000002 ''2
+#Define C_PATH                      &h00000003 ''3
 #Define PATH_VGMPLAY                &h00000000 ''0
 #Define PATH_DEFAULT                &h00000001 ''1
+#Define PATH_DEFLIST                &h00000002 ''2
 
 ''IDs for plpszHistory
 /'
@@ -105,8 +111,14 @@
 #Define CCH_APPNAME                 &h00000040 ''64
 #Define CB_APPNAME                  Cast(SIZE_T, (CCH_APPNAME * SizeOf(TCHAR)))
 
+#Define CCH_ABT                     &h00000400 ''1024
+#Define CB_ABT                      Cast(SIZE_T, (CCH_ABT * SizeOf(TCHAR)))
+#Define C_ABT                       &h00000002 ''2
+#Define ABT_DESCRIPTION             &h00000000 ''0
+#Define ABT_LEGAL                   &h00000001 ''1
+
 ''IDs for context menus
-#Define MEN_DRIVES                  &h00000000
-#Define MEN_MAINLIST                &h00000001
+#Define MEN_DRIVES                  &h00000000 ''0
+#Define MEN_MAINLIST                &h00000001 ''1
 
 ''EOF
