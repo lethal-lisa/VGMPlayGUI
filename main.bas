@@ -92,6 +92,7 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     
 End Function
 
+''initalizes classes
 Private Function InitClasses () As BOOL
     
     #If __FB_DEBUG__
@@ -156,7 +157,7 @@ Private Function StartMainDialog (ByVal hWnd As HWND, ByVal nShowCmd As INT32, B
     
 End Function
 
-''dialog procedures
+''main dialog procedure
 Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
     Static lpszCurPath As LPTSTR
@@ -168,7 +169,7 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
             Dim hHeap As HANDLE = GetProcessHeap()
             If (hHeap = INVALID_HANDLE_VALUE) Then Return(FatalSysErrMsgBox(hWnd, GetLastError()))
             
-            lpszCurPath = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
+            lpszCurPath = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
             If (lpszCurPath = NULL) Then Return(FatalSysErrMsgBox(hWnd, GetLastError()))
             
             ''set the program's icon
@@ -269,12 +270,17 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                         Case IDC_LST_MAIN       ''file list
                             
                             ''get selected item, change directories, and refresh the listboxes
-                            DlgDirSelectEx(hWnd, lpszCurPath, MAX_PATH, IDC_LST_MAIN)
+                            'DlgDirSelectEx(hWnd, lpszCurPath, MAX_PATH, IDC_LST_MAIN)
+                            If (GetDlgItemText(hWnd, IDC_EDT_FILE, lpszCurPath, MAX_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (PathIsDirectory(Cast(LPCTSTR, lpszCurPath)) = Cast(BOOL, FILE_ATTRIBUTE_DIRECTORY)) Then
                                 
                                 ''change to selected directory and refresh the listboxes
                                 If (GetLastError()) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                                 If (PopulateLists(hWnd, Cast(LPCTSTR, lpszCurPath)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                                
+                            Else
+                                
+                                If (StartVGMPlay(Cast(LPCTSTR, lpszCurPath)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                                 
                             End If
                             
@@ -481,6 +487,7 @@ Private Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As 
     
 End Function
 
+''displays context menus for the main dialog
 Private Function DisplayMainContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DWORD32) As BOOL
     
     #If __FB_DEBUG__
@@ -632,6 +639,7 @@ Private Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) A
     
 End Function
 
+''updates the main dialog's title bar
 Private Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
     
     #If __FB_DEBUG__
@@ -674,7 +682,6 @@ Private Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTS
     
 End Function
 
-
 ''starts VGMPlay with the specified file
 Private Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     
@@ -715,6 +722,7 @@ Private Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
     
 End Function
 
+''displays the about message box
 Private Function AboutMsgBox (ByVal hDlg As HWND) As BOOL
     
     Dim hCurPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
@@ -724,8 +732,7 @@ Private Function AboutMsgBox (ByVal hDlg As HWND) As BOOL
     
     ''load unformatted strings
     Dim plpszAbout As LPTSTR Ptr
-    SetLastError(HeapAllocPtrList(hHeap, plpszAbout, CB_ABT, C_ABT))
-    If (GetLastError()) Then Return(FALSE)
+    If (HeapListAlloc(hHeap, plpszAbout, CB_ABT, C_ABT) = FALSE) Then Return(FALSE)
     SetLastError(LoadStringRange(hInstance, plpszAbout, IDS_ABT_DESCRIPTION, CCH_ABT, C_ABT))
     If (GetLastError()) Then Return(FALSE)
     
@@ -754,8 +761,7 @@ Private Function AboutMsgBox (ByVal hDlg As HWND) As BOOL
     hCurPrev = SetCursor(LoadCursor(NULL, IDC_WAIT))
     
     ''return
-    SetLastError(HeapFreePtrList(hHeap, plpszAbout, CB_ABT, C_ABT))
-    If (GetLastError()) Then Return(FALSE)
+    If (HeapListFree(hHeap, plpszAbout, CB_ABT, C_ABT) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, NULL, lpszMessage) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, NULL, lpMbp) = FALSE) Then Return(FALSE)
     SetCursor(hCurPrev)

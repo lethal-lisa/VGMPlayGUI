@@ -248,4 +248,8 @@ v2.12.0.x:
     +       Added a file deletion function.
     *       Re-arranged resource IDs.
     
+v2.12.0.19:
+    
+    +       Added new about message routine.
+    
 EOF

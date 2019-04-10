@@ -98,16 +98,6 @@
 #Define PATH_DEFAULT                &h00000001 ''1
 #Define PATH_DEFLIST                &h00000002 ''2
 
-''IDs for plpszHistory
-/'
-        In the final version of this history feature, the value determined
-    currently by NUM_HIST will instead be loaded from the registry based on
-    the user's preference.
-'/
-#Define CCH_HIST                    MAX_PATH
-#Define CB_HIST                     Cast(SIZE_T, (CCH_HIST * SizeOf(TCHAR)))
-#Define C_HIST                      &h00000003 ''3
-
 #Define CCH_APPNAME                 &h00000040 ''64
 #Define CB_APPNAME                  Cast(SIZE_T, (CCH_APPNAME * SizeOf(TCHAR)))
 
