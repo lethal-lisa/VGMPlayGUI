@@ -23,7 +23,6 @@ Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Pt
         ? !"Total size\t= "; (cbItem * cItems); " Bytes"
     #EndIf
     
-    ''get a lock on the heap
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
     ''allocate the list of pointers
@@ -40,9 +39,8 @@ Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Pt
         #EndIf
     Next iItem
     
-    ''release the lock on the heap
+    ''return
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-    
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
@@ -65,7 +63,6 @@ Public Function HeapListFree (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr
         Return(FALSE)
     End If
     
-    ''get a lock on the heap
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
     ''free each individual item
@@ -79,7 +76,36 @@ Public Function HeapListFree (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr
     ''free the list of pointers
     If (HeapFree(hHeap, NULL, plpList) = FALSE) Then Return(FALSE)
     
-    ''release the lock on the heap
+    ''return
+    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Public Function HeapListClear (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hHeap\t= 0x"; Hex(hHeap)
+        ? !"plpList\t= 0x"; Hex(plpList)
+        ? !"cbItem\t= 0x"; Hex(cbItem)
+        ? !"cItems\t= 0x"; Hex(cItems)
+        ? !"Total size\t= "; (cbItem * cItems); " Bytes"
+    #EndIf
+    
+    ''make sure a valid list is being passed
+    If (plpList = NULL) Then
+        SetLastError(ERROR_INVALID_PARAMETER)
+        Return(FALSE)
+    End If
+    
+    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    
+    For iItem As UINT = 0 To (cItems - 1)
+        ZeroMemory(plpList[iItem], cbItem)
+    Next iItem
+    
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     
     SetLastError(ERROR_SUCCESS)
@@ -110,20 +136,6 @@ Public Function LoadStringRange (ByVal hInst As HINSTANCE, ByVal plpszBuff As LP
     Next iStr
     
     ''return
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-
-Public Function HeapListReAlloc (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItemsOld As UINT, ByVal cItemsNew As UINT) As BOOL
-    
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    plpList = HeapReAlloc(hHeap, HEAP_REALLOC_IN_PLACE_ONLY, plpList, (cItemsNew * cbItem))
-    If (plpList = NULL) Then Return(FALSE)
-    
-    ''return
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
