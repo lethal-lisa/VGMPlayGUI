@@ -260,5 +260,10 @@ v2.12.0.27:
     
     *       Improved 64-bit support in heapptrlist module.
     *       Updated error checking in heapptrlist module.
+    +       Added double-click to open functionality.
+    
+v2.12.0.38:
+    
+    -       Removed history module.
     
 EOF

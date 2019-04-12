@@ -134,4 +134,9 @@ v2.11.6:
     *       Bug fixes.
     *       Improved modularization.
     
+v2.12:
+    
+    +       You can now double-click on a file to open it instead of using
+        the play button.
+    
 EOF

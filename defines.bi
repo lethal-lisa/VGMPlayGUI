@@ -39,8 +39,6 @@
 #Define IDC_BTN_GO                  &h03EF ''1007
 #Define IDC_BTN_UP                  &h03F0 ''1008
 #Define IDC_BTN_REFRESH             &h03F1 ''1009
-#Define IDC_BTN_BACK                &h03F2 ''1010
-#Define IDC_BTN_FORWARD             &h03F3 ''1011
 
 ''paths property sheet
 #Define IDD_PATHS                   &h044C ''1100

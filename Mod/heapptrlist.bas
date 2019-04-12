@@ -12,7 +12,7 @@
 ''include header
 #Include "inc/heapptrlist.bi"
 
-Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT) As BOOL
+Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT32) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -30,7 +30,7 @@ Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Pt
     If (plpList = NULL) Then Return(FALSE)
     
     ''allocate each individual item
-    For iItem As UINT = 0 To (cItems - 1)
+    For iItem As UINT32 = 0 To (cItems - 1)
         plpList[iItem] = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, cbItem)
         If (plpList[iItem] = NULL) Then Return(FALSE)
         #If __FB_DEBUG__
@@ -39,10 +39,6 @@ Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Pt
         #EndIf
     Next iItem
     
-    #If __FB_DEBUG__
-        ? !"plpList\t= 0x"; Hex(plpList)
-    #Endif
-    
     ''return
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
@@ -50,7 +46,7 @@ Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Pt
     
 End Function
 
-Public Function HeapListFree (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT) As BOOL
+Public Function HeapListFree (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT32) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -70,7 +66,7 @@ Public Function HeapListFree (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
     ''free each individual item
-    For iItem As UINT = 0 To (cItems - 1)
+    For iItem As UINT32 = 0 To (cItems - 1)
         If (HeapFree(hHeap, NULL, plpList[iItem]) = FALSE) Then Return(FALSE)
         #If __FB_DEBUG__
             ? "Freed Item #"; iItem
@@ -87,38 +83,7 @@ Public Function HeapListFree (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr
     
 End Function
 
-Public Function HeapListClear (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT) As BOOL
-    
-    #If __FB_DEBUG__
-        ? "Calling:", __FILE__; "\"; __FUNCTION__
-        ? !"hHeap\t= 0x"; Hex(hHeap)
-        ? !"plpList\t= 0x"; Hex(plpList)
-        ? !"cbItem\t= 0x"; Hex(cbItem)
-        ? !"cItems\t= 0x"; Hex(cItems)
-        ? !"Total size\t= "; (cbItem * cItems); " Bytes"
-    #EndIf
-    
-    ''make sure a valid list is being passed
-    If (plpList = NULL) Then
-        SetLastError(ERROR_INVALID_PARAMETER)
-        Return(FALSE)
-    End If
-    
-    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
-    
-    ''clear list item contents
-    For iItem As UINT = 0 To (cItems - 1)
-        ZeroMemory(plpList[iItem], cbItem)
-    Next iItem
-    
-    ''return
-    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-    SetLastError(ERROR_SUCCESS)
-    Return(TRUE)
-    
-End Function
-
-Public Function LoadStringRange (ByVal hInst As HINSTANCE, ByVal plpszBuff As LPTSTR Ptr, ByVal wIdFirst As WORD, ByVal cchString As UINT, ByVal cStrings As UINT) As BOOL
+Public Function LoadStringRange (ByVal hInst As HINSTANCE, ByVal plpszBuff As LPTSTR Ptr, ByVal wIdFirst As WORD, ByVal cchString As UINT32, ByVal cStrings As UINT32) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -129,9 +94,20 @@ Public Function LoadStringRange (ByVal hInst As HINSTANCE, ByVal plpszBuff As LP
         ? !"cStrings\t= "; cStrings
     #EndIf
     
+    ''check parameters
+    If (hInst = INVALID_HANDLE_VALUE) Then
+        SetLastError(ERROR_INVALID_HANDLE)
+        Return(FALSE)
+    End If
+    
+    If (plpszBuff = NULL) Then
+        SetLastError(ERROR_INVALID_PARAMETER)
+        Return(FALSE)
+    End If
+    
     ''load strings
-    For iStr As UINT = 0 To (cStrings - 1)
-        If (LoadString(hInst, Cast(UINT, (wIdFirst + iStr)), plpszBuff[iStr], cchString) = 0) Then Return(FALSE)
+    For iStr As UINT32 = 0 To (cStrings - 1)
+        If (LoadString(hInst, Cast(UINT32, (wIdFirst + iStr)), plpszBuff[iStr], cchString) = 0) Then Return(FALSE)
         #If __FB_DEBUG__
             ? "Loaded string #"; iStr
             ? !"String ID\t= 0x"; Hex((wIdFirst + iStr))

@@ -44,7 +44,7 @@ ExitProcess(uExitCode)
 End(uExitCode)
 
 ''main function
-Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
+Public Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal lpszCmdLine As LPSTR, ByVal nShowCmd As INT32) As INT32
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -55,18 +55,13 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
         ? !"nShowCmd\t= 0x"; Hex(nShowCmd)
     #EndIf
     
-    hConfig = HeapCreate(NULL, NULL, NULL)
-    If (hConfig = INVALID_HANDLE_VALUE) Then Return(GetLastError())
-    
-    hHist = HeapCreate(NULL, SIZE_HIST_MIN, SIZE_HIST_MAX)
-    If (hHist = INVALID_HANDLE_VALUE) Then Return(GetLastError())
-    
+    ''init window classes
     If (InitClasses() = FALSE) Then Return(GetLastError())
     
-    ''initialize memory
+    ''initialize config
+    hConfig = HeapCreate(NULL, NULL, NULL)
+    If (hConfig = INVALID_HANDLE_VALUE) Then Return(GetLastError())
     If (InitConfig() = FALSE) Then Return(GetLastError())
-    
-    ''load config from registry
     If (LoadConfig() = FALSE) Then Return(GetLastError())
     
     ''create, show, and update the main window
@@ -81,12 +76,9 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
         End If
     Wend
     
-    ''free memory
+    ''destroy config
     If (FreeConfig() = FALSE) Then Return(GetLastError())
-    
-    ''destroy the heaps
     If (HeapDestroy(hConfig) = FALSE) Then Return(GetLastError())
-    If (HeapDestroy(hHist) = FALSE) Then Return(GetLastError())
     
     ''unregister the window classes
     If (UnregisterClass(@MainClass, hInst) = FALSE) Then Return(GetLastError())
@@ -164,13 +156,14 @@ End Function
 ''main dialog procedure
 Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
+    Static hHeap As HANDLE
     Static lpszCurPath As LPTSTR
     
     ''process messages
     Select Case uMsg                ''messages:
         Case WM_CREATE              ''creating window
             
-            Dim hHeap As HANDLE = GetProcessHeap()
+            hHeap = GetProcessHeap()
             If (hHeap = INVALID_HANDLE_VALUE) Then Return(FatalSysErrMsgBox(hWnd, GetLastError()))
             
             lpszCurPath = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
@@ -192,10 +185,6 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
             ''initialize directory listings to default directory
             If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
-            If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
-            
-            ''set the default keyboard focus to IDC_LST_MAIN
-            If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             ''make sure VGMPlay's path is valid
             If (PathFileExists(plpszPath[PATH_VGMPLAY]) = FALSE) Then
@@ -204,6 +193,10 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                     DoOptionsPropSheet(hWnd)
                 End If
             End If
+            If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            
+            ''set the default keyboard focus to IDC_LST_MAIN
+            If (SetFocus(GetDlgItem(hWnd, IDC_LST_MAIN)) = Cast(HWND, NULL)) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
         Case WM_CLOSE               ''window is being closed
             
@@ -334,7 +327,7 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
             rcParent.bottom -= rcSbr.bottom
             
             ''resize the child windows
-            If (EnumChildWindows(hWnd, @ResizeChildren, Cast(LPARAM, @rcParent)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            If (EnumChildWindows(hWnd, @ResizeMainChildren, Cast(LPARAM, @rcParent)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             Return(Cast(LRESULT, TRUE))
             
@@ -386,8 +379,6 @@ Private Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
     CreateWindowEx(NULL, WC_BUTTON, "Go", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_GO), hInstance, NULL)
     CreateWindowEx(NULL, WC_BUTTON, "[..]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_UP), hInstance, NULL)
     CreateWindowEx(NULL, WC_BUTTON, "[.]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_REFRESH), hInstance, NULL)
-    CreateWindowEx(NULL, WC_BUTTON, "<-", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_BACK), hInstance, NULL)
-    CreateWindowEx(NULL, WC_BUTTON, "->", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_FORWARD), hInstance, NULL)
     
     ''set IDI_PLAY to IDC_BTN_PLAY
     SendMessage(GetDlgItem(hDlg, IDC_BTN_PLAY), BM_SETIMAGE, IMAGE_ICON, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PLAY))))
@@ -423,7 +414,7 @@ Private Function CreateMainToolTips (ByVal hDlg As HWND) As BOOL
 End Function
 
 ''resizes the main dialog's child windows
-Private Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
+Private Function ResizeMainChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
     
     ''declare local variables
     Dim lprcParent As LPRECT    ''parent window's bounding rectangle
@@ -437,62 +428,51 @@ Private Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As 
         ''calculate child window's new bounding rectangle
         Select Case GetWindowLong(hWnd, GWL_ID)
             Case IDC_SBR_MAIN
-                .left   = 0
+                /'.left   = 0
                 .top    = 0
                 .right  = 0
-                .bottom = 0
+                .bottom = 0'/
+                ZeroMemory(@rcChild, SizeOf(RECT))
             Case IDC_LST_MAIN
-                .left   = MARGIN_SIZE
-                .top    = ((2 * MARGIN_SIZE) + WINDOW_SIZE)
-                .right  = (lprcParent->Right - ((3 * MARGIN_SIZE) + (3 * WINDOW_SIZE)))
-                .bottom = (lprcParent->bottom - ((4 * MARGIN_SIZE) + (2 * WINDOW_SIZE)))
+                .left   = MARGIN_SIZE                                                       ''10=10
+                .top    = ((2 * MARGIN_SIZE) + WINDOW_SIZE)                                 ''2*10+30=20+30=50
+                .right  = (lprcParent->Right - ((3 * MARGIN_SIZE) + (3 * WINDOW_SIZE)))     ''3*10+3*30=30+90=120
+                .bottom = (lprcParent->bottom - ((4 * MARGIN_SIZE) + (2 * WINDOW_SIZE)))    ''4*10+2*30=40+60=100
             Case IDC_LST_DRIVES
-                .left   = (lprcParent->Right - (MARGIN_SIZE + (3 * WINDOW_SIZE)))
-                .top    = ((2 * MARGIN_SIZE) + WINDOW_SIZE)
-                .right  = (3 * WINDOW_SIZE)
-                .bottom = (lprcParent->bottom - ((4 * MARGIN_SIZE) + (2 * WINDOW_SIZE)))
+                .left   = (lprcParent->Right - (MARGIN_SIZE + (3 * WINDOW_SIZE)))           ''10+3*30=10+90=100
+                .top    = ((2 * MARGIN_SIZE) + WINDOW_SIZE)                                 ''2*10+30=20+30=50
+                .right  = (3 * WINDOW_SIZE)                                                 ''3*30=90
+                .bottom = (lprcParent->bottom - ((4 * MARGIN_SIZE) + (2 * WINDOW_SIZE)))    ''4*10+2*30=40+60=100
             Case IDC_EDT_FILE
-                .left   = MARGIN_SIZE
-                .top    = (lprcParent->bottom - (MARGIN_SIZE + WINDOW_SIZE))
-                .right  = (lprcParent->Right - ((3 * MARGIN_SIZE) + (2 * WINDOW_SIZE)))
-                .bottom = WINDOW_SIZE
+                .left   = MARGIN_SIZE                                                       ''10=10
+                .top    = (lprcParent->bottom - (MARGIN_SIZE + WINDOW_SIZE))                ''10+30=40
+                .right  = (lprcParent->Right - ((3 * MARGIN_SIZE) + (2 * WINDOW_SIZE)))     ''3*10+2*30=30+60=90
+                .bottom = WINDOW_SIZE                                                       ''30=30
             Case IDC_BTN_PLAY
-                .left   = (lprcParent->Right - (MARGIN_SIZE + (2 * WINDOW_SIZE)))
-                .top    = (lprcParent->bottom - (MARGIN_SIZE + (1.25 * WINDOW_SIZE)))
-                .right  = (2 * WINDOW_SIZE)
-                .bottom = (1.5 * WINDOW_SIZE)
+                .left   = (lprcParent->Right - (MARGIN_SIZE + (2 * WINDOW_SIZE)))           ''10+2*30=10+60=70
+                .top    = (lprcParent->bottom - (MARGIN_SIZE + (1.25 * WINDOW_SIZE)))       ''10+1.25*30=10+37.5=47.5
+                .right  = (2 * WINDOW_SIZE)                                                 ''2*30=60
+                .bottom = (1.5 * WINDOW_SIZE)                                               ''1.5*30=45
             Case IDC_EDT_PATH
-                '.left   = MARGIN_SIZE
-                .left   = ((2 * MARGIN_SIZE) + (2 * WINDOW_SIZE))
-                .top    = MARGIN_SIZE
-                '.right  = (lprcParent->Right - ((3 * WINDOW_SIZE) + (3 * MARGIN_SIZE)))
-                .right  = (lprcParent->Right - ((5 * WINDOW_SIZE) + (5 * MARGIN_SIZE)))
-                .bottom = WINDOW_SIZE
+                .left   = MARGIN_SIZE                                                       ''10=10
+                .top    = MARGIN_SIZE                                                       ''10=10
+                .right  = (lprcParent->Right - ((3 * MARGIN_SIZE) + (3 * WINDOW_SIZE)))     ''3*10+3*30=30+90=120
+                .bottom = WINDOW_SIZE                                                       ''30=30
             Case IDC_BTN_GO
-                .left   = (lprcParent->Right - (MARGIN_SIZE + (3 * WINDOW_SIZE)))
-                .top    = MARGIN_SIZE
-                .right  = WINDOW_SIZE
-                .bottom = WINDOW_SIZE
+                .left   = (lprcParent->Right - (MARGIN_SIZE + (3 * WINDOW_SIZE)))           ''10+3*30=10+90=100
+                .top    = MARGIN_SIZE                                                       ''10=10
+                .right  = WINDOW_SIZE                                                       ''30=30
+                .bottom = WINDOW_SIZE                                                       ''30=30
             Case IDC_BTN_UP
-                .left   = (lprcParent->Right - (MARGIN_SIZE + (2 * WINDOW_SIZE)))
-                .top    = MARGIN_SIZE
-                .right  = WINDOW_SIZE
-                .bottom = WINDOW_SIZE
+                .left   = (lprcParent->Right - (MARGIN_SIZE + (2 * WINDOW_SIZE)))           ''10+2*30=10+60=70
+                .top    = MARGIN_SIZE                                                       ''10=10
+                .right  = WINDOW_SIZE                                                       ''30=30
+                .bottom = WINDOW_SIZE                                                       ''30=30
             Case IDC_BTN_REFRESH
-                .left   = (lprcParent->Right - (MARGIN_SIZE + WINDOW_SIZE))
-                .top    = MARGIN_SIZE
-                .right  = WINDOW_SIZE
-                .bottom = WINDOW_SIZE
-            Case IDC_BTN_BACK
-                .left   = MARGIN_SIZE
-                .top    = MARGIN_SIZE
-                .right  = WINDOW_SIZE
-                .bottom = WINDOW_SIZE
-            Case IDC_BTN_FORWARD
-                .left   = (MARGIN_SIZE + WINDOW_SIZE)
-                .top    = MARGIN_SIZE
-                .right  = WINDOW_SIZE
-                .bottom = WINDOW_SIZE
+                .left   = (lprcParent->Right - (MARGIN_SIZE + WINDOW_SIZE))                 ''10+30=40
+                .top    = MARGIN_SIZE                                                       ''10=10
+                .right  = WINDOW_SIZE                                                       ''30=30
+                .bottom = WINDOW_SIZE                                                       ''30=30
         End Select
         
         ''resize the child window
@@ -612,6 +592,7 @@ Private Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) A
             At this location, write the previous path (since we haven't
         changed it yet, this can be gotten with CurDir()) to a buffer.
     '/
+    
     
     ''change directories
     If (ChDir(*lpszPath)) Then

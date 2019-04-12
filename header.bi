@@ -40,7 +40,6 @@
 #Include Once "win/shlwapi.bi"
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
-#Include "inc/history.bi"
 #Include "inc/config.bi"
 #Include "inc/createtooltip.bi"
 #Include "inc/errorhandler.bi"
@@ -84,7 +83,7 @@ Declare Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
 Declare Function CreateMainToolTips (ByVal hDlg As HWND) As BOOL
 
 ''EnumChildWindows procedure for resizing the main dialog's child windows
-Declare Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
+Declare Function ResizeMainChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
 
 /'  Displays a context menu in the main dialog. dwMouse holds the screen
     coords of the mouse click in the following form:

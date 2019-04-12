@@ -108,10 +108,8 @@ Public Function InitConfig () As BOOL
     #EndIf
     
 	''allocate memory
-    'If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     If (HeapListAlloc(hConfig, plpszPath, CB_PATH, C_PATH) = FALSE) Then Return(FALSE)
-    'If (plpszPath = NULL) Then Return(FALSE)
-    'If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
+    If (plpszPath = NULL) Then Return(FALSE)
 	
 	''return
     SetLastError(ERROR_SUCCESS)
@@ -127,9 +125,7 @@ Public Function FreeConfig () As BOOL
     #EndIf
     
 	''get a lock on the heap
-    'If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     If (HeapListFree(hConfig, plpszPath, CB_PATH, C_PATH) = FALSE) Then Return(FALSE)
-    'If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
     SetLastError(ERROR_SUCCESS)
