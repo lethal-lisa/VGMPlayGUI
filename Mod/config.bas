@@ -108,10 +108,10 @@ Public Function InitConfig () As BOOL
     #EndIf
     
 	''allocate memory
-    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
+    'If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     If (HeapListAlloc(hConfig, plpszPath, CB_PATH, C_PATH) = FALSE) Then Return(FALSE)
-    If (plpszPath = NULL) Then Return(FALSE)
-    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
+    'If (plpszPath = NULL) Then Return(FALSE)
+    'If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
     SetLastError(ERROR_SUCCESS)
@@ -127,9 +127,9 @@ Public Function FreeConfig () As BOOL
     #EndIf
     
 	''get a lock on the heap
-    If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
+    'If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     If (HeapListFree(hConfig, plpszPath, CB_PATH, C_PATH) = FALSE) Then Return(FALSE)
-    If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
+    'If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
     SetLastError(ERROR_SUCCESS)
@@ -166,8 +166,7 @@ Public Function LoadConfig () As BOOL
         
         ''setup key names
         If (HeapListAlloc(hHeap, plpszKeyName, CB_KEY, C_KEY) = FALSE) Then Return(FALSE)
-        SetLastError(LoadStringRange(hInstance, plpszKeyName, IDS_REG_VGMPLAYPATH, CCH_KEY, C_KEY))
-        If (GetLastError()) Then Return(FALSE)
+        If (LoadStringRange(hInstance, plpszKeyName, IDS_REG_VGMPLAYPATH, CCH_KEY, C_KEY) = FALSE) Then Return(FALSE)
         
         ''load the config
         If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
@@ -230,8 +229,7 @@ Public Function SaveConfig () As BOOL
     ''setup key names
     Dim plpszKeyName As LPTSTR Ptr
     If (HeapListAlloc(hHeap, plpszKeyName, CB_KEY, C_KEY) = FALSE) Then Return(FALSE)
-    SetLastError(LoadStringRange(hInstance, plpszKeyName, IDS_REG_VGMPLAYPATH, CCH_KEY, C_KEY))
-    If (GetLastError()) Then Return(FALSE)
+    If (LoadStringRange(hInstance, plpszKeyName, IDS_REG_VGMPLAYPATH, CCH_KEY, C_KEY) = FALSE) Then Return(FALSE)
     
     ''save the configuration to the registry
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)

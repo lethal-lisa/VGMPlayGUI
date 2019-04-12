@@ -40,6 +40,7 @@
 #Include Once "win/shlwapi.bi"
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
+#Include "inc/history.bi"
 #Include "inc/config.bi"
 #Include "inc/createtooltip.bi"
 #Include "inc/errorhandler.bi"

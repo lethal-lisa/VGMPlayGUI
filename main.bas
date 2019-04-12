@@ -58,6 +58,9 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     hConfig = HeapCreate(NULL, NULL, NULL)
     If (hConfig = INVALID_HANDLE_VALUE) Then Return(GetLastError())
     
+    hHist = HeapCreate(NULL, SIZE_HIST_MIN, SIZE_HIST_MAX)
+    If (hHist = INVALID_HANDLE_VALUE) Then Return(GetLastError())
+    
     If (InitClasses() = FALSE) Then Return(GetLastError())
     
     ''initialize memory
@@ -81,8 +84,9 @@ Function WinMain (ByVal hInst As HINSTANCE, ByVal hInstPrev As HINSTANCE, ByVal 
     ''free memory
     If (FreeConfig() = FALSE) Then Return(GetLastError())
     
-    ''destroy the heap
+    ''destroy the heaps
     If (HeapDestroy(hConfig) = FALSE) Then Return(GetLastError())
+    If (HeapDestroy(hHist) = FALSE) Then Return(GetLastError())
     
     ''unregister the window classes
     If (UnregisterClass(@MainClass, hInst) = FALSE) Then Return(GetLastError())
@@ -382,6 +386,8 @@ Private Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
     CreateWindowEx(NULL, WC_BUTTON, "Go", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_GO), hInstance, NULL)
     CreateWindowEx(NULL, WC_BUTTON, "[..]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_UP), hInstance, NULL)
     CreateWindowEx(NULL, WC_BUTTON, "[.]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_REFRESH), hInstance, NULL)
+    CreateWindowEx(NULL, WC_BUTTON, "<-", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_BACK), hInstance, NULL)
+    CreateWindowEx(NULL, WC_BUTTON, "->", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_FORWARD), hInstance, NULL)
     
     ''set IDI_PLAY to IDC_BTN_PLAY
     SendMessage(GetDlgItem(hDlg, IDC_BTN_PLAY), BM_SETIMAGE, IMAGE_ICON, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PLAY))))
@@ -456,9 +462,11 @@ Private Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As 
                 .right  = (2 * WINDOW_SIZE)
                 .bottom = (1.5 * WINDOW_SIZE)
             Case IDC_EDT_PATH
-                .left   = MARGIN_SIZE
+                '.left   = MARGIN_SIZE
+                .left   = ((2 * MARGIN_SIZE) + (2 * WINDOW_SIZE))
                 .top    = MARGIN_SIZE
-                .right  = (lprcParent->Right - ((3 * WINDOW_SIZE) + (3 * MARGIN_SIZE)))
+                '.right  = (lprcParent->Right - ((3 * WINDOW_SIZE) + (3 * MARGIN_SIZE)))
+                .right  = (lprcParent->Right - ((5 * WINDOW_SIZE) + (5 * MARGIN_SIZE)))
                 .bottom = WINDOW_SIZE
             Case IDC_BTN_GO
                 .left   = (lprcParent->Right - (MARGIN_SIZE + (3 * WINDOW_SIZE)))
@@ -472,6 +480,16 @@ Private Function ResizeChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As 
                 .bottom = WINDOW_SIZE
             Case IDC_BTN_REFRESH
                 .left   = (lprcParent->Right - (MARGIN_SIZE + WINDOW_SIZE))
+                .top    = MARGIN_SIZE
+                .right  = WINDOW_SIZE
+                .bottom = WINDOW_SIZE
+            Case IDC_BTN_BACK
+                .left   = MARGIN_SIZE
+                .top    = MARGIN_SIZE
+                .right  = WINDOW_SIZE
+                .bottom = WINDOW_SIZE
+            Case IDC_BTN_FORWARD
+                .left   = (MARGIN_SIZE + WINDOW_SIZE)
                 .top    = MARGIN_SIZE
                 .right  = WINDOW_SIZE
                 .bottom = WINDOW_SIZE

@@ -15,7 +15,6 @@
 
 Dim Shared hHist As HANDLE
 Dim Shared plpszHist As LPTSTR Ptr
-Dim Shared nHist As ULONG32
 
 Public Function InitHistory () As BOOL
     
@@ -23,10 +22,7 @@ Public Function InitHistory () As BOOL
         ? "Calling:", __FILE__; "\"; __FUNCTION__
     #EndIf
     
-    ''allocate desired number of paths
-    If (HeapLock(hHist) = FALSE) Then Return(FALSE)
-    If (HeapListAlloc(hHist, plpszHist, CB_PATH, nHist) = FALSE) Then Return(FALSE)
-    If (HeapUnlock(hHist) = FALSE) Then Return(FALSE)
+    If (HeapListAlloc(hHist, plpszHist, CB_PATH, C_HIST) = FALSE) Then Return(FALSE)
     
     ''return
     SetLastError(ERROR_SUCCESS)
@@ -40,11 +36,53 @@ Public Function FreeHistory () As BOOL
         ? "Calling:", __FILE__; "\"; __FUNCTION__
     #EndIf
     
-    If (HeapLock(hHist) = FALSE) Then Return(FALSE)
-    If (HeapListFree(hHist, plpszHist, CB_PATH, nHist) = FALSE) Then Return(FALSE)
-    If (HeapUnlock(hHist) = FALSE) Then Return(FALSE)
+    If (HeapListFree(hHist, plpszHist, CB_PATH, C_HIST) = FALSE) Then Return(FALSE)
     
     ''return
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Public Function ClearHistory () As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+    #EndIf
+    
+    If (HeapListClear(hHist, plpszHist, CB_PATH, C_HIST) = FALSE) Then Return(FALSE)
+    
+    ''return
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Public Function AddPathToHistory (ByVal lpszPath As LPCTSTR) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"lpszPath\t= 0x"; Hex(lpszPath)
+        ? !"*lpszPath\t= "; *lpszPath
+    #EndIf
+    
+    If (HeapLock(hHist) = FALSE) Then Return(FALSE)
+    
+    ''make room for the new item by moving all the other items up in the array
+    Dim nLast As UINT
+    For iHist As UINT = 0 To (C_HIST - 1)
+        If (*plpszHist[iHist] = "") Then
+            nLast = iHist
+            Exit For
+        End If
+        *plpszHist[iHist] = *plpszHist[iHist + 1]
+    Next iHist
+    
+    ''add the new item as the last item in the array
+    *plpszHist[nLast] = *lpszPath
+    
+    ''return
+    If (HeapUnlock(hHist) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     

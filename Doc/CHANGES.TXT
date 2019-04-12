@@ -252,4 +252,13 @@ v2.12.0.19:
     
     +       Added new about message routine.
     
+v2.12.0.26:
+    
+    +       Added history module.
+    
+v2.12.0.27:
+    
+    *       Improved 64-bit support in heapptrlist module.
+    *       Updated error checking in heapptrlist module.
+    
 EOF

@@ -39,6 +39,10 @@ Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Pt
         #EndIf
     Next iItem
     
+    #If __FB_DEBUG__
+        ? !"plpList\t= 0x"; Hex(plpList)
+    #Endif
+    
     ''return
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
@@ -102,18 +106,19 @@ Public Function HeapListClear (ByVal hHeap As HANDLE, ByVal plpList As LPVOID Pt
     
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
+    ''clear list item contents
     For iItem As UINT = 0 To (cItems - 1)
         ZeroMemory(plpList[iItem], cbItem)
     Next iItem
     
+    ''return
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
-    
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
 End Function
 
-Public Function LoadStringRange (ByVal hInst As HINSTANCE, ByVal plpszBuff As LPTSTR Ptr, ByVal wIdFirst As WORD, ByVal cchString As ULONG32, ByVal cStrings As ULONG32) As LRESULT
+Public Function LoadStringRange (ByVal hInst As HINSTANCE, ByVal plpszBuff As LPTSTR Ptr, ByVal wIdFirst As WORD, ByVal cchString As UINT, ByVal cStrings As UINT) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
