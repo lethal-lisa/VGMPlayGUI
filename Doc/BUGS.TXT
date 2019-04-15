@@ -6,4 +6,6 @@ VGMPlayGUI - Bug Tracker:
     -       Registry I/O functions write to the wrong location.
         (fixed (v2.11.4)).
     
+    -       About message box broken. (fixed (v2.12.1)).
+    
 EOF

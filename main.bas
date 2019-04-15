@@ -189,8 +189,7 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
             ''make sure VGMPlay's path is valid
             If (PathFileExists(plpszPath[PATH_VGMPLAY]) = FALSE) Then
                 If (ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_VGMPMISS, IDS_MSGCAP_VGMPMISS, (MB_YESNO Or MB_ICONWARNING)) = IDYES) Then
-                    ''TODO: fix error checking here
-                    DoOptionsPropSheet(hWnd)
+                    If (DoOptionsPropSheet(hWnd) = FALSE) Then Return(FALSE)
                 End If
             End If
             If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
@@ -220,7 +219,7 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                             
                         Case IDM_OPTIONS                        ''start the options property sheet
                             
-                            DoOptionsPropSheet(hWnd)
+                            If (DoOptionsPropSheet(hWnd) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                         Case IDM_ABOUT                          ''display the about message
                             
@@ -369,16 +368,22 @@ Private Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
         ? !"hDlg\t= 0x"; Hex(hDlg)
     #EndIf
     
-    ''create child windows
-    CreateWindowEx(NULL, STATUSCLASSNAME, NULL, WS_CHILD Or WS_VISIBLE Or SBARS_SIZEGRIP Or SBARS_TOOLTIPS, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_SBR_MAIN), hInstance, NULL)
-    CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTBOX, NULL, WS_CHILD Or WS_VISIBLE Or WS_VSCROLL Or WS_TABSTOP Or LBS_NOTIFY Or LBS_DISABLENOSCROLL Or LBS_HASSTRINGS Or LBS_SORT, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_LST_MAIN), hInstance, NULL)
-    CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTBOX, NULL, WS_CHILD Or WS_VISIBLE Or WS_VSCROLL Or WS_TABSTOP Or LBS_NOTIFY Or LBS_DISABLENOSCROLL Or LBS_HASSTRINGS Or LBS_SORT, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_LST_DRIVES), hInstance, NULL)
-    CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or ES_LEFT Or ES_AUTOHSCROLL, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_EDT_FILE), hInstance, NULL)
-    CreateWindowEx(NULL, WC_BUTTON, NULL, WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER Or BS_DEFPUSHBUTTON Or BS_ICON, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_PLAY), hInstance, NULL)
-    CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or ES_LEFT Or ES_AUTOHSCROLL, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_EDT_PATH), hInstance, NULL)
-    CreateWindowEx(NULL, WC_BUTTON, "Go", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_GO), hInstance, NULL)
-    CreateWindowEx(NULL, WC_BUTTON, "[..]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_UP), hInstance, NULL)
-    CreateWindowEx(NULL, WC_BUTTON, "[.]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_REFRESH), hInstance, NULL)
+    ''create status bar control
+    If (CreateWindowEx(NULL, STATUSCLASSNAME, NULL, WS_CHILD Or WS_VISIBLE Or SBARS_SIZEGRIP Or SBARS_TOOLTIPS, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_SBR_MAIN), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''create list box controls
+    If (CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTBOX, NULL, WS_CHILD Or WS_VISIBLE Or WS_VSCROLL Or WS_TABSTOP Or LBS_NOTIFY Or LBS_DISABLENOSCROLL Or LBS_HASSTRINGS Or LBS_SORT, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_LST_MAIN), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateWindowEx(WS_EX_CLIENTEDGE, WC_LISTBOX, NULL, WS_CHILD Or WS_VISIBLE Or WS_VSCROLL Or WS_TABSTOP Or LBS_NOTIFY Or LBS_DISABLENOSCROLL Or LBS_HASSTRINGS Or LBS_SORT, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_LST_DRIVES), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''create edit controls
+    If (CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or ES_LEFT Or ES_AUTOHSCROLL, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_EDT_FILE), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateWindowEx(WS_EX_CLIENTEDGE, WC_EDIT, NULL, WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or ES_LEFT Or ES_AUTOHSCROLL, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_EDT_PATH), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''create button controls
+    If (CreateWindowEx(NULL, WC_BUTTON, NULL, WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER Or BS_DEFPUSHBUTTON Or BS_ICON, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_PLAY), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateWindowEx(NULL, WC_BUTTON, "Go", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_GO), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateWindowEx(NULL, WC_BUTTON, "[..]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_UP), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    If (CreateWindowEx(NULL, WC_BUTTON, "[.]", WS_CHILD Or WS_VISIBLE Or WS_TABSTOP Or BS_CENTER Or BS_VCENTER, 0, 0, 0, 0, hDlg, Cast(HMENU, IDC_BTN_REFRESH), hInstance, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''set IDI_PLAY to IDC_BTN_PLAY
     SendMessage(GetDlgItem(hDlg, IDC_BTN_PLAY), BM_SETIMAGE, IMAGE_ICON, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_PLAY))))
@@ -724,6 +729,11 @@ End Function
 ''displays the about message box
 Private Function AboutMsgBox (ByVal hDlg As HWND) As BOOL
     
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
+    #EndIf
+    
     Dim hCurPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
     
     Dim hHeap As HANDLE = GetProcessHeap()
@@ -732,8 +742,7 @@ Private Function AboutMsgBox (ByVal hDlg As HWND) As BOOL
     ''load unformatted strings
     Dim plpszAbout As LPTSTR Ptr
     If (HeapListAlloc(hHeap, plpszAbout, CB_ABT, C_ABT) = FALSE) Then Return(FALSE)
-    SetLastError(LoadStringRange(hInstance, plpszAbout, IDS_ABT_DESCRIPTION, CCH_ABT, C_ABT))
-    If (GetLastError()) Then Return(FALSE)
+    If (LoadStringRange(hInstance, plpszAbout, IDS_ABT_DESCRIPTION, CCH_ABT, C_ABT) = FALSE) Then Return(FALSE)
     
     ''format the strings
     Dim lpszMessage As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (C_ABT * CB_ABT))
@@ -744,14 +753,14 @@ Private Function AboutMsgBox (ByVal hDlg As HWND) As BOOL
     Dim lpMbp As LPMSGBOXPARAMS = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, SizeOf(MSGBOXPARAMS))
     If (lpMbp = NULL) Then Return(FALSE)
     With *lpMbp
-        .hInstance = hInstance
-        .cbSize = SizeOf(MSGBOXPARAMS)
-        .hwndOwner = hDlg
-        .lpszText = lpszMessage
-        .lpszCaption = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
-        .dwStyle = (MB_OK Or MB_USERICON)
-        .lpszIcon = MAKEINTRESOURCE(IDI_KAZUSOFT)
-        .dwLanguageId = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
+        .hInstance      = hInstance
+        .cbSize         = SizeOf(MSGBOXPARAMS)
+        .hwndOwner      = hDlg
+        .lpszText       = lpszMessage
+        .lpszCaption    = MAKEINTRESOURCE(IDS_MSGCAP_ABOUT)
+        .dwStyle        = MB_USERICON
+        .lpszIcon       = MAKEINTRESOURCE(IDI_KAZUSOFT)
+        .dwLanguageId   = MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL)
     End With
     
     ''show message box
