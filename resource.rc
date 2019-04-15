@@ -78,10 +78,10 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 11, 2, 8
+FILEVERSION     1, 11, 2, 9
 PRODUCTVERSION  2, 12, 1, 1
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
+FILEFLAGS       0 //VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     0
@@ -90,7 +90,7 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.11.2.8\0"
+            VALUE "FileVersion",        "1.11.2.9\0"
             VALUE "ProductVersion",     "2.12.1.1\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
@@ -99,8 +99,8 @@ BEGIN
             VALUE "LegalTrademarks",    "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
-            VALUE "PrivateBuild",       "Built by Lisa for testing new error checking.\0"
-            VALUE "SpecialBuild",       "Debug/test build.\0"
+            //VALUE "PrivateBuild",       "\0"
+            //VALUE "SpecialBuild",       "\0"
         END
     END
     BLOCK "VarFileInfo"
