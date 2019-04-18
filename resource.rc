@@ -13,25 +13,14 @@
 //main dialog
 #define IDD_MAIN                    0x03E8 //1000
 
-//menus
-#define IDR_MENUMAIN                0x2710 //10000
-#define IDM_FILE                    0x2711 //10001
-#define IDM_OPTIONS                 0x2718 //10008
-#define IDM_EXIT                    0x2712 //10002
-#define IDM_LIST					0x2713 //10003
-#define IDM_UP						0x2714 //10004
-#define IDM_ROOT					0x2715 //10005
-#define IDM_BACK                    0x2716 //10006
-#define IDM_REFRESH					0x2717 //10007
-#define IDM_ABOUT                   0x2719 //10009
 
 //strings
 #define IDS_APPNAME                 0x0001 //1
 #define IDS_OPTIONS                 0x0002 //2
-#define IDS_FILT_VGMPLAY            0x0003 //3
-#define IDS_FILT_M3U                0x0004 //4
-#define IDS_ABT_DESCRIPTION         0x0005 //5
-#define IDS_ABT_LEGAL               0x0006 //6
+'#define IDS_FILT_VGMPLAY            0x0003 //3
+'#define IDS_FILT_M3U                0x0004 //4
+#define IDS_ABT_DESCRIPTION         0x0003 //3
+#define IDS_ABT_LEGAL               0x0004 //4
 
 //message captions
 #define IDS_MSGCAP_ABOUT            0x0100 //256
@@ -40,6 +29,7 @@
 #define IDS_MSGCAP_CHANGES          0x0103 //259
 #define IDS_MSGCAP_FILTHELP         0x0104 //260
 #define IDS_MSGCAP_DELCONFIRM       0x0105 //270
+#define IDS_MSGCAP_VGMPLAYKEYS      0x0106 //271
 
 //message text
 #define IDS_MSGTXT_NYI              0x0200 //512
@@ -47,6 +37,7 @@
 #define IDS_MSGTXT_CHANGES          0x0202 //514
 #define IDS_MSGTXT_FILTHELP         0x0203 //515
 #define IDS_MSGTXT_DELCONFIRM       0x0204 //516
+#define IDS_MSGTXT_VGMPLAYKEYS      0x0205 //517
 
 //registry key names
 #define IDS_REG_VGMPLAYPATH         0x0300 //768
@@ -68,6 +59,12 @@
 #define IDS_TIP_SYSTEM              0x040A //1034
 #define IDS_TIP_READONLY            0x040B //1035
 #define IDS_TIP_EXCLUSIVE           0x040C //1036
+#define IDS_TIP_DELMOD_RECYCLE      0x040D //1037
+#define IDS_TIP_DELMOD_REMOVE       0x040E //1038
+
+#define IDS_FILT_VGMPLAY            0x0500 //1280
+#define IDS_FILT_M3U                0x0501 //1281
+#define IDS_FILT_ADDTOLIST          0x0502 //1282
 
 //IDs for icons
 #define IDI_VGMPLAYGUI              0x0064 //100
@@ -78,10 +75,10 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 11, 2, 9
-PRODUCTVERSION  2, 12, 1, 1
+FILEVERSION     1, 12, 0, 0
+PRODUCTVERSION  2, 13, 0, 0
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       0 //VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
+FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     0
@@ -90,8 +87,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.11.2.9\0"
-            VALUE "ProductVersion",     "2.12.1.1\0"
+            VALUE "FileVersion",        "1.12\0"
+            VALUE "ProductVersion",     "2.13\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
@@ -99,8 +96,8 @@ BEGIN
             VALUE "LegalTrademarks",    "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
-            //VALUE "PrivateBuild",       "\0"
-            //VALUE "SpecialBuild",       "\0"
+            VALUE "PrivateBuild",       "Built by Lisa for testing new config routines.\0"
+            VALUE "SpecialBuild",       "Test/debug build.\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -114,8 +111,8 @@ LANGUAGE 9, 1
 BEGIN
     IDS_APPNAME                 "VGMPlayGUI"
     IDS_OPTIONS                 "VGMPlayGUI Options"
-    IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
-    IDS_FILT_M3U                "M3U Playlists (*.m3u)\0*.M3U\0All Files (*.*)\n*.*\0\0"
+    'IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
+    'IDS_FILT_M3U                "M3U Playlists (*.m3u)\0*.M3U\0All Files (*.*)\n*.*\0\0"
     IDS_ABT_DESCRIPTION         "VGMPlayGUI - Windows GUI for Valley Bell's VGMPlay.\n"
     IDS_ABT_LEGAL               "Copyright (c) 2018-2019 Kazusoft Co.\nKazusoft Co., and the Kazusoft logo are trademarks of Lisa Murray.\nVGMPlay is a Trademark of Valley Bell.\nThis program is licensed under the GNU GPL 3.0 license.\n"
     IDS_MSGCAP_ABOUT            "About VGMPlayGUI"
@@ -124,11 +121,13 @@ BEGIN
     IDS_MSGCAP_CHANGES          "Cancel?"
     IDS_MSGCAP_FILTHELP         "File Filter Help"
     IDS_MSGCAP_DELCONFIRM       "Delete?"
+    IDS_MSGCAP_VGMPLAYKEYS      "VGMPlay Control Keys"
     IDS_MSGTXT_NYI              "This feature is not implemented yet.\nSorry."
     IDS_MSGTXT_VGMPMISS         "Could not find ""VGMPlay.exe"".\nYou must specify its location to continue.\nWould you like to specify its location now?."
     IDS_MSGTXT_CHANGES          "If you cancel now, you will lose any unsaved changes.\nWould you like to save them now?"
     IDS_MSGTXT_FILTHELP         "You can change the filter used by the file browser by selecting different options from here."
     IDS_MSGTXT_DELCONFIRM       "Are you sure you want to delete the selected item?"
+    IDS_MSGTXT_VGMPLAYKEYS      "Control keys for VGMPlay\n\nKey:\t\tCommand:\nSpace\t\tPause\nLeft/Right Arrow\t\tSeek five seconds.\nCtrl+Left/Right Arrow\tSeek one minute.\nEsc./Q\t\tQuit\nF\t\tFade Out\nR\t\tRestart Track.\nPage Up/B\tPrevious Track.\nPage Down/N\tNext Track."
     IDS_REG_VGMPLAYPATH         "VGMPlay Path"
     IDS_REG_DEFAULTPATH         "Default Path"
     IDS_REG_DEFAULTLIST         "Default Playlist"
@@ -146,6 +145,11 @@ BEGIN
     IDS_TIP_SYSTEM              "Include files with the system attribute set."
     IDS_TIP_READONLY            "Include read-only files."
     IDS_TIP_EXCLUSIVE           "Show only files with the selected attributes."
+    IDS_TIP_DELMOD_RECYCLE      "When deleting a file, the file will be sent to the recycle bin."
+    IDS_TIP_DELMOD_REMOVE       "Permenantly deletes a file without sending it to the recycle bin."
+    IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
+    IDS_FILT_M3U                "M3U Playlists (*.m3u)\0*.M3U\0All Files (*.*)\n*.*\0\0"
+    IDS_FILT_ADDTOLIST          "Accepted File Types\0*.VGM;*.VGZ;*.DRO;*.CMF;\0VGM Files (*.vgm, *.vgz)\0*.VGM;*.VGZ\0DOSBox Raw OPL Logs (*.dro)\0*.DRO\0Creative Music Format Modules (*.cmf)\0*.CMF\0All Files (*.*)\0*.*\0\0"
 END
 
 //icons
@@ -165,27 +169,6 @@ LANGUAGE 9, 1
 STYLE WS_CAPTION | WS_MAXIMIZEBOX | WS_MINIMIZEBOX | WS_OVERLAPPED | WS_OVERLAPPEDWINDOW | WS_SIZEBOX | WS_SYSMENU | WS_VISIBLE //0x10CF0000
 EXSTYLE WS_EX_APPWINDOW | WS_EX_LEFT | WS_EX_LTRREADING | WS_EX_RIGHTSCROLLBAR //0x00040000
 BEGIN
-END
-
-//menus
-IDR_MENUMAIN MENUEX
-LANGUAGE 9, 1
-BEGIN
-    POPUP "&File", IDM_FILE, MFT_STRING, MFS_ENABLED
-    BEGIN
-        MENUITEM "&Options", IDM_OPTIONS, MFT_STRING, MFS_ENABLED
-        MENUITEM SEPARATOR
-        MENUITEM "E&xit", IDM_EXIT, MFT_STRING, MFS_ENABLED
-    END
-	POPUP "&List", IDM_LIST, MFT_STRING, MFS_ENABLED
-	BEGIN
-		MENUITEM "Go &Up One Directory Level", IDM_UP, MFT_STRING, MFS_ENABLED
-		MENUITEM "Go to Drive &Root", IDM_ROOT, MFT_STRING, MFS_ENABLED
-		MENUITEM "Go to &Previous Directory", IDM_BACK, MFT_STRING, MFS_DISABLED
-		MENUITEM SEPARATOR
-		MENUITEM "Re&fresh Lists", IDM_REFRESH, MFT_STRING, MFS_ENABLED
-	END
-    MENUITEM "&About", IDM_ABOUT, MFT_STRING, MFS_ENABLED
 END
 
 //EOF

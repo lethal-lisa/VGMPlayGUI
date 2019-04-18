@@ -20,6 +20,11 @@
 #define IDC_CHK_READONLY            0x04B5 //1205
 #define IDC_CHK_EXCLUSIVE           0x04B6 //1206
 
+#define IDD_GENERALOPTS             0x0514 //1300
+#define IDC_GRP_DELMOD              0x0515 //1301
+#define IDC_CHK_DELMOD_RECYCLE      0x0516 //1302
+#define IDC_CHK_DELMOD_REMOVE       0x0517 //1303
+
 //define property sheet sizes because GoRC doesn't seem to include these definitions by default.
 #define PROP_SM_CXDLG               0x00D4 //212
 #define PROP_SM_CYDLG               0x00BC //188
@@ -61,6 +66,18 @@ BEGIN
     AUTOCHECKBOX "System", IDC_CHK_SYSTEM, 6, 39, 120, 12
     AUTOCHECKBOX "Read Only", IDC_CHK_READONLY, 6, 51, 120, 12
     AUTOCHECKBOX "Exclusive", IDC_CHK_EXCLUSIVE, 6, 63, 120, 12
+END
+
+IDD_GENERALOPTS DIALOGEX 10, 10, PROP_SM_CXDLG, PROP_SM_CYDLG
+CAPTION "File Filter"
+FONT 10, "Tahoma", 400, 0, 0
+LANGUAGE 9, 1
+STYLE WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_TILED | WS_VISIBLE
+EXSTYLE 0x00010080
+BEGIN
+    GROUPBOX "Delete Mode", IDC_GRP_DELMOD, 3, 3, 130, 36
+    AUTOCHECKBOX "Move to Recycle Bin", IDC_CHK_DELMOD_RECYCLE, 6, 15, 120, 12, BS_AUTOCHECKBOX | WS_TABSTOP | WS_GROUP
+    AUTOCHECKBOX "Remove File", IDC_CHK_DELMOD_REMOVE, 6, 27, 120, 12
 END
 
 //EOF

@@ -6,6 +6,16 @@
     
 '/
 
+/'  Config structure
+    [HKEY_CURRENT_USER\Software\VGMPlayGUI]
+    Name:               Type:       Default Value:
+    (default)           REG_SZ      (N/A)
+    "Default Path"      REG_SZ      (N/A)
+    "Default Playlist"  REG_SZ      (N/A)
+    "File Filter"       REG_DWORD   0x10 (16)
+    "VGMPlay Path"      REG_SZ      (N/A)
+'/
+
 #Pragma Once
 #Include Once "windows.bi"
 #Include Once "win/commctrl.bi"
@@ -25,9 +35,10 @@
 #Define BVGMP_FILETITLE     3
 
 ''page count and IDs
-#Define C_PAGES             2
+#Define C_PAGES             3
 #Define PG_PATHS            0
 #Define PG_FILEFILT         1
+#Define PG_GENERALOPTS      2
 
 ''IDs for plpszKeyName
 #Define CCH_KEY             &h00000020 ''32
@@ -42,7 +53,7 @@ Extern hConfig As HANDLE
 Extern plpszPath As LPTSTR Ptr
 Extern dwFileFilt As DWORD32
 
-Declare Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
+Declare Function DoOptionsPropSheet (ByVal hDlg As HWND, ByVal nStartPage As UINT = PG_PATHS) As BOOL
 Declare Function InitConfig () As BOOL
 Declare Function FreeConfig () As BOOL
 Declare Function LoadConfig () As BOOL

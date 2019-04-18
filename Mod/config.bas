@@ -34,7 +34,7 @@ Declare Function SetDefConfig () As BOOL
 Declare Function OpenProgHKey (ByVal phkOut As PHKEY, ByVal lpszAppName As LPCTSTR, ByVal lpszClass As LPTSTR, ByVal samDesired As REGSAM, ByVal pdwDisp As PDWORD32) As LRESULT
 
 ''starts the options property sheet
-Public Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
+Public Function DoOptionsPropSheet (ByVal hDlg As HWND, ByVal nStartPage As UINT = PG_PATHS) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -68,6 +68,15 @@ Public Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .pfnDlgProc     = @FileFiltProc
     End With
     
+    With lpPsp[PG_GENERALOPTS]
+        .dwSize         = SizeOf(PROPSHEETPAGE)
+        .dwFlags        = (PSP_USEICONID Or PSP_HASHELP)
+        .hInstance      = hInstance
+        .pszTemplate    = MAKEINTRESOURCE(IDD_GENERALOPTS)
+        .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
+        .pfnDlgProc     = @GeneralOptsProc
+    End With
+    
     ''setup property sheet header
     Dim lpPsh As LPPROPSHEETHEADER = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, SizeOf(PROPSHEETHEADER))
     If (lpPsh = NULL) Then Return(FALSE)
@@ -82,7 +91,7 @@ Public Function DoOptionsPropSheet (ByVal hDlg As HWND) As BOOL
         .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
         .pszCaption     = Cast(LPCTSTR, lpszOptions)
         .nPages         = C_PAGES
-        .nStartPage     = 0
+        .nStartPage     = nStartPage
         .ppsp           = Cast(LPCPROPSHEETPAGE, lpPsp)
     End With
     
@@ -229,6 +238,14 @@ Public Function SaveConfig () As BOOL
     
     ''save the configuration to the registry
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
+    
+    ''write the executable's path to (default)
+    Dim lpszExecPath As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
+    If (lpszExecPath = NULL) Then Return(FALSE)
+    *lpszExecPath = ExePath()
+    SetLastError(RegSetValueEx(hkProgKey, NULL, NULL, REG_SZ, Cast(LPBYTE, lpszExecPath), (MAX_PATH * SizeOf(TCHAR))))
+    If (GetLastError()) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, lpszExecPath) = FALSE) Then Return(FALSE)
     
     SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_VGMPLAYPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_VGMPLAY]), CB_PATH))
     If (GetLastError()) Then Return(FALSE)
@@ -705,6 +722,45 @@ Private Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) 
 	SetLastError(ERROR_SUCCESS)
 	Return(TRUE)
     
+End Function
+
+
+''procedures for the general options page
+Private Function GeneralOptsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+    
+    Static hwndPrsht As HWND
+    
+    Select Case uMsg
+        Case WM_NOTIFY
+            
+            Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
+                Case PSN_SETACTIVE                      ''page becoming active
+                    
+                    ''get page handle
+                    hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
+                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                    
+                Case PSN_KILLACTIVE                     ''page becoming inactive
+                    
+                    ''let page become inactive
+                    SetWindowLong(hWnd, DWL_MSGRESULT, Cast(LONG32, FALSE))
+                    Return(FALSE)
+                    
+                Case PSN_APPLY                          ''user has pressed the apply button
+                    
+                    ''get settings from dialog
+                    
+                    
+                    ''save settings to the registry
+                    If (SaveConfig() = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                    
+                Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
+                    
+                    PrpshCancelPrompt(hWnd)
+                    
+            End Select
+            
+    End Select
 End Function
 
 ''EOF

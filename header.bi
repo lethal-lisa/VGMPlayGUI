@@ -82,7 +82,10 @@ Declare Function CreateMainChildren (ByVal hDlg As HWND) As BOOL
 '/
 Declare Function CreateMainToolTips (ByVal hDlg As HWND) As BOOL
 
-''EnumChildWindows procedure for resizing the main dialog's child windows
+/'  EnumChildWindows procedure for resizing the main dialog's child windows.
+    lParam is a pointer to a RECT containing the main window's size in
+    client co-ords.
+'/
 Declare Function ResizeMainChildren (ByVal hWnd As HWND, ByVal lParam As LPARAM) As BOOL
 
 /'  Displays a context menu in the main dialog. dwMouse holds the screen
@@ -98,6 +101,10 @@ Declare Function DisplayMainContextMenu (ByVal hDlg As HWND, ByVal dwMouse As DW
 '/
 Declare Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
+/'  Updates the main dialog's title bar.
+    lpszPath is the path to set, if this is NULL, the path part of the
+    title is removed.
+'/
 Declare Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) As BOOL
 
 Declare Function StartVGMPlay (ByVal lpszFile As LPCTSTR) As BOOL
