@@ -2,14 +2,15 @@ VGMPlayGUI - Developer Notes:
 
 Registry Structure:
 
-    HKEY_CURRENT_USER\Software\VGMPlayGUI\
+    [HKEY_CURRENT_USER\Software\VGMPlayGUI]
         
-        KEY:            TYPE:       DEFAULT VALUE:
+        KEY:                TYPE:       DEFAULT VALUE:
         
-        (Default)       REG_SZ      (value not set)
-        VGMPlay Path    REG_SZ      ""
-        Default Path    REG_SZ      ""
-        File Filter     REG_DWORD   DDL_DIRECTORY
+        (default)           REG_SZ      (value not set)
+        "VGMPlay Path"      REG_SZ      ""
+        "Default Path"      REG_SZ      ""
+        "File Filter"       REG_DWORD   DDL_DIRECTORY (0x10 (16))
+        "Default Playlist"  REG_SZ      ""
     
 Keyboard controls used by VGMPlay:
     
@@ -20,8 +21,8 @@ Keyboard controls used by VGMPlay:
     Right           Seek forwards five seconds.
     Ctrl+Left       Seek one minute backwards.
     Ctrl+Right      Seek one minute forwards.
-    Escape          Quit
-    Q               Quit
+    Escape          Quit.
+    Q               Quit.
     F               Fade out.
     R               Restart current track.
     PageUp          Previous track.

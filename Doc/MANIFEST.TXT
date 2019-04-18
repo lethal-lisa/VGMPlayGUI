@@ -3,6 +3,7 @@ VGMPlayGUI - File List:
     Files in Binary Packages:
     \
         VGMPlayGUI.exe          -   Main executable.
+        LICENSE                 -   GNU GPL3 license file.
     
     \Doc\
         AUTHORS.TXT             -   Credits.
@@ -11,7 +12,7 @@ VGMPlayGUI - File List:
                                     for developers.
         DEVNOTES.TXT            -   Developer notes.
         INSTALL.TXT             -   Installation instructions.
-        MANIFEST.TXT            -   List of included files.
+        MANIFEST.TXT            -   List of included files (this file).
         NEWS.TXT                -   Simple changelog indend for users.
         README.TXT              -   General documentation
         THANKS.TXT              -   Special thanks.
