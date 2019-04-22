@@ -9,6 +9,24 @@
     
 '/
 
+#If __FB_OUT_OBJ__
+    #Print "Compiling ""Mod\config.bas""."
+#Else
+    #Error "This file, ""Mod\config.bas"" must be compiled as a module."
+#EndIf
+
+#Ifdef __FB_64BIT__
+    #Print "Compiling for 64-bit Windows."
+#Else
+    #Print "Compiling for 32-bit Windows."
+#EndIf
+
+#If __FB_DEBUG__
+    #Print "Compiling in debug mode."
+#Else
+    #Print "Compiling in release mode."
+#EndIf
+
 #Include "inc/config.bi"
 
 Extern hInstance As HINSTANCE
@@ -28,6 +46,8 @@ Declare Function FileFiltProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal w
 Declare Function CreateFileFiltToolTips (ByVal hDlg As HWND) As BOOL
 Declare Function SetFileFiltProc (ByVal hDlg As HWND, ByVal dwValue As DWORD32) As BOOL 
 Declare Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) As BOOL
+
+Declare Function GeneralOptsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 
 Declare Function PrpshCancelPrompt (ByVal hDlg As HWND) As DWORD32
 Declare Function SetDefConfig () As BOOL

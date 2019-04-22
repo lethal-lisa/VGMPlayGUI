@@ -9,6 +9,24 @@
     
 '/
 
+#If __FB_OUT_OBJ__
+    #Print "Compiling ""Mod\heapptrlist.bas""."
+#Else
+    #Error "This file, ""Mod\heapptrlist.bas"" must be compiled as a module."
+#EndIf
+
+#Ifdef __FB_64BIT__
+    #Print "Compiling for 64-bit Windows."
+#Else
+    #Print "Compiling for 32-bit Windows."
+#EndIf
+
+#If __FB_DEBUG__
+    #Print "Compiling in debug mode."
+#Else
+    #Print "Compiling in release mode."
+#EndIf
+
 ''include header
 #Include "inc/heapptrlist.bi"
 
