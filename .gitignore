@@ -5,4 +5,10 @@
 *.obj
 *.o
 *.a
+*.zip
+
+# ignore project files
 *.fbp
+
+# ignore batch scripts
+*.bat
