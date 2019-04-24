@@ -233,6 +233,10 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                             
                             ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
                             
+                        Case IDM_PLEDIT
+                            
+                            DialogBox(hInstance, MAKEINTRESOURCE(IDD_PLAYLIST), hWnd, @PlaylistProc)
+                            
                         Case IDM_DELETE                         ''delete file
                             
                             If (ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_DELCONFIRM, IDS_MSGCAP_DELCONFIRM, (MB_ICONWARNING Or MB_YESNO)) = IDYES) Then

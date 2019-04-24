@@ -17,6 +17,8 @@
 '/
 
 #Pragma Once
+#Print "Including ""config.bi""."
+
 #Include Once "windows.bi"
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"

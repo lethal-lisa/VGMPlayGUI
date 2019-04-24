@@ -531,7 +531,7 @@ Private Function BrowseVGMPlay (ByVal hDlg As HWND) As BOOL
     #EndIf
     
     ''create local heap
-    Dim hOfn As HANDLE = HeapCreate(NULL, Cast(SIZE_T, (SizeOf(OPENFILENAME) + (CB_BVGMP * C_BVGMP))), NULL)
+    Dim hOfn As HANDLE = HeapCreate(NULL, ((SizeOf(OPENFILENAME) + (CB_BVGMP * C_BVGMP))), NULL)
     If (hOfn = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)

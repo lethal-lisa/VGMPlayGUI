@@ -4,7 +4,8 @@
 
 //include other files
 #include "Res\propertysheets.rc"
-#include "Res\contextmenus.rc"
+#include "Res\menus.rc"
+#include "Res\playlist-editor.rc"
 
 //ID definintions
 //version information
@@ -17,8 +18,6 @@
 //strings
 #define IDS_APPNAME                 0x0001 //1
 #define IDS_OPTIONS                 0x0002 //2
-'#define IDS_FILT_VGMPLAY            0x0003 //3
-'#define IDS_FILT_M3U                0x0004 //4
 #define IDS_ABT_DESCRIPTION         0x0003 //3
 #define IDS_ABT_LEGAL               0x0004 //4
 
@@ -75,8 +74,8 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 12, 0, 0
-PRODUCTVERSION  2, 13, 0, 0
+FILEVERSION     1, 12, 0, 3
+PRODUCTVERSION  2, 13, 0, 3
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
@@ -87,8 +86,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.12\0"
-            VALUE "ProductVersion",     "2.13\0"
+            VALUE "FileVersion",        "1.12.0.3\0"
+            VALUE "ProductVersion",     "2.13.0.3\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
@@ -96,7 +95,7 @@ BEGIN
             VALUE "LegalTrademarks",    "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
-            VALUE "PrivateBuild",       "Built by Lisa for testing new config routines.\0"
+            VALUE "PrivateBuild",       "Built by Lisa for testing playlist editor.\0"
             VALUE "SpecialBuild",       "Test/debug build.\0"
         END
     END
@@ -111,8 +110,6 @@ LANGUAGE 9, 1
 BEGIN
     IDS_APPNAME                 "VGMPlayGUI"
     IDS_OPTIONS                 "VGMPlayGUI Options"
-    'IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
-    'IDS_FILT_M3U                "M3U Playlists (*.m3u)\0*.M3U\0All Files (*.*)\n*.*\0\0"
     IDS_ABT_DESCRIPTION         "VGMPlayGUI - Windows GUI for Valley Bell's VGMPlay.\n"
     IDS_ABT_LEGAL               "Copyright (c) 2018-2019 Kazusoft Co.\nKazusoft Co., and the Kazusoft logo are trademarks of Lisa Murray.\nVGMPlay is a Trademark of Valley Bell.\nThis program is licensed under the GNU GPL 3.0 license.\n"
     IDS_MSGCAP_ABOUT            "About VGMPlayGUI"

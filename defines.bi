@@ -9,6 +9,7 @@
 '/
 
 #Pragma Once
+#Print "Including ""defines.bi""."
 #Include "inc/resource-defines.bi"
 
 ''defines
@@ -17,14 +18,14 @@
 #Define MIN_SIZE_X                  &h000001C2 ''450 '&h000001F8 ''504
 #Define MIN_SIZE_Y                  &h00000190 ''400 '&h000001BC ''444
 
-''for some reason, DWL_MSGRESULT isn't defined in FB v1.05.0's 64-bit Windows
-''headers, as this may be fixed in future versions, only define this if it isn't already
+/'  For some reason, DWL_MSGRESULT isn't defined in FreeBASIC v1.05.0's
+    64-bit Windows headers, as this may be fixed in future versions, only
+    define this if it isn't already
+'/
 #Ifndef DWL_MSGRESULT
     #Define DWL_MSGRESULT           &h00000000 ''0
 #EndIf
 
-
-''heap object info:
 ''IDs for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (CCH_PATH * SizeOf(TCHAR)))
@@ -33,9 +34,11 @@
 #Define PATH_DEFAULT                &h00000001 ''1
 #Define PATH_DEFLIST                &h00000002 ''2
 
+''app name sizes
 #Define CCH_APPNAME                 &h00000040 ''64
 #Define CB_APPNAME                  Cast(SIZE_T, (CCH_APPNAME * SizeOf(TCHAR)))
 
+''IDs and sizes for the about message
 #Define CCH_ABT                     &h00000400 ''1024
 #Define CB_ABT                      Cast(SIZE_T, (CCH_ABT * SizeOf(TCHAR)))
 #Define C_ABT                       &h00000002 ''2

@@ -10,6 +10,7 @@
 #define IDM_ROOT					0x2715 //10005
 #define IDM_BACK                    0x2716 //10006
 #define IDM_REFRESH					0x2717 //10007
+#define IDM_PLEDIT                  0x271A //10010
 #define IDM_ABOUT                   0x2719 //10009
 
 #define IDR_MENUCONTEXT             0x4E20 //20000
@@ -36,6 +37,8 @@ BEGIN
 		MENUITEM "Go to &Previous Directory", IDM_BACK, MFT_STRING, MFS_DISABLED
 		MENUITEM SEPARATOR
 		MENUITEM "Re&fresh Lists", IDM_REFRESH, MFT_STRING, MFS_ENABLED
+		MENUITEM SEPARATOR
+		MENUITEM "Playlist &Editor", IDM_PLEDIT, MFT_STRING, MFS_ENABLED
 	END
     MENUITEM "&About", IDM_ABOUT, MFT_STRING, MFS_ENABLED
 END

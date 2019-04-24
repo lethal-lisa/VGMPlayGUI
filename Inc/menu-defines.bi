@@ -20,6 +20,7 @@
 #Define IDM_REFRESH					&h2717 ''10007
 #Define IDM_OPTIONS                 &h2718 ''10008
 #Define IDM_ABOUT                   &h2719 ''10009
+#Define IDM_PLEDIT                  &h271A ''10010
 
 ''context menu
 #Define IDR_MENUCONTEXT             &h4E20 ''20000

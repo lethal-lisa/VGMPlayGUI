@@ -41,6 +41,7 @@
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
 #Include "inc/config.bi"
+#Include "inc/playlist-editor.bi"
 #Include "inc/createtooltip.bi"
 #Include "inc/errorhandler.bi"
 #Include "inc/heapptrlist.bi"
