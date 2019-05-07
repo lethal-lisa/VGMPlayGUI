@@ -233,9 +233,15 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                             
                             ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
                             
-                        Case IDM_PLEDIT
+                        Case IDM_PLEDIT                         ''launch playlist editor
+                            
+                            ''store current path
+                            *lpszCurPath = CurDir()
                             
                             DialogBox(hInstance, MAKEINTRESOURCE(IDD_PLAYLIST), hWnd, @PlaylistProc)
+                            
+                            ''refresh lists with current path in case the editor changed the current path
+                            If (PopulateLists(hWnd, lpszCurPath) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                         Case IDM_DELETE                         ''delete file
                             
@@ -270,7 +276,6 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                         Case IDC_LST_MAIN       ''file list
                             
                             ''get selected item, change directories, and refresh the listboxes
-                            'DlgDirSelectEx(hWnd, lpszCurPath, MAX_PATH, IDC_LST_MAIN)
                             If (GetDlgItemText(hWnd, IDC_EDT_FILE, lpszCurPath, MAX_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (PathIsDirectory(Cast(LPCTSTR, lpszCurPath)) = Cast(BOOL, FILE_ATTRIBUTE_DIRECTORY)) Then
                                 
@@ -317,20 +322,25 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                 ? "(cx, cy)", "= ("; LoWord(lParam); ", "; HiWord(lParam); ")"
             #EndIf
             
-            ''declare local variables
-            Dim rcSbr As RECT       ''statusbar rect
-            Dim rcParent As RECT    ''main dialog rect
+            '''declare local variables
+            'Dim rcSbr As RECT       ''statusbar rect
+            'Dim rcParent As RECT    ''main dialog rect
+            
+            Dim lprc As LPRECT = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (2 * SizeOf(RECT)))
+            If (lprc = NULL) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             ''get rects for statusbar and main dialog, and subtract the statusbar's height from that of the main window
-            With rcParent
+            With lprc[0] 'rcParent
                 .right  = LoWord(lParam)
                 .bottom = HiWord(lParam)
             End With
-            If (GetClientRect(GetDlgItem(hWnd, IDC_SBR_MAIN), @rcSbr) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
-            rcParent.bottom -= rcSbr.bottom
+            If (GetClientRect(GetDlgItem(hWnd, IDC_SBR_MAIN), @lprc[1]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            lprc[0].bottom -= lprc[1].bottom
             
             ''resize the child windows
-            If (EnumChildWindows(hWnd, @ResizeMainChildren, Cast(LPARAM, @rcParent)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            If (EnumChildWindows(hWnd, @ResizeMainChildren, Cast(LPARAM, @lprc[0])) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            
+            If (HeapFree(hHeap, NULL, lprc) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             Return(Cast(LRESULT, TRUE))
             
@@ -621,25 +631,6 @@ Private Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) A
     If (DlgDirList(hDlg, (CurDir() + "\*"), IDC_LST_MAIN, NULL, dwFileFilt) = 0) Then Return(FALSE)
     If (DlgDirList(hDlg, NULL, IDC_LST_DRIVES, NULL, (DDL_DRIVES Or DDL_EXCLUSIVE)) = 0) Then Return(FALSE)
     
-    /'''allocate space for appname & load the string
-    Dim lpszAppName As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (128 * SizeOf(TCHAR)))
-    If (lpszAppName = NULL) Then Return(FALSE)
-    If (LoadString(hInstance, IDS_APPNAME, lpszAppName, 128) = 0) Then Return(FALSE)
-    
-    ''allocate space for new title bar string and format it
-    Dim lpszTitle As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, ((MAX_PATH + 128) * SizeOf(TCHAR)))
-    If (lpszTitle = NULL) Then Return(FALSE)
-    *lpszTitle = (*lpszAppName + " - [" + CurDir() + "]")
-    
-    ''free memory used for appname
-    If (HeapFree(hHeap, NULL, lpszAppName) = FALSE) Then Return(FALSE)
-    
-    ''update the title bar
-    If (SetWindowText(hDlg, Cast(LPCTSTR, lpszTitle)) = FALSE) Then Return(FALSE)
-    
-    ''free memory used for new title bar string
-    If (HeapFree(hHeap, NULL, lpszTitle) = FALSE) Then Return(FALSE)'/
-    
     ''return
     SetCursor(hCurPrev)
     SetLastError(ERROR_SUCCESS)
@@ -675,6 +666,7 @@ Private Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTS
         Return(TRUE)
     End If
     
+    PathCompactPath(NULL, Cast(PTSTR, lpszPath), 240) ''240 may change later
     Dim lpszTitle As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, ((MAX_PATH + CCH_APPNAME + 5) * SizeOf(TCHAR)))
     If (lpszTitle = NULL) Then Return(FALSE)
     *lpszTitle = (*lpszAppName + " - [" + *lpszPath + "]")

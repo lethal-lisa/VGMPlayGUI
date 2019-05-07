@@ -25,6 +25,7 @@
 #Define IDM_PL_PRUNEDUPLICATE   &h753A ''30010
 #Define IDM_PL_ADD              &h753B ''30011
 #Define IDM_PL_INSERT           &h753C ''30012
-#Define IDM_PL_REMOTE           &h753D ''30013
+#Define IDM_PL_REMOVE           &h753D ''30013
+#Define IDM_PL_PRUNENONEXIST    &h753E ''30014
 
 ''EOF

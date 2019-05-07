@@ -71,13 +71,14 @@
 #define IDI_WRENCH                  0x0066 //102
 #define IDI_PLAY                    0x0067 //103
 #define IDI_GD3TAG                  0x0068 //104
+#define IDI_MAKEM3U                 0x0069 //105
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 12, 0, 3
-PRODUCTVERSION  2, 13, 0, 3
+FILEVERSION     1, 12, 0, 25
+PRODUCTVERSION  2, 13, 0, 21
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
-FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
+FILEFLAGS       0 //VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
 FILETYPE        VFT_APP
 FILESUBTYPE     0
@@ -86,8 +87,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.12.0.3\0"
-            VALUE "ProductVersion",     "2.13.0.3\0"
+            VALUE "FileVersion",        "1.12.0.24\0"
+            VALUE "ProductVersion",     "2.13.0.20\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
@@ -95,8 +96,8 @@ BEGIN
             VALUE "LegalTrademarks",    "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
-            VALUE "PrivateBuild",       "Built by Lisa for testing playlist editor.\0"
-            VALUE "SpecialBuild",       "Test/debug build.\0"
+            VALUE "PrivateBuild",       "\0"
+            VALUE "SpecialBuild",       "\0"
         END
     END
     BLOCK "VarFileInfo"
@@ -145,7 +146,7 @@ BEGIN
     IDS_TIP_DELMOD_RECYCLE      "When deleting a file, the file will be sent to the recycle bin."
     IDS_TIP_DELMOD_REMOVE       "Permenantly deletes a file without sending it to the recycle bin."
     IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
-    IDS_FILT_M3U                "M3U Playlists (*.m3u)\0*.M3U\0All Files (*.*)\n*.*\0\0"
+    IDS_FILT_M3U                "M3U Playlists (*.m3u)\0*.M3U\0All Files (*.*)\0*.*\0\0"
     IDS_FILT_ADDTOLIST          "Accepted File Types\0*.VGM;*.VGZ;*.DRO;*.CMF;\0VGM Files (*.vgm, *.vgz)\0*.VGM;*.VGZ\0DOSBox Raw OPL Logs (*.dro)\0*.DRO\0Creative Music Format Modules (*.cmf)\0*.CMF\0All Files (*.*)\0*.*\0\0"
 END
 
@@ -155,6 +156,7 @@ IDI_KAZUSOFT    ICON    "Res/Kazusoft.ico"
 IDI_WRENCH      ICON    "Res/wrench.ico"
 IDI_PLAY        ICON    "Res/play.ico"
 IDI_GD3TAG      ICON    "Res/GD3Tag.ico"
+IDI_MAKEM3U     ICON    "Res/MakeM3U.ico"
 
 //dialogs
 IDD_MAIN DIALOGEX 10, 10, 300, 300

@@ -271,4 +271,9 @@ v2.12.1:
     *       Fixed the about message box.
     *       Updated error checking.
     
+v2.13.0.8:
+    
+    *       Fixed an issue with the general options property sheet page
+        displaying the wrong title.
+    
 EOF

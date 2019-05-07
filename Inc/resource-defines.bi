@@ -33,5 +33,7 @@
 #Define IDI_KAZUSOFT                &h0065 ''101
 #Define IDI_WRENCH                  &h0066 ''102
 #Define IDI_PLAY                    &h0067 ''103
+#Define IDI_GD3TAG                  &h0068 ''104
+#Define IDI_MAKEM3U                 &h0069 ''105
 
 ''EOF
