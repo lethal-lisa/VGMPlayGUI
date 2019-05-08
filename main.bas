@@ -649,7 +649,7 @@ Private Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTS
     #EndIf
     
     Dim hCurPrev As HCURSOR = SetCursor(LoadCursor(NULL, IDC_WAIT))
-        
+    
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
@@ -666,14 +666,20 @@ Private Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTS
         Return(TRUE)
     End If
     
-    PathCompactPath(NULL, Cast(PTSTR, lpszPath), 240) ''240 may change later
+    ''format the path name
+    Dim lpszTempPath As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
+    If (lpszTempPath = NULL) Then Return(FALSE)
+    *lpszTempPath = *lpszPath
+    If (PathCompactPath(NULL, lpszTempPath, 200) = FALSE) Then Return(FALSE)
+    
+    ''format the new window title
     Dim lpszTitle As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, ((MAX_PATH + CCH_APPNAME + 5) * SizeOf(TCHAR)))
     If (lpszTitle = NULL) Then Return(FALSE)
-    *lpszTitle = (*lpszAppName + " - [" + *lpszPath + "]")
-    
+    *lpszTitle = (*lpszAppName + " - [" + *lpszTempPath + "]")
     If (SetWindowText(hDlg, Cast(LPCTSTR, lpszTitle)) = FALSE) Then Return(FALSE)
     
     ''return
+    If (HeapFree(hHeap, NULL, lpszTempPath) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, NULL, lpszAppName) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, NULL, lpszTitle) = FALSE) Then Return(FALSE)
     SetCursor(hCurPrev)

@@ -162,6 +162,7 @@ Private Function BrowseOpen (ByVal hDlg As HWND, ByVal lpszFile As LPTSTR, ByVal
         ? !"hDlg\t= 0x"; Hex(hDlg)
         ? !"lpszFile\t= 0x"; Hex(lpszFile)
         ? !"*lpszFile\t= "; *lpszFile
+        ? !"bReadOnly\t= 0x"; Hex(bReadOnly)
     #EndIf
     
     If (hInstance = INVALID_HANDLE_VALUE) Then
@@ -209,6 +210,13 @@ End Function
 
 Private Function BrowseSave (ByVal hDlg As HWND, ByVal lpszFile As LPTSTR) As BOOL
     
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
+        ? !"lpszFile\t= 0x"; Hex(lpszFile)
+        ? !"*lpszFile\t= "; *lpszFile
+    #EndIf
+    
     If (hInstance = INVALID_HANDLE_VALUE) Then
         SetLastError(ERROR_INVALID_HANDLE)
         Return(FALSE)
@@ -228,7 +236,6 @@ Private Function BrowseSave (ByVal hDlg As HWND, ByVal lpszFile As LPTSTR) As BO
     With *lpOfn
         .lStructSize    = SizeOf(OPENFILENAME)
         .hwndOwner      = hDlg
-        '.hInstance      = hInstance
         .lpstrFilter    = Cast(LPCTSTR, lpszFilt)
         .nFilterIndex   = 1
         .lpstrFile      = lpszFile
@@ -248,6 +255,13 @@ Private Function BrowseSave (ByVal hDlg As HWND, ByVal lpszFile As LPTSTR) As BO
 End Function
 
 Private Function LoadFromFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hWnd\t= 0x"; Hex(hWnd)
+        ? !"lpszFile\t= 0x"; Hex(lpszFile)
+        ? !"*lpszFile\t= "; *lpszFile
+    #EndIf
     
     ''make sure the file exists
     If (PathFileExists(lpszFile) = FALSE) Then Return(FALSE)
@@ -276,9 +290,6 @@ Private Function LoadFromFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As
             ''load an item
             Line Input #uf, *lpszItem
             
-            ''format the item
-            'PathUnquoteSpaces(lpszItem)
-            
             ''add the item
             If (Len(*lpszItem) > 0) Then SendMessage(hWnd, LB_ADDSTRING, NULL, Cast(LPARAM, lpszItem))
             
@@ -298,6 +309,13 @@ Private Function LoadFromFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As
 End Function
 
 Private Function SaveToFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hWnd\t= 0x"; Hex(hWnd)
+        ? !"lpszFile\t= 0x"; Hex(lpszFile)
+        ? !"*lpszFile\t= "; *lpszFile
+    #EndIf
     
     ''make sure file name is valid
     If (lpszFile = NULL) Then
@@ -325,10 +343,6 @@ Private Function SaveToFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As B
             ''get an item from the list
             SendMessage(hWnd, LB_GETTEXT, iItem, Cast(LPARAM, lpszItem))
             
-            ''format the path
-            'PathQuoteSpaces(lpszItem)
-            PathRemoveBlanks(lpszItem)
-            
             ''write the item to the file
             Print #uf, *lpszItem
             
@@ -351,6 +365,13 @@ End Function
 
 Private Function BrowseItem (ByVal hDlg As HWND, ByVal lpszItem As LPTSTR) As BOOL
     
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
+        ? !"lpszItem\t= 0x"; Hex(lpszItem)
+        ? !"*lpszItem\t= "; *lpszItem
+    #EndIf
+    
     If (hInstance = INVALID_HANDLE_VALUE) Then
         SetLastError(ERROR_INVALID_HANDLE)
         Return(FALSE)
@@ -370,13 +391,10 @@ Private Function BrowseItem (ByVal hDlg As HWND, ByVal lpszItem As LPTSTR) As BO
     With *lpOfn
         .lStructSize    = SizeOf(OPENFILENAME)
         .hwndOwner      = hDlg
-        '.hInstance      = hInstance
         .lpstrFilter    = Cast(LPCTSTR, lpszFilt)
         .nFilterIndex   = 1
         .lpstrFile      = lpszItem
         .nMaxFile       = MAX_PATH
-        '.lpstrFileTitle = lpszItem
-        '.nMaxFileTitle  = MAX_PATH
         .Flags          = (OFN_DONTADDTORECENT Or OFN_HIDEREADONLY) ''hide read-only since we aren't actually opening the files and disable recent file lists since files don't need to exist
     End With
     
@@ -392,6 +410,11 @@ Private Function BrowseItem (ByVal hDlg As HWND, ByVal lpszItem As LPTSTR) As BO
 End Function
 
 Private Function AddItem (ByVal hDlg As HWND) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
+    #EndIf
     
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
@@ -417,6 +440,11 @@ Private Function AddItem (ByVal hDlg As HWND) As BOOL
 End Function
 
 Private Function InsertItem (ByVal hDlg As HWND) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
+    #EndIf
     
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
@@ -446,6 +474,11 @@ Private Function InsertItem (ByVal hDlg As HWND) As BOOL
 End Function
 
 Private Function RemoveItem (ByVal hWnd As HWND) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hWnd\t= 0x"; Hex(hWnd)
+    #EndIf
     
     Dim nCurSel As UINT = SendMessage(hWnd, LB_GETCURSEL, NULL, NULL)
     SendMessage(hWnd, LB_DELETESTRING, nCurSel, NULL)
