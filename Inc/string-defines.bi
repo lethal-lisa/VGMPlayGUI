@@ -40,8 +40,7 @@
 
 #Define IDS_REG_VGMPLAYPATH         &h0300 ''768
 #Define IDS_REG_DEFAULTPATH         &h0301 ''769
-#Define IDS_REG_DEFAULTLIST         &h0302 ''770
-#Define IDS_REG_FILEFILTER          &h0303 ''771
+#Define IDS_REG_FILEFILTER          &h0302 ''770
 
 #Define IDS_TIP_DRIVELIST           &h0400 ''1024
 #Define IDS_TIP_UPBTN               &h0401 ''1025
@@ -50,7 +49,6 @@
 #Define IDS_TIP_PLAYBTN             &h0404 ''1028
 #Define IDS_TIP_VGMPLAYPATH         &h0405 ''1029
 #Define IDS_TIP_DEFAULTPATH         &h0406 ''1030
-#Define IDS_TIP_DEFAULTLIST         &h0407 ''1031
 #Define IDS_TIP_ARCHIVE             &h0408 ''1032
 #Define IDS_TIP_HIDDEN              &h0409 ''1033
 #Define IDS_TIP_SYSTEM              &h040A ''1034

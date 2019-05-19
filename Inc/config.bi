@@ -45,7 +45,7 @@
 ''IDs for plpszKeyName
 #Define CCH_KEY             &h00000020 ''32
 #Define CB_KEY              Cast(SIZE_T, (CCH_KEY * SizeOf(TCHAR)))
-#Define C_KEY               &h00000004 ''4
+#Define C_KEY               &h00000003 ''3
 #Define KEY_VGMPLAYPATH     &h00000000 ''0
 #Define KEY_DEFAULTPATH     &h00000001 ''1
 #Define KEY_DEFAULTLIST     &h00000002 ''2

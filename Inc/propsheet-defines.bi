@@ -17,9 +17,9 @@
 #Define IDC_STC_DEFAULTPATH         &h0450 ''1104
 #Define IDC_EDT_DEFAULTPATH         &h0451 ''1105
 #Define IDC_BTN_DEFAULTPATH         &h0452 ''1106
-#Define IDC_STC_DEFAULTLIST         &h0453 ''1107
+/'#Define IDC_STC_DEFAULTLIST         &h0453 ''1107
 #Define IDC_EDT_DEFAULTLIST         &h0454 ''1108
-#Define IDC_BTN_DEFAULTLIST         &h0455 ''1109
+#Define IDC_BTN_DEFAULTLIST         &h0455 ''1109'/
 
 ''file filter property sheet
 #Define IDD_FILEFILTER              &h04B0 ''1200
