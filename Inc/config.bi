@@ -48,8 +48,7 @@
 #Define C_KEY               &h00000003 ''3
 #Define KEY_VGMPLAYPATH     &h00000000 ''0
 #Define KEY_DEFAULTPATH     &h00000001 ''1
-#Define KEY_DEFAULTLIST     &h00000002 ''2
-#Define KEY_FILEFILTER      &h00000003 ''3
+#Define KEY_FILEFILTER      &h00000002 ''2
 
 Extern hConfig As HANDLE
 Extern plpszPath As LPTSTR Ptr
