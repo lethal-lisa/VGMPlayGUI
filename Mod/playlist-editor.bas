@@ -107,7 +107,7 @@ Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                             
                             If (RemoveItem(GetDlgItem(hWnd, IDC_LST_PLAYLIST)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
-                        Case IDM_PL_PRUNENONEXIST
+                        /'Case IDM_PL_PRUNENONEXIST
                             
                             ''get the count of items in the list
                             Dim cItems As INT32 = SendMessage(GetDlgItem(hWnd, IDC_LST_PLAYLIST), LB_GETCOUNT, NULL, NULL)
@@ -135,7 +135,7 @@ Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                                 SetWindowLong(hWnd, DWL_MSGRESULT, TRUE)
                                 Return(SysErrMsgBox(hWnd, GetLastError()))
                             End If
-                            
+                            '/
                     End Select
                     
                 Case Cast(UINT32, LBN_ERRSPACE)

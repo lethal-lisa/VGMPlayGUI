@@ -13,12 +13,9 @@
 #define IDM_PL_EXIT             0x7536 //30006
 #define IDM_PL_LIST             0x7537 //30007
 #define IDM_PL_PRUNE            0x7538 //30008
-#define IDM_PL_PRUNEINVALID     0x7539 //30009
-#define IDM_PL_PRUNEDUPLICATE   0x753A //30010
-#define IDM_PL_ADD              0x753B //30011
-#define IDM_PL_INSERT           0x753C //30012
-#define IDM_PL_REMOVE           0x753D //30013
-#define IDM_PL_PRUNENONEXIST    0x753E //30014
+#define IDM_PL_ADD              0x7539 //30009
+#define IDM_PL_INSERT           0x753A //30010
+#define IDM_PL_REMOVE           0x753B //30011
 
 IDD_PLAYLIST DIALOGEX 10, 10, 200, 200
 CAPTION "Playlist Editor"
@@ -45,12 +42,6 @@ BEGIN
     END
     POPUP "&List", IDM_PL_LIST, MFT_STRING, MFS_ENABLED
     BEGIN
-        POPUP "&Prune", IDM_PL_PRUNE, MFT_STRING, MFS_ENABLED
-        BEGIN
-            MENUITEM "Remove Invalid File &Types", IDM_PL_PRUNEINVALID, MFT_STRING, MFS_DISABLED
-            MENUITEM "Remove &Duplicate Entries", IDM_PL_PRUNEDUPLICATE, MFT_STRING, MFS_DISABLED
-            MENUITEM "Remove &Nonexistant Files", IDM_PL_PRUNENONEXIST, MFT_STRING, MFS_ENABLED
-        END
         MENUITEM "&Add File", IDM_PL_ADD, MFT_STRING, MFS_ENABLED
         MENUITEM "&Insert File", IDM_PL_INSERT, MFT_STRING, MFS_ENABLED
         MENUITEM "&Remove File", IDM_PL_REMOVE, MFT_STRING, MFS_ENABLED
