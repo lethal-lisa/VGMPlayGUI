@@ -54,10 +54,113 @@ Extern hConfig As HANDLE
 Extern plpszPath As LPTSTR Ptr
 Extern dwFileFilt As DWORD32
 
+/'  DoOptionsPropSheet:
+    
+    /'  Description:
+        
+            Starts the options property sheet dialog.
+        
+    '/
+    
+    /'  Parameters:
+        
+        /'  ByVal hDlg As HWND
+            
+                Handle to the dialog to use as a parent window.
+            
+        '/
+        
+        /'  ByVal nStartPage As UINT = PG_PATHS
+            
+                Page ID of the property sheet page to start on. This
+            defaults to the Paths page if this value is not included.
+            
+        '/
+        
+    '/
+    
+    /'  Return Value:
+        
+            Returns TRUE on success and FALSE on failure. To get more
+        detailed error information, call GetLastError().
+        
+    '/
+    
+'/
 Declare Function DoOptionsPropSheet (ByVal hDlg As HWND, ByVal nStartPage As UINT = PG_PATHS) As BOOL
+
+/'  InitConfig:
+    
+    /'  Description:
+        
+            Initializes the config module. This must be called before using
+        any other config functions.
+        
+    '/
+    
+    /'  Return Value:
+        
+            Returns TRUE on success and FALSE on failure. To get more
+        detailed error information, call GetLastError().
+        
+    '/
+    
+'/
 Declare Function InitConfig () As BOOL
+
+/'  FreeConfig:
+    
+    /'  Description:
+        
+            Frees the memory allocated by the config module. This must be
+        called before exiting the program.
+        
+    '/
+    
+    /'  Return Value:
+        
+            Returns TRUE on success and FALSE on failure. To get more
+        detailed error information, call GetLastError().
+        
+    '/
+    
+'/
 Declare Function FreeConfig () As BOOL
+
+/'  LoadConfig:
+    
+    /'  Description:
+        
+            Loads the config information into memory from the registry.
+        
+    '/
+    
+    /'  Return Value:
+        
+            Returns TRUE on success and FALSE on failure. To get more
+        detailed error information, call GetLastError().
+        
+    '/
+    
+'/
 Declare Function LoadConfig () As BOOL
+
+/'  SaveConfig:
+    
+    /'  Description:
+        
+            Writes the config information from memory to the registry.
+        
+    '/
+    
+    /'  Return Value:
+        
+            Returns TRUE on success and FALSE on failure. To get more
+        detailed error information, call GetLastError().
+        
+    '/
+    
+'/
 Declare Function SaveConfig () As BOOL
 
 ''EOF
