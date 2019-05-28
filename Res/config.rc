@@ -1,0 +1,59 @@
+//propertysheets.rc
+//Copyright (c) 2019 Kazusoft Co.
+
+#define IDD_PATHS                   0x044C //1100
+#define IDC_STC_VGMPLAYPATH         0x044D //1101
+#define IDC_EDT_VGMPLAYPATH         0x044E //1102
+#define IDC_BTN_VGMPLAYPATH         0x044F //1103
+#define IDC_STC_DEFAULTPATH         0x0450 //1104
+#define IDC_EDT_DEFAULTPATH         0x0451 //1105
+#define IDC_BTN_DEFAULTPATH         0x0452 //1106
+
+#define IDD_FILEFILTER              0x04B0 //1200
+#define IDC_GRP_ATTRIB              0x04B1 //1201
+#define IDC_CHK_ARCHIVE             0x04B2 //1202
+#define IDC_CHK_HIDDEN              0x04B3 //1203
+#define IDC_CHK_SYSTEM              0x04B4 //1204
+#define IDC_CHK_READONLY            0x04B5 //1205
+#define IDC_CHK_EXCLUSIVE           0x04B6 //1206
+
+//define property sheet sizes because GoRC doesn't seem to include these definitions by default.
+#define PROP_SM_CXDLG               0x00D4 //212
+#define PROP_SM_CYDLG               0x00BC //188
+#define PROP_MED_CXDLG              0x00E3 //227
+#define PROP_MED_CYDLG              0x00D7 //215
+#define PROP_LG_CXDLG               0x00FC //252
+#define PROP_LG_CYDLG               0x00DA //218
+
+IDD_PATHS DIALOGEX 10, 10, PROP_SM_CXDLG, PROP_SM_CYDLG
+CAPTION "Paths"
+FONT 10, "Tahoma", 400, 0, 0
+LANGUAGE 9, 1
+STYLE WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_TILED | WS_VISIBLE
+EXSTYLE 0x00010080
+BEGIN
+    CONTROL "Path to VGMPlay.exe", IDC_STC_VGMPLAYPATH, "Static", 0x50000200, 3, 3, 171, 12
+    EDITTEXT IDC_EDT_VGMPLAYPATH, 3, 15, 123, 12, 0x50010080, 0x00000200
+    CONTROL "Browse", IDC_BTN_VGMPLAYPATH, "Button", 0x50010000, 129, 15, 45, 12
+    
+    CONTROL "Default Path", IDC_STC_DEFAULTPATH, "Static", 0x50000200, 3, 30, 171, 12
+    EDITTEXT IDC_EDT_DEFAULTPATH, 3, 42, 123, 12, 0x50010080, 0x00000200
+    CONTROL "Use Current", IDC_BTN_DEFAULTPATH, "Button", 0x50010000, 129, 42, 45, 12
+END
+
+IDD_FILEFILTER DIALOGEX 10, 10, PROP_SM_CXDLG, PROP_SM_CYDLG
+CAPTION "File Filter"
+FONT 10, "Tahoma", 400, 0, 0
+LANGUAGE 9, 1
+STYLE WS_CAPTION | WS_OVERLAPPED | WS_SYSMENU | WS_TILED | WS_VISIBLE
+EXSTYLE 0x00010080
+BEGIN
+    GROUPBOX "File Attributes", IDC_GRP_ATTRIB, 3, 3, 130, 75
+    AUTOCHECKBOX "Archive", IDC_CHK_ARCHIVE, 6, 15, 120, 12, BS_AUTOCHECKBOX | WS_TABSTOP | WS_GROUP
+    AUTOCHECKBOX "Hidden", IDC_CHK_HIDDEN, 6, 27, 120, 12
+    AUTOCHECKBOX "System", IDC_CHK_SYSTEM, 6, 39, 120, 12
+    AUTOCHECKBOX "Read Only", IDC_CHK_READONLY, 6, 51, 120, 12
+    AUTOCHECKBOX "Exclusive", IDC_CHK_EXCLUSIVE, 6, 63, 120, 12
+END
+
+//EOF
