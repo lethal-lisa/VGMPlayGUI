@@ -30,7 +30,11 @@
 ''include header
 #Include "inc/heapptrlist.bi"
 
-Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT32) As BOOL
+/'Property HEAP_LIST.cbTotal () As SIZE_T
+    Return(This.cbItem * This.cItems)
+End Property'/
+
+Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -48,7 +52,7 @@ Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Pt
     If (plpList = NULL) Then Return(FALSE)
     
     ''allocate each individual item
-    For iItem As UINT32 = 0 To (cItems - 1)
+    For iItem As UINT = 0 To (cItems - 1)
         plpList[iItem] = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, cbItem)
         If (plpList[iItem] = NULL) Then Return(FALSE)
         #If __FB_DEBUG__
@@ -64,7 +68,7 @@ Public Function HeapListAlloc (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Pt
     
 End Function
 
-Public Function HeapListFree (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT32) As BOOL
+Public Function HeapListFree (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT) As BOOL
     
     #If __FB_DEBUG__
         ? "Calling:", __FILE__; "\"; __FUNCTION__
@@ -84,7 +88,7 @@ Public Function HeapListFree (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr
     If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
     
     ''free each individual item
-    For iItem As UINT32 = 0 To (cItems - 1)
+    For iItem As UINT = 0 To (cItems - 1)
         If (HeapFree(hHeap, NULL, plpList[iItem]) = FALSE) Then Return(FALSE)
         #If __FB_DEBUG__
             ? "Freed Item #"; iItem
@@ -93,6 +97,47 @@ Public Function HeapListFree (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr
     
     ''free the list of pointers
     If (HeapFree(hHeap, NULL, plpList) = FALSE) Then Return(FALSE)
+    
+    ''return
+    If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Public Function HeapListFill (ByVal hHeap As HANDLE, ByRef plpList As LPVOID Ptr, ByVal cbItem As SIZE_T, ByVal cItems As UINT, ByVal lpValue As LPBYTE) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hHeap\t= 0x"; Hex(hHeap)
+        ? !"plpList\t= 0x"; Hex(plpList)
+        ? !"cbItem\t= 0x"; Hex(cbItem)
+        ? !"cItems\t= 0x"; Hex(cItems)
+        ? !"Total size\t= "; (cbItem * cItems); " Bytes"
+        ? !"lpValue\t= 0x"; Hex(lpValue)
+        ? !"*lpValue\t= "; *lpValue
+    #EndIf
+    
+    ''make sure a valid list is being passed
+    If (plpList = NULL) Then
+        SetLastError(ERROR_INVALID_PARAMETER)
+        Return(FALSE)
+    End If
+    
+    If (lpValue = NULL) Then
+        SetLastError(ERROR_INVALID_PARAMETER)
+        Return(FALSE)
+    End If
+    
+    If (HeapLock(hHeap) = FALSE) Then Return(FALSE)
+    
+    ''fill the list with the value at lpValue
+    For iItem As UINT = 0 To (cItems - 1)
+        FillMemory(plpList[iItem], cbItem, *lpValue)
+        #If __FB_DEBUG__
+            ? "Set Item #"; iItem; " to: "; *lpValue
+        #EndIf
+    Next iItem
     
     ''return
     If (HeapUnlock(hHeap) = FALSE) Then Return(FALSE)

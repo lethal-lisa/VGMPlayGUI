@@ -15,8 +15,8 @@
 ''defines
 #Define MARGIN_SIZE                 &h0000000A ''(10) distance between adjacent controls
 #Define WINDOW_SIZE                 &h0000001E ''(30) minimum window length/width
-#Define MIN_SIZE_X                  &h000001C2 ''450 '&h000001F8 ''504
-#Define MIN_SIZE_Y                  &h00000190 ''400 '&h000001BC ''444
+#Define MIN_SIZE_X                  &h000001C2 ''450
+#Define MIN_SIZE_Y                  &h00000190 ''400
 
 /'  For some reason, DWL_MSGRESULT isn't defined in FreeBASIC v1.05.0's
     64-bit Windows headers, as this may be fixed in future versions, only
@@ -29,10 +29,9 @@
 ''IDs for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (CCH_PATH * SizeOf(TCHAR)))
-#Define C_PATH                      &h00000003 ''3
+#Define C_PATH                      &h00000002 ''2
 #Define PATH_VGMPLAY                &h00000000 ''0
 #Define PATH_DEFAULT                &h00000001 ''1
-#Define PATH_DEFLIST                &h00000002 ''2
 
 ''app name sizes
 #Define CCH_APPNAME                 &h00000040 ''64

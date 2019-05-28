@@ -107,35 +107,6 @@ Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                             
                             If (RemoveItem(GetDlgItem(hWnd, IDC_LST_PLAYLIST)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
-                        /'Case IDM_PL_PRUNENONEXIST
-                            
-                            ''get the count of items in the list
-                            Dim cItems As INT32 = SendMessage(GetDlgItem(hWnd, IDC_LST_PLAYLIST), LB_GETCOUNT, NULL, NULL)
-                            If (cItems < 1) Then
-                                ''if the list is empty, then return with the message processed code
-                                SetWindowLong(hWnd, DWL_MSGRESULT, TRUE)
-                                Return(TRUE)
-                            End If
-                            
-                            ''allocate space for a path buffer
-                            Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
-                            If (lpszItem = NULL) Then
-                                SetWindowLong(hWnd, DWL_MSGRESULT, FALSE)
-                                Return(SysErrMsgBox(hWnd, GetLastError()))
-                            End If
-                            
-                            ''test each file for existance & remove it if it doesn't
-                            For iItem As UINT32 = 0 To (cItems - 1)
-                                SendMessage(GetDlgItem(hWnd, IDC_LST_PLAYLIST), LB_GETTEXT, iItem, Cast(LPARAM, lpszItem))
-                                If (PathFileExists(lpszItem) = FALSE) Then SendMessage(GetDlgItem(hWnd, IDC_LST_PLAYLIST), LB_DELETESTRING, iItem, NULL)
-                            Next iItem
-                            
-                            ''free the memory
-                            If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then
-                                SetWindowLong(hWnd, DWL_MSGRESULT, TRUE)
-                                Return(SysErrMsgBox(hWnd, GetLastError()))
-                            End If
-                            '/
                     End Select
                     
                 Case Cast(UINT32, LBN_ERRSPACE)

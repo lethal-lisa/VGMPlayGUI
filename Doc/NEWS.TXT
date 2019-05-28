@@ -143,4 +143,15 @@ v2.12.1:
     
     *       Fixed the about message box.
     
+v2.13:
+    
+    *       Fixed the general options page's title.
+    
+v2.13.1:
+    
+    +       Path truncating in the title bar.
+    *       Improved the error handler.
+    -       Removed nonfunctional "Default Playlist" option from options
+        menu.
+    
 EOF

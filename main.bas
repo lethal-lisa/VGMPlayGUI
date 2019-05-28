@@ -5,8 +5,8 @@
     VGMPlayGUI v2 - Main module.
     
     Compile with:
-        GoRC /r /nu "resource.rc"
-        fbc -s gui "main.bas" "resource.res" "Mod\*.o" -x "VGMPlayGUI.exe"
+        fbc -c "Mod\*.bas"
+        fbc -s gui "main.bas" "resource.rc" "Mod\*.o" -x "VGMPlayGUI.exe"
     
     Copyright (c) 2018-2019 Kazusoft Co.
     Kazusoft is a TradeMark of Lisa Murray.
@@ -321,10 +321,6 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                 ? "Resize type:", "0x"; Hex(wParam)
                 ? "(cx, cy)", "= ("; LoWord(lParam); ", "; HiWord(lParam); ")"
             #EndIf
-            
-            '''declare local variables
-            'Dim rcSbr As RECT       ''statusbar rect
-            'Dim rcParent As RECT    ''main dialog rect
             
             Dim lprc As LPRECT = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (2 * SizeOf(RECT)))
             If (lprc = NULL) Then Return(SysErrMsgBox(hWnd, GetLastError()))
@@ -670,7 +666,8 @@ Private Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTS
     Dim lpszTempPath As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
     If (lpszTempPath = NULL) Then Return(FALSE)
     *lpszTempPath = *lpszPath
-    If (PathCompactPath(NULL, lpszTempPath, 200) = FALSE) Then Return(FALSE)
+    ''the measurement of 240 is a placeholder and might change later
+    If (PathCompactPath(NULL, lpszTempPath, 240) = FALSE) Then Return(FALSE)
     
     ''format the new window title
     Dim lpszTitle As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, ((MAX_PATH + CCH_APPNAME + 5) * SizeOf(TCHAR)))

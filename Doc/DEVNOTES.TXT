@@ -10,9 +10,8 @@ Registry Structure:
         "VGMPlay Path"      REG_SZ      ""
         "Default Path"      REG_SZ      ""
         "File Filter"       REG_DWORD   DDL_DIRECTORY (0x10 (16))
-        "Default Playlist"  REG_SZ      ""
     
-Keyboard controls used by VGMPlay:
+Keyboard Controls Used by VGMPlay:
     
     KEY:            FUNCTION:
     
@@ -30,13 +29,13 @@ Keyboard controls used by VGMPlay:
     PageDown        Next track.
     N               Next track.
     
-File types supported by VGMPlay:
+File Types Supported by VGMPlay:
     
     Video Game Music Files (*.vgm, *.vgz)
     Creative Music Files (*.cmf)
     DOSBox RAW OPL Logs (*.dro)
     M3U Playlist Files (*.m3u)
     
-Minimum size in Pixels for main dialog is 504x444.
+Minimum size in Pixels for main dialog is 450x400.
 
 EOF

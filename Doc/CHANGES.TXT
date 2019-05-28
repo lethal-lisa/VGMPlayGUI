@@ -276,4 +276,16 @@ v2.13.0.8:
     *       Fixed an issue with the general options property sheet page
         displaying the wrong title.
     
+v2.13.1.2:
+    
+    +       Added path truncating in the title bar using PathCompactPath.
+    
+v2.13.1.13:
+    
+    *       Partial rewrite of Inc\errorhandler.bas\SysErrMsgBox. The
+        function now primarially uses heap functions for memory management.
+    +       The function Inc\errorhandler.bas\MsgBoxBeep was added.
+    -       Removed references to the default playlist options menu item.
+    *       Renamed Res\property-sheets.rc to Res\config.rc.
+    
 EOF

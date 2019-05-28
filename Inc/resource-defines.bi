@@ -9,7 +9,7 @@
 #Pragma Once
 #Print "Including ""resource-defines.bi""."
 #Include "inc/menu-defines.bi"
-#Include "inc/propsheet-defines.bi"
+#Include "inc/config-defines.bi"
 #Include "inc/string-defines.bi"
 #Include "inc/playlist-editor-defines.bi"
 

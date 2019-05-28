@@ -11,7 +11,6 @@
     Name:               Type:       Default Value:
     (default)           REG_SZ      (N/A)
     "Default Path"      REG_SZ      (N/A)
-    "Default Playlist"  REG_SZ      (N/A)
     "File Filter"       REG_DWORD   0x10 (16)
     "VGMPlay Path"      REG_SZ      (N/A)
 '/
@@ -37,10 +36,9 @@
 #Define BVGMP_FILETITLE     3
 
 ''page count and IDs
-#Define C_PAGES             3
+#Define C_PAGES             2
 #Define PG_PATHS            0
 #Define PG_FILEFILT         1
-#Define PG_GENERALOPTS      2
 
 ''IDs for plpszKeyName
 #Define CCH_KEY             &h00000020 ''32

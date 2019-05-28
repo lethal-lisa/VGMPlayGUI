@@ -88,15 +88,6 @@ Public Function DoOptionsPropSheet (ByVal hDlg As HWND, ByVal nStartPage As UINT
         .pfnDlgProc     = @FileFiltProc
     End With
     
-    With lpPsp[PG_GENERALOPTS]
-        .dwSize         = SizeOf(PROPSHEETPAGE)
-        .dwFlags        = (PSP_USEICONID Or PSP_HASHELP)
-        .hInstance      = hInstance
-        .pszTemplate    = MAKEINTRESOURCE(IDD_GENERALOPTS)
-        .pszIcon        = MAKEINTRESOURCE(IDI_WRENCH)
-        .pfnDlgProc     = @GeneralOptsProc
-    End With
-    
     ''setup property sheet header
     Dim lpPsh As LPPROPSHEETHEADER = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, SizeOf(PROPSHEETHEADER))
     If (lpPsh = NULL) Then Return(FALSE)
@@ -204,10 +195,6 @@ Public Function LoadConfig () As BOOL
         SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), @cbValue))
         If (GetLastError()) Then Return(FALSE)
         
-        /'cbValue = CB_PATH
-        SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTLIST], NULL, NULL, Cast(LPBYTE, plpszPath[PATH_DEFLIST]), @cbValue))
-        If (GetLastError()) Then Return(FALSE)'/
-        
         cbValue = SizeOf(DWORD32)
         SetLastError(RegQueryValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, NULL, Cast(LPBYTE, @dwFileFilt), @cbValue))
         If (GetLastError()) Then Return(FALSE)
@@ -273,9 +260,6 @@ Public Function SaveConfig () As BOOL
     SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTPATH], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFAULT]), CB_PATH))
     If (GetLastError()) Then Return(FALSE)
     
-    /'SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_DEFAULTLIST], NULL, REG_SZ, Cast(LPBYTE, plpszPath[PATH_DEFLIST]), CB_PATH))
-    If (GetLastError()) Then Return(FALSE)'/
-    
     SetLastError(RegSetValueEx(hkProgKey, plpszKeyName[KEY_FILEFILTER], NULL, REG_DWORD, Cast(LPBYTE, @dwFileFilt), SizeOf(DWORD32)))
     If (GetLastError()) Then Return(FALSE)
     
@@ -336,7 +320,6 @@ Private Function SetDefConfig () As BOOL
     ''set defaults
     *plpszPath[PATH_VGMPLAY]    = ""
     *plpszPath[PATH_DEFAULT]    = ""
-    *plpszPath[PATH_DEFLIST]    = ""
     dwFileFilt                  = DDL_DIRECTORY
     
 	''release the lock on the heap
@@ -407,10 +390,6 @@ Private Function PathsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPar
 							Dim szCurDir As ZString*MAX_PATH = CurDir()
 							If (SetDlgItemText(hWnd, IDC_EDT_DEFAULTPATH, @szCurDir) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
 							
-                        /'Case IDC_BTN_DEFAULTLIST    ''browse for a default M3U list
-                            
-                            ProgMsgBox(hInstance, hWnd, IDS_MSGTXT_NYI, IDS_MSGCAP_NYI, MB_ICONWARNING)
-							'/
                     End Select
                     
                 Case EN_CHANGE          ''edit control changing
@@ -472,7 +451,6 @@ Private Function CreatePathsToolTips (ByVal hDlg As HWND) As BOOL
     ''create tooltips
     If (CreateToolTip(hInstance, hDlg, IDC_EDT_VGMPLAYPATH, IDS_TIP_VGMPLAYPATH, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
     If (CreateToolTip(hInstance, hDlg, IDC_EDT_DEFAULTPATH, IDS_TIP_DEFAULTPATH, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
-    'If (CreateToolTip(hInstance, hDlg, IDC_EDT_DEFAULTLIST, IDS_TIP_DEFAULTLIST, TTS_ALWAYSTIP, NULL) = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''return
     SetLastError(ERROR_SUCCESS)
@@ -492,7 +470,6 @@ Private Function SetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Pt
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     If (SetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY]) = FALSE) Then Return(FALSE)
     If (SetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT]) = FALSE) Then Return(FALSE)
-    /'If (SetDlgItemText(hDlg, IDC_EDT_DEFAULTLIST, plpszValue[PATH_DEFLIST]) = FALSE) Then Return(FALSE)'/
     If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
@@ -513,7 +490,6 @@ Private Function GetPathsProc (ByVal hDlg As HWND, ByVal plpszValue As LPTSTR Pt
     If (HeapLock(hConfig) = FALSE) Then Return(FALSE)
     If (GetDlgItemText(hDlg, IDC_EDT_VGMPLAYPATH, plpszValue[PATH_VGMPLAY], MAX_PATH) = FALSE) Then Return(FALSE)
     If (GetDlgItemText(hDlg, IDC_EDT_DEFAULTPATH, plpszValue[PATH_DEFAULT], MAX_PATH) = FALSE) Then Return(FALSE)
-    /'If (GetDlgItemText(hDlg, IDC_EDT_DEFAULTLIST, plpszValue[PATH_DEFLIST], MAX_PATH) = FALSE) Then Return(FALSE)'/
     If (HeapUnlock(hConfig) = FALSE) Then Return(FALSE)
 	
 	''return
@@ -742,45 +718,6 @@ Private Function GetFileFiltProc (ByVal hDlg As HWND, ByRef dwValue As DWORD32) 
 	SetLastError(ERROR_SUCCESS)
 	Return(TRUE)
     
-End Function
-
-
-''procedures for the general options page
-Private Function GeneralOptsProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
-    
-    Static hwndPrsht As HWND
-    
-    Select Case uMsg
-        Case WM_NOTIFY
-            
-            Select Case (Cast(LPNMHDR, lParam)->code)   ''notification codes
-                Case PSN_SETACTIVE                      ''page becoming active
-                    
-                    ''get page handle
-                    hwndPrsht = Cast(HWND, Cast(LPNMHDR, lParam)->hwndFrom)
-                    If (hwndPrsht = INVALID_HANDLE_VALUE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
-                    
-                Case PSN_KILLACTIVE                     ''page becoming inactive
-                    
-                    ''let page become inactive
-                    SetWindowLong(hWnd, DWL_MSGRESULT, Cast(LONG32, FALSE))
-                    Return(FALSE)
-                    
-                Case PSN_APPLY                          ''user has pressed the apply button
-                    
-                    ''get settings from dialog
-                    
-                    
-                    ''save settings to the registry
-                    If (SaveConfig() = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
-                    
-                Case PSN_QUERYCANCEL                    ''user has pressed the cancel button
-                    
-                    PrpshCancelPrompt(hWnd)
-                    
-            End Select
-            
-    End Select
 End Function
 
 ''EOF
