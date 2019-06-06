@@ -184,7 +184,6 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
             
             ''initialize directory listings to default directory
             If (HeapLock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
-            If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             ''make sure VGMPlay's path is valid
             If (PathFileExists(plpszPath[PATH_VGMPLAY]) = FALSE) Then
@@ -192,6 +191,14 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                     If (DoOptionsPropSheet(hWnd) = FALSE) Then Return(FALSE)
                 End If
             End If
+            
+            ''display the default path if it exists, otherwise display the current path
+            If (PathIsDirectory(plpszPath[PATH_DEFAULT])) Then
+                If (PopulateLists(hWnd, plpszPath[PATH_DEFAULT]) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            Else
+                If (PopulateLists(hWnd, ".") = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            End If
+            
             If (HeapUnlock(hConfig) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             ''set the default keyboard focus to IDC_LST_MAIN

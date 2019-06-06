@@ -154,4 +154,8 @@ v2.13.1:
     -       Removed nonfunctional "Default Playlist" option from options
         menu.
     
+v2.13.2:
+    
+    *       Fixed the initial startup routine.
+    
 EOF

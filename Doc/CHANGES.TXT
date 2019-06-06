@@ -288,4 +288,8 @@ v2.13.1.13:
     -       Removed references to the default playlist options menu item.
     *       Renamed Res\property-sheets.rc to Res\config.rc.
     
+v2.13.2:
+    
+    *       Fixed a bug with the initial startup routine.
+    
 EOF
