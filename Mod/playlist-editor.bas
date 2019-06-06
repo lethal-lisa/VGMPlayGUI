@@ -41,6 +41,7 @@ Declare Function BrowseItem (ByVal hDlg As HWND, ByVal lpszItem As LPTSTR) As BO
 Declare Function AddItem (ByVal hDlg As HWND) As BOOL
 Declare Function InsertItem (ByVal hDlg As HWND) As BOOL
 Declare Function RemoveItem (ByVal hWnd As HWND) As BOOL
+Declare Function ImportDirectory (ByVal hDlg As HWND) As BOOL
 
 Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
@@ -55,7 +56,7 @@ Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
             hHeap = GetProcessHeap()
             If (hHeap = INVALID_HANDLE_VALUE) Then Return(FatalSysErrMsgBox(hWnd, GetLastError()))
             
-            lpszFile = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
+            lpszFile = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
             If (lpszFile = NULL) Then Return(FatalSysErrMsgBox(hWnd, GetLastError()))
             
             SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MAKEM3U))))
@@ -106,6 +107,10 @@ Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                         Case IDM_PL_REMOVE  ''remove an item from the list
                             
                             If (RemoveItem(GetDlgItem(hWnd, IDC_LST_PLAYLIST)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                            
+                        Case IDM_PL_IMPORT
+                            
+                            If (ImportDirectory(hWnd) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
                     End Select
                     
@@ -390,7 +395,7 @@ Private Function AddItem (ByVal hDlg As HWND) As BOOL
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
-    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
+    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
     If (lpszItem = NULL) Then Return(FALSE)
     
     If (BrowseItem(hDlg, lpszItem) = FALSE) Then
@@ -420,7 +425,7 @@ Private Function InsertItem (ByVal hDlg As HWND) As BOOL
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
-    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
+    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
     If (lpszItem = NULL) Then Return(FALSE)
     
     If (BrowseItem(hDlg, lpszItem) = FALSE) Then
@@ -428,7 +433,9 @@ Private Function InsertItem (ByVal hDlg As HWND) As BOOL
         Return(FALSE)
     End If
     
-    ''add the item
+    PathStripPath(lpszItem)
+    
+    ''insert the item
     Dim hWndList As HWND = GetDlgItem(hDlg, IDC_LST_PLAYLIST)
     If (hWndList = INVALID_HANDLE_VALUE) Then
         SetLastError(ERROR_INVALID_HANDLE)
@@ -454,6 +461,62 @@ Private Function RemoveItem (ByVal hWnd As HWND) As BOOL
     Dim nCurSel As UINT = SendMessage(hWnd, LB_GETCURSEL, NULL, NULL)
     SendMessage(hWnd, LB_DELETESTRING, nCurSel, NULL)
     
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Private Function ImportDirectory (ByVal hDlg As HWND) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
+    #EndIf
+    
+    ''get the playlist editor window's handle
+    Dim hWndList As HWND = GetDlgItem(hDlg, IDC_LST_PLAYLIST)
+    If (hWndList = INVALID_HANDLE_VALUE) Then
+        SetLastError(ERROR_INVALID_HANDLE)
+        Return(FALSE)
+    End If
+    
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''launch a WinAPI dialog to figure out what directory to import (NYI)
+    Dim lpszDir As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+    If (lpszDir = FALSE) Then Return(FALSE)
+    *lpszDir = CurDir()
+    
+    /'  not req'd until the user prompting routine is implemented.
+    ''store and change the directory
+    Dim lpszReturnTo As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+    If (lpszReturnTo = NULL) Then Return(FALSE)
+    *lpszReturnTo = CurDir()
+    If (ChDir(*lpszDir)) Then
+        SetLastError(ERROR_PATH_NOT_FOUND)
+        Return(FALSE)
+    End If'/
+    
+    ''add all the items in the directory
+    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+    If (lpszItem = NULL) Then Return(FALSE)
+    SendMessage(hWndList, LB_RESETCONTENT, NULL, NULL)
+    *lpszItem = Dir("*", fbNormal) ''launch a dialog to get the parameters for this from the user (NYI)
+    While (Len(*lpszItem) > 0)
+        PathStripPath(lpszItem)
+        SendMessage(hWndList, LB_ADDFILE, NULL, Cast(LPARAM, lpszItem))
+        *lpszItem = Dir()
+    Wend
+    
+    ''free allocated memory, return to initial directory, and return
+    If (HeapFree(hHeap, NULL, lpszDir) = FALSE) Then Return(FALSE)
+    /'If (ChDir(*lpszReturnTo)) Then
+        SetLastError(ERROR_PATH_NOT_FOUND)
+        Return(FALSE)
+    End If
+    If (HeapFree(hHeap, NULL, lpszReturnTo) = FALSE) Then Return(FALSE)'/
+    If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     

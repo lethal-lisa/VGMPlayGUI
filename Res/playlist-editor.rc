@@ -11,11 +11,12 @@
 #define IDM_PL_SAVE             0x7534 //30004
 #define IDM_PL_SAVEAS           0x7535 //30005
 #define IDM_PL_EXIT             0x7536 //30006
-#define IDM_PL_LIST             0x7537 //30007
+#define IDM_PL_EDIT             0x7537 //30007
 #define IDM_PL_PRUNE            0x7538 //30008
 #define IDM_PL_ADD              0x7539 //30009
 #define IDM_PL_INSERT           0x753A //30010
 #define IDM_PL_REMOVE           0x753B //30011
+#define IDM_PL_IMPORT           0x753C //30012
 
 IDD_PLAYLIST DIALOGEX 10, 10, 200, 200
 CAPTION "Playlist Editor"
@@ -40,11 +41,13 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "E&xit Playlist Editor", IDM_PL_EXIT, MFT_STRING, MFS_ENABLED
     END
-    POPUP "&List", IDM_PL_LIST, MFT_STRING, MFS_ENABLED
+    POPUP "&Edit", IDM_PL_EDIT, MFT_STRING, MFS_ENABLED
     BEGIN
         MENUITEM "&Add File", IDM_PL_ADD, MFT_STRING, MFS_ENABLED
         MENUITEM "&Insert File", IDM_PL_INSERT, MFT_STRING, MFS_ENABLED
         MENUITEM "&Remove File", IDM_PL_REMOVE, MFT_STRING, MFS_ENABLED
+        MENUITEM SEPARATOR
+        MENUITEM "I&mport Directory", IDM_PL_IMPORT, MFT_STRING, MFS_ENABLED
     END
 END
 

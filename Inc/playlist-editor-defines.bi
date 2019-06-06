@@ -19,10 +19,11 @@
 #Define IDM_PL_SAVE             &h7534 ''30004
 #Define IDM_PL_SAVEAS           &h7535 ''30005
 #Define IDM_PL_EXIT             &h7536 ''30006
-#Define IDM_PL_LIST             &h7537 ''30007
+#Define IDM_PL_EDIT             &h7537 ''30007
 #Define IDM_PL_PRUNE            &h7538 ''30008
 #Define IDM_PL_ADD              &h7539 ''30009
 #Define IDM_PL_INSERT           &h753A ''30010
 #Define IDM_PL_REMOVE           &h753B ''30011
+#Define IDM_PL_IMPORT           &h753C ''30012
 
 ''EOF
