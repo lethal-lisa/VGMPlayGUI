@@ -43,6 +43,9 @@ Declare Function InsertItem (ByVal hDlg As HWND) As BOOL
 Declare Function RemoveItem (ByVal hWnd As HWND) As BOOL
 Declare Function ImportDirectory (ByVal hDlg As HWND) As BOOL
 
+''other functions
+Declare Function ImportDirProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+
 Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
     Static hHeap As HANDLE
@@ -483,26 +486,39 @@ Private Function ImportDirectory (ByVal hDlg As HWND) As BOOL
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
-    ''launch a WinAPI dialog to figure out what directory to import (NYI)
-    Dim lpszDir As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
-    If (lpszDir = FALSE) Then Return(FALSE)
-    *lpszDir = CurDir()
+    ''init params for dialog box
+    Dim idpParam As IMPORTDIRPARAMS
+    ZeroMemory(@idpParam, SizeOf(idpParam))
+    With idpParam
+        .lpszDir = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+        If (.lpszDir = NULL) Then Return(FALSE)
+        .lpszFilt = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+        If (.lpszFilt = NULL) Then Return(FALSE)
+    End With
     
-    /'  not req'd until the user prompting routine is implemented.
+    ''start the dialog box
+    If (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_IMPORTDIR), hDlg, @ImportDirProc, Cast(LPARAM, @idpParam)) <> IDOK) Then Return(FALSE)
+    
+    If (PathIsDirectory(idpParam.lpszDir) = FALSE) Then
+        SetLastError(ERROR_PATH_NOT_FOUND)
+        Return(FALSE)
+    End If
+    
+    If (idpParam.bClear = TRUE) Then SendMessage(hWndList, LB_RESETCONTENT, NULL, NULL)
+    
     ''store and change the directory
     Dim lpszReturnTo As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
     If (lpszReturnTo = NULL) Then Return(FALSE)
     *lpszReturnTo = CurDir()
-    If (ChDir(*lpszDir)) Then
+    If (ChDir(*idpParam.lpszDir)) Then
         SetLastError(ERROR_PATH_NOT_FOUND)
         Return(FALSE)
-    End If'/
+    End If
     
     ''add all the items in the directory
     Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
     If (lpszItem = NULL) Then Return(FALSE)
-    SendMessage(hWndList, LB_RESETCONTENT, NULL, NULL)
-    *lpszItem = Dir("*", fbNormal) ''launch a dialog to get the parameters for this from the user (NYI)
+    *lpszItem = Dir(*idpParam.lpszFilt, fbNormal) ''launch a dialog to get the parameters for this from the user (NYI)
     While (Len(*lpszItem) > 0)
         PathStripPath(lpszItem)
         SendMessage(hWndList, LB_ADDFILE, NULL, Cast(LPARAM, lpszItem))
@@ -510,14 +526,73 @@ Private Function ImportDirectory (ByVal hDlg As HWND) As BOOL
     Wend
     
     ''free allocated memory, return to initial directory, and return
-    If (HeapFree(hHeap, NULL, lpszDir) = FALSE) Then Return(FALSE)
-    /'If (ChDir(*lpszReturnTo)) Then
+    With idpParam
+        If (HeapFree(hHeap, NULL, .lpszDir) = FALSE) Then Return(FALSE)
+        If (HeapFree(hHeap, NULL, .lpszFilt) = FALSE) Then Return(FALSE)
+    End With
+    If (ChDir(*lpszReturnTo)) Then
         SetLastError(ERROR_PATH_NOT_FOUND)
         Return(FALSE)
     End If
-    If (HeapFree(hHeap, NULL, lpszReturnTo) = FALSE) Then Return(FALSE)'/
+    If (HeapFree(hHeap, NULL, lpszReturnTo) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Private Function ImportDirProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+    
+    Static pidpParam As IMPORTDIRPARAMS Ptr
+    
+    Select Case uMsg
+        Case WM_INITDIALOG
+            
+            pidpParam = Cast(IMPORTDIRPARAMS Ptr, lParam)
+            
+            SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MAKEM3U))))
+            
+        Case WM_CLOSE
+            
+            EndDialog(hWnd, IDCANCEL)
+            
+        Case WM_COMMAND
+            Select Case HiWord(wParam)
+                Case BN_CLICKED
+                    Select Case LoWord(wParam)
+                        Case IDC_BTN_IMP_OK
+                            
+                            With *pidpParam
+                                GetDlgItemText(hWnd, IDC_EDT_IMP_PATH, .lpszDir, MAX_PATH)
+                                GetDlgItemText(hWnd, IDC_EDT_IMP_FILT, .lpszFilt, MAX_PATH)
+                                If (IsDlgButtonChecked(hWnd, IDC_CHK_IMP_CLEAR) = BST_CHECKED) Then
+                                    .bClear = TRUE
+                                Else
+                                    .bClear = FALSE
+                                End If
+                            End With
+                            
+                            EndDialog(hWnd, IDOK)
+                            
+                        Case IDC_BTN_IMP_CANCEL
+                            
+                            SendMessage(hWnd, WM_CLOSE, NULL, NULL)
+                            
+                    End Select
+                    
+                Case EN_ERRSPACE
+                    
+                    SysErrMsgBox(hWnd, ERROR_NOT_ENOUGH_MEMORY)
+                    EndDialog(hWnd, -1)
+                    
+            End Select
+            
+        Case Else
+            
+            Return(FALSE)
+            
+    End Select
+    
     Return(TRUE)
     
 End Function

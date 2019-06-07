@@ -610,11 +610,12 @@ Private Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) A
     If (PathIsDirectory(lpszPath) = FALSE) Then Return(FALSE)
     
     ''store previous path
-    /' NYI:
+    /'  NYI:
             At this location, write the previous path (since we haven't
-        changed it yet, this can be gotten with CurDir()) to a buffer.
+        changed it yet, this can be obtained with CurDir()) to a buffer.
+        
+            This is for a "back" button.
     '/
-    
     
     ''change directories
     If (ChDir(*lpszPath)) Then

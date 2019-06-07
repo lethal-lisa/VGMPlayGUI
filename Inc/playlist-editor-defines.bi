@@ -12,6 +12,17 @@
 #Define IDD_PLAYLIST            &h0578 ''1400
 #Define IDC_LST_PLAYLIST        &h0579 ''1401
 
+#Define IDD_IMPORTDIR           &h05DC ''1500
+#Define IDC_STC_IMP_PATH        &h05DD ''1501
+#Define IDC_EDT_IMP_PATH        &h05DE ''1502
+#Define IDC_STC_IMP_BAR1        &h05DF ''1503
+#Define IDC_STC_IMP_FILT        &h05E0 ''1504
+#Define IDC_EDT_IMP_FILT        &h05E1 ''1505
+#Define IDC_BTN_IMP_OK          &h05E2 ''1506
+#Define IDC_BTN_IMP_CANCEL      &h05E3 ''1507
+#Define IDC_CHK_IMP_CLEAR       &h05E4 ''1508
+#Define IDC_STC_IMP_BAR2        &h05E5 ''1509
+
 #Define IDR_MENUPLAYLIST        &h7530 ''30000
 #Define IDM_PL_FILE             &h7531 ''30001
 #Define IDM_PL_NEW              &h7532 ''30002
