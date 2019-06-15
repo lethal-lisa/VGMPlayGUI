@@ -243,20 +243,31 @@ Private Function LoadFromFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As
         ? !"*lpszFile\t= "; *lpszFile
     #EndIf
     
-    ''make sure the file exists
-    If (PathFileExists(lpszFile) = FALSE) Then Return(FALSE)
+    ''make sure window handle is valid
+    If (hWnd = INVALID_HANDLE_VALUE) Then
+        SetLastError(ERROR_INVALID_HANDLE)
+        Return(FALSE)
+    End If
     
     ''make sure file name is valid
-    If (lpszFile = NULL) Then
+    If ((lpszFile = NULL) Or (*lpszFile = "")) Then
         SetLastError(ERROR_PATH_NOT_FOUND)
         Return(FALSE)
     End If
+    
+    ''make sure the file exists
+    If (PathFileExists(lpszFile) = FALSE) Then Return(FALSE)
     
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
     If (lpszItem = NULL) Then Return(FALSE)
+    
+    /'SendMessage(hWnd, LB_RESETCONTENT, NULL, NULL)
+    
+    Dim hFile As HANDLE = CreateFile(lpszFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_ARCHIVE, NULL)
+    If (hFile = INVALID_HANDLE_VALUE) Then Return(FALSE)'/
     
     ''get a file I/O id
     Dim uf As UByte = FreeFile()
@@ -280,6 +291,20 @@ Private Function LoadFromFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As
     Else
         Return(FALSE)
     End If
+    
+    /'SendMessage(hWnd, LB_RESETCONTENT, NULL, NULL)
+    
+    Dim chChar As TCHAR
+    Dim cbRead As SIZE_T
+    While (Not(chChar = !"\n"))
+        If (ReadFile(hFile, @chChar, SizeOf(TCHAR), Cast(PDWORD, @cbRead), NULL) = FALSE) Then Return(FALSE)
+        If (Not(chChar = !"\n")) Then
+            If (StringCchCat(lpszItem, STRSAFE_MAX_CCH, Cast(LPCTSTR, @chChar)) = STRSAFE_E_INVALID_PARAMETER) Then
+                SetLastError(ERROR_INVALID_PARAMETER)
+                Return(FALSE)
+            End If
+        End If
+    Wend'/
     
     ''return
     If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then Return(FALSE)
@@ -314,7 +339,7 @@ Private Function SaveToFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As B
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''allocate item buffer
-    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (STRSAFE_MAX_CCH * SizeOf(TCHAR)))
     If (lpszItem = NULL) Then Return(FALSE)
     
     ''get list item count
@@ -332,11 +357,15 @@ Private Function SaveToFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As B
         If (nChars <= 0) Then Return(FALSE)
         
         ''add a new-line char to the end of the item string
-        *lpszItem = (*lpszItem + !"\n")
+        '*lpszItem = (*lpszItem + !"\n")
+        If (StringCchCat(lpszItem, STRSAFE_MAX_CCH, !"\n") = STRSAFE_E_INVALID_PARAMETER) Then
+            SetLastError(ERROR_INVALID_PARAMETER)
+            Return(FALSE)
+        End If
         
         ''write to the file
-        Dim dwBytesWritten As DWORD
-        If (WriteFile(hFile, Cast(LPCTSTR, lpszItem), lstrlen(Cast(LPCTSTR, lpszItem)), @dwBytesWritten, NULL) = FALSE) Then Return(FALSE)
+        Dim cbBytesWritten As DWORD
+        If (WriteFile(hFile, Cast(LPCTSTR, lpszItem), (lstrlen(Cast(LPCTSTR, lpszItem)) * SizeOf(TCHAR)), Cast(PDWORD, @cbBytesWritten), NULL) = FALSE) Then Return(FALSE)
         
     Next iItem
     

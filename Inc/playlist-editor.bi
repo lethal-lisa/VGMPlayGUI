@@ -13,6 +13,7 @@
 #Include Once "win/shlwapi.bi"
 #Include Once "win/commctrl.bi"
 #Include Once "win/commdlg.bi"
+#Include Once "win/strsafe.bi"
 #Include Once "dir.bi"
 #Include "inc/heapptrlist.bi"
 #Include "inc/errorhandler.bi"
