@@ -76,7 +76,7 @@ Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                     Select Case LoWord(wParam)
                         Case IDM_PL_NEW     ''new list
                             
-                            ZeroMemory(lpszFile, (MAX_PATH * SizeOf(TCHAR)))
+                            ZeroMemory(lpszFile, CB_PATH)
                             SendMessage(GetDlgItem(hWnd, IDC_LST_PLAYLIST), LB_RESETCONTENT, NULL, NULL)
                             
                         Case IDM_PL_OPEN    ''open a list file
@@ -92,6 +92,7 @@ Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wP
                             
                         Case IDM_PL_SAVEAS  ''save the list with a new name
                             
+                            If (SendMessage(GetDlgItem(hWnd, IDC_LST_PLAYLIST), LB_GETCOUNT, NULL, NULL) = 0) Then Return(TRUE)
                             If (BrowseSave(hWnd, lpszFile) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             If (SaveToFile(GetDlgItem(hWnd, IDC_LST_PLAYLIST), Cast(LPCTSTR, lpszFile)) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
                             
@@ -296,44 +297,51 @@ Private Function SaveToFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As B
         ? !"*lpszFile\t= "; *lpszFile
     #EndIf
     
+    ''make sure window handle is valid
+    If (hWnd = INVALID_HANDLE_VALUE) Then
+        SetLastError(ERROR_INVALID_HANDLE)
+        Return(FALSE)
+    End If
+    
     ''make sure file name is valid
-    If (lpszFile = NULL) Then
+    If ((lpszFile = NULL) Or (*lpszFile = "")) Then
         SetLastError(ERROR_PATH_NOT_FOUND)
         Return(FALSE)
     End If
     
+    ''get app heap handle
     Dim hHeap As HANDLE = GetProcessHeap()
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
-    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
+    ''allocate item buffer
+    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
     If (lpszItem = NULL) Then Return(FALSE)
     
-    ''get file handle
-    Dim uf As UByte = FreeFile()
-    
     ''get list item count
-    Dim cItems As UINT = SendMessage(hWnd, LB_GETCOUNT, NULL, NULL)
+    Dim cItems As INT32 = SendMessage(hWnd, LB_GETCOUNT, NULL, NULL)
+    If (cItems <= 0) Then Return(FALSE)
+    
+    Dim hFile As HANDLE = CreateFile(lpszFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_ARCHIVE, NULL)
+    If (hFile = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''save items
-    If (Open(*lpszFile For Output As #uf) = 0) Then
+    For iItem As UINT = 0 To (cItems - 1)
         
-        For iItem As UINT = 0 To (cItems - 1)
-            
-            ''get an item from the list
-            SendMessage(hWnd, LB_GETTEXT, iItem, Cast(LPARAM, lpszItem))
-            
-            ''write the item to the file
-            Print #uf, *lpszItem
-            
-        Next iItem
+        ''get an item from the list
+        Dim nChars As INT32 = SendMessage(hWnd, LB_GETTEXT, iItem, Cast(LPARAM, lpszItem))
+        If (nChars <= 0) Then Return(FALSE)
         
-        ''close the file
-        Close #uf
+        ''add a new-line char to the end of the item string
+        *lpszItem = (*lpszItem + !"\n")
         
-    Else
-        SetLastError(ERROR_PATH_NOT_FOUND)
-        Return(FALSE)
-    End If
+        ''write to the file
+        Dim dwBytesWritten As DWORD
+        If (WriteFile(hFile, Cast(LPCTSTR, lpszItem), lstrlen(Cast(LPCTSTR, lpszItem)), @dwBytesWritten, NULL) = FALSE) Then Return(FALSE)
+        
+    Next iItem
+    
+    ''close the file
+    If (CloseHandle(hFile) = FALSE) Then Return(FALSE)
     
     ''return
     If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then Return(FALSE)
@@ -374,10 +382,13 @@ Private Function BrowseItem (ByVal hDlg As HWND, ByVal lpszItem As LPTSTR) As BO
         .nFilterIndex   = 1
         .lpstrFile      = lpszItem
         .nMaxFile       = MAX_PATH
+        '.lpstrFileTitle = lpszItem
+        '.nMaxFileTitle  = MAX_PATH
         .Flags          = (OFN_DONTADDTORECENT Or OFN_HIDEREADONLY) ''hide read-only since we aren't actually opening the files and disable recent file lists since files don't need to exist
     End With
     
     If (GetOpenFileName(lpOfn) = FALSE) Then Return(FALSE)
+    PathStripPath(lpszItem)
     
     ''return
     If (HeapFree(hHeap, NULL, lpszFilt) = FALSE) Then Return(FALSE)
@@ -406,8 +417,6 @@ Private Function AddItem (ByVal hDlg As HWND) As BOOL
         Return(FALSE)
     End If
     
-    PathStripPath(lpszItem)
-    
     ''add the item
     SendMessage(GetDlgItem(hDlg, IDC_LST_PLAYLIST), LB_ADDSTRING, NULL, Cast(LPARAM, lpszItem))
     
@@ -435,8 +444,6 @@ Private Function InsertItem (ByVal hDlg As HWND) As BOOL
         HeapFree(hHeap, NULL, lpszItem)
         Return(FALSE)
     End If
-    
-    PathStripPath(lpszItem)
     
     ''insert the item
     Dim hWndList As HWND = GetDlgItem(hDlg, IDC_LST_PLAYLIST)

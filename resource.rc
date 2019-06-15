@@ -72,8 +72,8 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 13, 3, 5
-PRODUCTVERSION  2, 14, 0, 7
+FILEVERSION     1, 13, 3, 13
+PRODUCTVERSION  2, 14, 0, 12
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
@@ -84,8 +84,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.13.3.5\0"
-            VALUE "ProductVersion",     "2.14.0.7\0"
+            VALUE "FileVersion",        "1.13.3.13\0"
+            VALUE "ProductVersion",     "2.14.0.12\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
