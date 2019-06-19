@@ -34,7 +34,8 @@ Dim lpszCmdLine As LPSTR = GetCommandLine()
 InitCommonControls()
 
 ''call WinMain
-Dim uExitCode As UINT32 = WinMain(hInstance, NULL, lpszCmdLine, SW_SHOWNORMAL)
+Dim uExitCode As UINT32 
+uExitCode = WinMain(hInstance, NULL, lpszCmdLine, SW_SHOWNORMAL)
 
 ''exit
 #If __FB_DEBUG__
@@ -177,8 +178,10 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
             
         Case WM_DESTROY             ''destroying window
             
-            ''post quit message with success code
-            PostQuitMessage(ERROR_SUCCESS)
+            If (HeapFree(hHeap, NULL, lpszCurPath) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+            
+            ''post quit message with last error-code
+            PostQuitMessage(GetLastError())
             
         Case WM_INITDIALOG          ''initializing dialog
             
@@ -329,11 +332,31 @@ Private Function MainProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wPara
                 ? "(cx, cy)", "= ("; LoWord(lParam); ", "; HiWord(lParam); ")"
             #EndIf
             
+            ''get the current directory
+            Dim lpszCurDir As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+            If (lpszCurDir = NULL) Then
+                SysErrMsgBox(hWnd, GetLastError())
+                Return(FALSE)
+            End If
+            *lpszCurDir = CurDir()
+            
+            ''update the title bar
+            If (UpdateMainTitleBar(hWnd, Cast(LPCTSTR, lpszCurDir)) = FALSE) Then
+                SysErrMsgBox(hWnd, GetLastError())
+                Return(FALSE)
+            End If
+            
+            ''free the current directory
+            If (HeapFree(hHeap, NULL, lpszCurDir) = FALSE) Then
+                SysErrMsgBox(hWnd, GetLastError())
+                Return(FALSE)
+            End If
+            
             Dim lprc As LPRECT = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (2 * SizeOf(RECT)))
             If (lprc = NULL) Then Return(SysErrMsgBox(hWnd, GetLastError()))
             
             ''get rects for statusbar and main dialog, and subtract the statusbar's height from that of the main window
-            With lprc[0] 'rcParent
+            With lprc[0] ''rcParent
                 .right  = LoWord(lParam)
                 .bottom = HiWord(lParam)
             End With
@@ -637,6 +660,7 @@ Private Function PopulateLists (ByVal hDlg As HWND, ByVal lpszPath As LPCTSTR) A
     
     ''return
     SetCursor(hCurPrev)
+    If (HeapFree(hHeap, NULL, lpszCurDir) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
     
@@ -671,11 +695,19 @@ Private Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTS
     End If
     
     ''format the path name
-    Dim lpszTempPath As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (MAX_PATH * SizeOf(TCHAR)))
+    Dim lpszTempPath As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
     If (lpszTempPath = NULL) Then Return(FALSE)
     *lpszTempPath = *lpszPath
-    ''the measurement of 240 is a placeholder and might change later
-    If (PathCompactPath(NULL, lpszTempPath, 240) = FALSE) Then Return(FALSE)
+    
+    ''get the title bar's size
+    Dim pti As PTITLEBARINFO = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, SizeOf(TITLEBARINFO))
+    If (pti = NULL) Then Return(FALSE)
+    pti->cbSize = SizeOf(TITLEBARINFO)
+    If (GetTitleBarInfo(hDlg, pti) = FALSE) Then Return(FALSE)
+    
+    ''resize the path
+    Dim dx As ULONG32 = ((pti->rcTitleBar.right - pti->rcTitleBar.left) \ 2)
+    If (PathCompactPath(NULL, lpszTempPath, dx) = FALSE) Then Return(FALSE)
     
     ''format the new window title
     Dim lpszTitle As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, ((MAX_PATH + CCH_APPNAME + 5) * SizeOf(TCHAR)))
@@ -684,9 +716,10 @@ Private Function UpdateMainTitleBar (ByVal hDlg As HWND, ByVal lpszPath As LPCTS
     If (SetWindowText(hDlg, Cast(LPCTSTR, lpszTitle)) = FALSE) Then Return(FALSE)
     
     ''return
+    If (HeapFree(hHeap, NULL, lpszTitle) = FALSE) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, pti) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, NULL, lpszTempPath) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, NULL, lpszAppName) = FALSE) Then Return(FALSE)
-    If (HeapFree(hHeap, NULL, lpszTitle) = FALSE) Then Return(FALSE)
     SetCursor(hCurPrev)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
