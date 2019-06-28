@@ -339,15 +339,18 @@ Private Function SaveToFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As B
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''allocate item buffer
-    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, (STRSAFE_MAX_CCH * SizeOf(TCHAR)))
+    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
     If (lpszItem = NULL) Then Return(FALSE)
     
     ''get list item count
     Dim cItems As INT32 = SendMessage(hWnd, LB_GETCOUNT, NULL, NULL)
     If (cItems <= 0) Then Return(FALSE)
     
-    Dim hFile As HANDLE = CreateFile(lpszFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_ARCHIVE, NULL)
-    If (hFile = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    'Dim hFile As HANDLE = CreateFile(lpszFile, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_ARCHIVE, NULL)
+    'If (hFile = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    Dim uFile As UByte = FreeFile()
+    Open *lpszFile For Output As #uFile
     
     ''save items
     For iItem As UINT = 0 To (cItems - 1)
@@ -358,19 +361,22 @@ Private Function SaveToFile (ByVal hWnd As HWND, ByVal lpszFile As LPCTSTR) As B
         
         ''add a new-line char to the end of the item string
         '*lpszItem = (*lpszItem + !"\n")
-        If (StringCchCat(lpszItem, STRSAFE_MAX_CCH, !"\n") = STRSAFE_E_INVALID_PARAMETER) Then
+        /'If (StringCchCat(lpszItem, STRSAFE_MAX_CCH, !"\n") = STRSAFE_E_INVALID_PARAMETER) Then
             SetLastError(ERROR_INVALID_PARAMETER)
             Return(FALSE)
         End If
         
         ''write to the file
         Dim cbBytesWritten As DWORD
-        If (WriteFile(hFile, Cast(LPCTSTR, lpszItem), (lstrlen(Cast(LPCTSTR, lpszItem)) * SizeOf(TCHAR)), Cast(PDWORD, @cbBytesWritten), NULL) = FALSE) Then Return(FALSE)
+        If (WriteFile(hFile, Cast(LPCTSTR, lpszItem), (lstrlen(Cast(LPCTSTR, lpszItem)) * SizeOf(TCHAR)), Cast(PDWORD, @cbBytesWritten), NULL) = FALSE) Then Return(FALSE)'/
+        
+        Print #uFile, *lpszItem
         
     Next iItem
     
     ''close the file
-    If (CloseHandle(hFile) = FALSE) Then Return(FALSE)
+    'If (CloseHandle(hFile) = FALSE) Then Return(FALSE)
+    Close #uFile
     
     ''return
     If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then Return(FALSE)
