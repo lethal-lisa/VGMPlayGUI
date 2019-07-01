@@ -138,6 +138,8 @@ Declare Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32) A
 '/
 Declare Function FatalSysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32) As LRESULT
 
+Declare Function EndDlgSysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32) As LRESULT
+
 /'  ProgMsgBox:
     
     /'  Description:

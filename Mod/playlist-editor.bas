@@ -41,12 +41,14 @@ Declare Function BrowseItem (ByVal hDlg As HWND, ByVal lpszItem As LPTSTR) As BO
 Declare Function AddItem (ByVal hDlg As HWND) As BOOL
 Declare Function InsertItem (ByVal hDlg As HWND) As BOOL
 Declare Function RemoveItem (ByVal hWnd As HWND) As BOOL
+Declare Function PruneList (ByVal hWnd As HWND) As BOOL
+Declare Function GetListItemType (ByVal hWnd As HWND, ByVal iItem As UINT, ByVal ubType As UByte) As BOOL
 Declare Function ImportDirectory (ByVal hDlg As HWND) As BOOL
 
 ''other functions
 Declare Function ImportDirProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
 
-Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
+Public Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT Export
     
     Static hHeap As HANDLE
     Static lpszFile As LPTSTR
@@ -511,6 +513,77 @@ Private Function RemoveItem (ByVal hWnd As HWND) As BOOL
     
 End Function
 
+Private Function PruneList (ByVal hWnd As HWND) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hWnd\t= 0x"; Hex(hWnd)
+    #EndIf
+    
+    ''get number of items
+    Dim cItems As UINT = SendMessage(hWnd, LB_GETCOUNT, NULL, NULL)
+    If (cItems < 1) Then
+        SetLastError(ERROR_INVALID_DATA)
+        Return(FALSE)
+    End If
+    
+    ''remove invalid list entries
+    Dim ubType As UByte
+    For iItem As UINT = (cItems - 1) To 0 Step -1
+        If (GetListItemType(hWnd, iItem, ubType) = FALSE) Then Return(FALSE)
+        If (ubType = FTYPE_INVALID) Then
+            If (SendMessage(hWnd, LB_DELETESTRING, iItem, NULL) < 1) Then Exit For
+        End If
+    Next iItem
+    
+    ''return
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
+Private Function GetListItemType (ByVal hWnd As HWND, ByVal iItem As UINT, ByVal ubType As UByte) As BOOL
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hWnd\t= 0x"; Hex(hWnd)
+        ? !"iItem\t= 0x"; Hex(iItem)
+        ? !"ubType\t= 0x"; Hex(ubType)
+    #EndIf
+    
+    ''get process heap
+    Dim hHeap As HANDLE = GetProcessHeap()
+    If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    
+    ''allocate an item buffer
+    Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+    If (lpszItem = NULL) Then Return(FALSE)
+    
+    ''read the item into the buffer
+    If (SendMessage(hWnd, LB_GETTEXT, iItem, Cast(LPARAM, lpszItem)) = 0) Then
+        If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then Return(FALSE)
+        SetLastError(ERROR_SUCCESS)
+        Return(FALSE)
+    End If
+    
+    ''convert to lowercase
+    CharLower(lpszItem)
+    
+    ''check for each valid file type
+    ubType = FTYPE_INVALID
+    If (PathMatchSpec(Cast(LPCTSTR, lpszItem), "*.m3u")) Then ubType = FTYPE_INVALID ''M3U files usually can't link to each other.
+    If (PathMatchSpec(Cast(LPCTSTR, lpszItem), "*.vgm")) Then ubType = FTYPE_VGM
+    If (PathMatchSpec(Cast(LPCTSTR, lpszItem), "*.vgz")) Then ubType = FTYPE_VGZ
+    If (PathMatchSpec(Cast(LPCTSTR, lpszItem), "*.cmf")) Then ubType = FTYPE_CMF
+    If (PathMatchSpec(Cast(LPCTSTR, lpszItem), "*.dro")) Then ubType = FTYPE_DRO
+    
+    ''return
+    If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then Return(FALSE)
+    SetLastError(ERROR_SUCCESS)
+    Return(TRUE)
+    
+End Function
+
 Private Function ImportDirectory (ByVal hDlg As HWND) As BOOL
     
     #If __FB_DEBUG__
@@ -529,54 +602,41 @@ Private Function ImportDirectory (ByVal hDlg As HWND) As BOOL
     If (hHeap = INVALID_HANDLE_VALUE) Then Return(FALSE)
     
     ''init params for dialog box
-    Dim idpParam As IMPORTDIRPARAMS
-    ZeroMemory(@idpParam, SizeOf(idpParam))
-    With idpParam
-        .lpszDir = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
-        If (.lpszDir = NULL) Then Return(FALSE)
-        .lpszFilt = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
-        If (.lpszFilt = NULL) Then Return(FALSE)
-    End With
+    Dim idp As IMPORTDIRPARAMS
+    ZeroMemory(@idp, SizeOf(idp))
+    idp.lpszPath = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
+    If (idp.lpszPath = NULL) Then Return(FALSE)
+    idp.dwAttrib = FILE_ATTRIBUTE_NORMAL
     
     ''start the dialog box
-    If (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_IMPORTDIR), hDlg, @ImportDirProc, Cast(LPARAM, @idpParam)) <> IDOK) Then Return(FALSE)
+    If (DialogBoxParam(hInstance, MAKEINTRESOURCE(IDD_IMPORTDIR), hDlg, @ImportDirProc, Cast(LPARAM, @idp)) <> IDOK) Then Return(FALSE)
     
-    If (PathIsDirectory(idpParam.lpszDir) = FALSE) Then
+    ''make sure path is a valid directory
+    If (PathIsDirectory(idp.lpszPath) = FALSE) Then
         SetLastError(ERROR_PATH_NOT_FOUND)
         Return(FALSE)
     End If
     
-    If (idpParam.bClear = TRUE) Then SendMessage(hWndList, LB_RESETCONTENT, NULL, NULL)
-    
-    ''store and change the directory
-    Dim lpszReturnTo As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
-    If (lpszReturnTo = NULL) Then Return(FALSE)
-    *lpszReturnTo = CurDir()
-    If (ChDir(*idpParam.lpszDir)) Then
-        SetLastError(ERROR_PATH_NOT_FOUND)
-        Return(FALSE)
-    End If
+    ''clear list if requested
+    If (idp.bClear = TRUE) Then SendMessage(hWndList, LB_RESETCONTENT, NULL, NULL)
     
     ''add all the items in the directory
     Dim lpszItem As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_PATH)
     If (lpszItem = NULL) Then Return(FALSE)
-    *lpszItem = Dir(*idpParam.lpszFilt, fbNormal) ''launch a dialog to get the parameters for this from the user (NYI)
-    While (Len(*lpszItem) > 0)
-        PathStripPath(lpszItem)
-        SendMessage(hWndList, LB_ADDFILE, NULL, Cast(LPARAM, lpszItem))
-        *lpszItem = Dir()
+    *idp.lpszPath = (*idp.lpszPath + "\*")
+    Dim ffd As WIN32_FIND_DATA
+    Dim hFind As HANDLE = FindFirstFile(Cast(LPCTSTR, idp.lpszPath), @ffd)
+    If (hFind = INVALID_HANDLE_VALUE) Then Return(FALSE)
+    While (FindNextFile(hFind, @ffd) <> 0)
+        If (ffd.dwFileAttributes And idp.dwAttrib)Then
+            *lpszItem = ffd.cFileName
+            SendMessage(hWndList, LB_ADDSTRING, NULL, Cast(LPARAM, lpszItem))
+        End If
     Wend
+    If (FindClose(hFind) = FALSE) Then Return(FALSE)
     
     ''free allocated memory, return to initial directory, and return
-    With idpParam
-        If (HeapFree(hHeap, NULL, .lpszDir) = FALSE) Then Return(FALSE)
-        If (HeapFree(hHeap, NULL, .lpszFilt) = FALSE) Then Return(FALSE)
-    End With
-    If (ChDir(*lpszReturnTo)) Then
-        SetLastError(ERROR_PATH_NOT_FOUND)
-        Return(FALSE)
-    End If
-    If (HeapFree(hHeap, NULL, lpszReturnTo) = FALSE) Then Return(FALSE)
+    If (HeapFree(hHeap, NULL, idp.lpszPath) = FALSE) Then Return(FALSE)
     If (HeapFree(hHeap, NULL, lpszItem) = FALSE) Then Return(FALSE)
     SetLastError(ERROR_SUCCESS)
     Return(TRUE)
@@ -585,14 +645,44 @@ End Function
 
 Private Function ImportDirProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT
     
-    Static pidpParam As IMPORTDIRPARAMS Ptr
+    Static pidp As IMPORTDIRPARAMS Ptr
     
     Select Case uMsg
         Case WM_INITDIALOG
             
-            pidpParam = Cast(IMPORTDIRPARAMS Ptr, lParam)
-            
+            ''set the icon
             SendMessage(hWnd, WM_SETICON, NULL, Cast(LPARAM, LoadIcon(hInstance, MAKEINTRESOURCE(IDI_MAKEM3U))))
+            
+            ''get params
+            pidp = Cast(IMPORTDIRPARAMS Ptr, lParam)
+            
+            ''init controls from params
+            
+            ''init path
+            Dim cchPath As SIZE_T
+            If (FAILED(StringCchLength(Cast(LPCTSTR, pidp->lpszPath), MAX_PATH, @cchPath))) Then
+                SetLastError(ERROR_INVALID_PARAMETER)
+                SysErrMsgBox(hWnd, GetLastError())
+                EndDialog(hWnd, -1)
+            End If
+            If (cchPath > 0) Then
+                If (SetDlgItemText(hWnd, IDC_EDT_IMP_PATH, Cast(LPCTSTR, pidp->lpszPath)) = FALSE) Then Return(EndDlgSysErrMsgBox(hWnd, GetLastError()))
+            End If
+            
+            ''init clear
+            If (pidp->bClear) Then
+                If (CheckDlgButton(hWnd, IDC_CHK_IMP_CLEAR, BST_CHECKED) = FALSE) Then Return(EndDlgSysErrMsgBox(hWnd, GetLastError()))
+            Else
+                If (CheckDlgButton(hWnd, IDC_CHK_IMP_CLEAR, BST_UNCHECKED) = FALSE) Then Return(EndDlgSysErrMsgBox(hWnd, GetLastError()))
+            End If
+            
+            ''init valid only
+            If (pidp->bValidOnly) Then
+                If (CheckDlgButton(hWnd, IDC_CHK_IMP_VALIDONLY, BST_CHECKED) = FALSE) Then Return(EndDlgSysErrMsgBox(hWnd, GetLastError()))
+            Else
+                If (CheckDlgButton(hWnd, IDC_CHK_IMP_VALIDONLY, BST_UNCHECKED) = FALSE) Then Return(EndDlgSysErrMsgBox(hWnd, GetLastError()))
+            End If
+            
             
         Case WM_CLOSE
             
@@ -604,16 +694,34 @@ Private Function ImportDirProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal 
                     Select Case LoWord(wParam)
                         Case IDC_BTN_IMP_OK
                             
-                            With *pidpParam
-                                GetDlgItemText(hWnd, IDC_EDT_IMP_PATH, .lpszDir, MAX_PATH)
-                                GetDlgItemText(hWnd, IDC_EDT_IMP_FILT, .lpszFilt, MAX_PATH)
-                                If (IsDlgButtonChecked(hWnd, IDC_CHK_IMP_CLEAR) = BST_CHECKED) Then
-                                    .bClear = TRUE
-                                Else
-                                    .bClear = FALSE
-                                End If
-                            End With
+                            ''read input
                             
+                            /'GetDlgItemText(hWnd, IDC_EDT_IMP_PATH, .lpszDir, MAX_PATH)
+                            GetDlgItemText(hWnd, IDC_EDT_IMP_FILT, .lpszFilt, MAX_PATH)'/
+                            
+                            ''get lpszPath
+                            If (GetDlgItemText(hWnd, IDC_EDT_IMP_PATH, pidp->lpszPath, MAX_PATH) = FALSE) Then Return(SysErrMsgBox(hWnd, GetLastError()))
+                            
+                            ''get bClear
+                            If (IsDlgButtonChecked(hWnd, IDC_CHK_IMP_CLEAR) = BST_CHECKED) Then
+                                pidp->bClear = TRUE
+                            Else
+                                pidp->bClear = FALSE
+                            End If
+                            
+                            ''get bValidOnly
+                            If (IsDlgButtonChecked(hWnd, IDC_CHK_IMP_VALIDONLY) = BST_CHECKED) Then
+                                pidp->bValidOnly = TRUE
+                            Else
+                                pidp->bValidOnly = FALSE
+                            End If
+                            
+                            pidp->dwAttrib = FILE_ATTRIBUTE_NORMAL
+                            If (IsDlgButtonChecked(hWnd, IDC_CHK_IMP_ARCHIVE) = BST_CHECKED) Then pidp->dwAttrib = (pidp->dwAttrib Or FILE_ATTRIBUTE_ARCHIVE)
+                            If (IsDlgButtonChecked(hWnd, IDC_CHK_IMP_READONLY) = BST_CHECKED) Then pidp->dwAttrib = (pidp->dwAttrib Or FILE_ATTRIBUTE_READONLY)
+                            If (IsDlgButtonChecked(hWnd, IDC_CHK_IMP_HIDDEN) = BST_CHECKED) Then pidp->dwAttrib = (pidp->dwAttrib Or FILE_ATTRIBUTE_HIDDEN)
+                            
+                            ''close the dialog
                             EndDialog(hWnd, IDOK)
                             
                         Case IDC_BTN_IMP_CANCEL

@@ -26,6 +26,14 @@
     #Define DWL_MSGRESULT           &h00000000 ''0
 #EndIf
 
+''IDs for valid file types
+#Define FTYPE_INVALID   &h00
+#Define FTYPE_VGM       &h01
+#Define FTYPE_VGZ       &h02
+#Define FTYPE_CMF       &h03
+#Define FTYPE_DRO       &h04
+#Define FTYPE_M3U       &h05
+
 ''IDs for plpszPaths
 #Define CCH_PATH                    MAX_PATH
 #Define CB_PATH                     Cast(SIZE_T, (CCH_PATH * SizeOf(TCHAR)))

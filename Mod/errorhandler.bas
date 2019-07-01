@@ -80,7 +80,7 @@ Public Function SysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32) As
     ''get error ID string
     Dim lpszErrId As LPTSTR = HeapAlloc(hHeap, HEAP_ZERO_MEMORY, CB_ERRID)
     If (lpszErrId = NULL) Then Return(GetLastError())
-    *lpszErrId = ("Win32 error code 0x" + Hex(dwErrorId) + !":\n")
+    *lpszErrId = ("Win32 error code: 0x" + Hex(dwErrorId) + !":\n")
     #If __FB_DEBUG__
         ? !"lpszErrId\t= 0x"; Hex(lpszErrId)
         ? !"*lpszErrId\t= "; *lpszErrId
@@ -139,6 +139,20 @@ Public Function FatalSysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD3
     
     SysErrMsgBox(hDlg, dwErrorId)
     PostQuitMessage(dwErrorId)
+    Return(dwErrorId)
+    
+End Function
+
+Public Function EndDlgSysErrMsgBox (ByVal hDlg As HWND, ByVal dwErrorId As DWORD32) As LRESULT
+    
+    #If __FB_DEBUG__
+        ? "Calling:", __FILE__; "\"; __FUNCTION__
+        ? !"hDlg\t= 0x"; Hex(hDlg)
+        ? !"dwErrorId\t= 0x"; Hex(dwErrorId)
+    #EndIf
+    
+    SysErrMsgBox(hDlg, dwErrorId)
+    EndDialog(hDlg, -1)
     Return(dwErrorId)
     
 End Function

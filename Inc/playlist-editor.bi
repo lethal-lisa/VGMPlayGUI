@@ -23,9 +23,10 @@
 #Define CB_FILT     Cast(SIZE_T, (CCH_FILT * SizeOf(TCHAR)))
 
 Type IMPORTDIRPARAMS
-    lpszDir As LPTSTR
-    lpszFilt As LPTSTR
-    bClear As BOOL
+    lpszPath As LPTSTR      ''path to import
+    dwAttrib As DWORD32     ''file attributes
+    bClear As BOOL          ''clear existing list
+    bValidOnly As BOOL      ''only include valid file types (use extension)
 End Type
 
 Declare Function PlaylistProc (ByVal hWnd As HWND, ByVal uMsg As UINT32, ByVal wParam As WPARAM, ByVal lParam As LPARAM) As LRESULT

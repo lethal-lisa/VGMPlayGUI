@@ -54,8 +54,6 @@
 #Define IDS_TIP_SYSTEM              &h040A ''1034
 #Define IDS_TIP_READONLY            &h040B ''1035
 #Define IDS_TIP_EXCLUSIVE           &h040C ''1036
-#Define IDS_TIP_DELMOD_RECYCLE      &h040D ''1037
-#Define IDS_TIP_DELMOD_REMOVE       &h040E ''1038
 
 #Define IDS_FILT_VGMPLAY            &h0500 ''1280
 #Define IDS_FILT_M3U                &h0501 ''1281

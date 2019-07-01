@@ -55,9 +55,8 @@
 #define IDS_TIP_SYSTEM              0x040A //1034
 #define IDS_TIP_READONLY            0x040B //1035
 #define IDS_TIP_EXCLUSIVE           0x040C //1036
-#define IDS_TIP_DELMOD_RECYCLE      0x040D //1037
-#define IDS_TIP_DELMOD_REMOVE       0x040E //1038
 
+//file filters
 #define IDS_FILT_VGMPLAY            0x0500 //1280
 #define IDS_FILT_M3U                0x0501 //1281
 #define IDS_FILT_ADDTOLIST          0x0502 //1282
@@ -72,8 +71,8 @@
 
 //version information
 IDR_VERSIONINFO VERSIONINFO
-FILEVERSION     1, 13, 3, 36
-PRODUCTVERSION  2, 14, 0, 40
+FILEVERSION     1, 13, 3, 58
+PRODUCTVERSION  2, 14, 0, 50
 FILEFLAGSMASK   VS_FFI_FILEFLAGSMASK
 FILEFLAGS       VS_FF_SPECIALBUILD | VS_FF_PRIVATEBUILD | VS_FF_DEBUG
 FILEOS          VOS_NT_WINDOWS32
@@ -84,8 +83,8 @@ BEGIN
     BEGIN
         BLOCK "04090000"
         BEGIN
-            VALUE "FileVersion",        "1.13.3.36\0"
-            VALUE "ProductVersion",     "2.14.0.40\0"
+            VALUE "FileVersion",        "1.13.3.58\0"
+            VALUE "ProductVersion",     "2.14.0.50\0"
             VALUE "CompanyName",        "Kazusoft Co.\0"
             VALUE "FileDescription",    "Windows GUI for VGMPlay\0"
             VALUE "InternalName",       "VGMPlayGUI\0"
@@ -93,7 +92,7 @@ BEGIN
             VALUE "LegalTrademarks",    "Kazusoft Co., and the Kazusoft logo are Trademarks of Lisa Murray. VGMPlay is a Trademark of Valley Bell.\0"
             VALUE "OriginalFilename",   "VGMPlayGUI.exe\0"
             VALUE "ProductName",        "VGMPlayGUI\0"
-            VALUE "PrivateBuild",       "Built by Lisa to finish the playlist editor.\0"
+            VALUE "PrivateBuild",       "Built by Lisa to test playlist pruning.\0"
             VALUE "SpecialBuild",       "Debug/pre-release build.\0"
         END
     END
@@ -138,8 +137,6 @@ BEGIN
     IDS_TIP_SYSTEM              "Include files with the system attribute set."
     IDS_TIP_READONLY            "Include read-only files."
     IDS_TIP_EXCLUSIVE           "Show only files with the selected attributes."
-    IDS_TIP_DELMOD_RECYCLE      "When deleting a file, the file will be sent to the recycle bin."
-    IDS_TIP_DELMOD_REMOVE       "Permenantly deletes a file without sending it to the recycle bin."
     IDS_FILT_VGMPLAY            "VGMPlay (VGMPlay.exe)\0VGMPlay.EXE\0All Files (*.*)\0*.*\0\0"
     IDS_FILT_M3U                "M3U Playlists (*.m3u)\0*.M3U\0All Files (*.*)\0*.*\0\0"
     IDS_FILT_ADDTOLIST          "Accepted File Types\0*.VGM;*.VGZ;*.DRO;*.CMF;\0VGM Files (*.vgm, *.vgz)\0*.VGM;*.VGZ\0DOSBox Raw OPL Logs (*.dro)\0*.DRO\0Creative Music Format Modules (*.cmf)\0*.CMF\0All Files (*.*)\0*.*\0\0"
