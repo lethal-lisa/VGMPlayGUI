@@ -55,6 +55,9 @@ VGMPlayGUI - List of Planned Functions:
         directory selected will bring up a Message Box confirming the
         operation.
     
+    -Move Up/Down or Swaping Functionality for Playlist Editor.
+    -Context Menu for Playlist Editor.
+    
     Potential Items (need flushing out):
         -Add an M3U file (playlist) editor.
         -Add file history.
